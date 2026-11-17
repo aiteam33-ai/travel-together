@@ -219,6 +219,12 @@ export const T = {
   privacyHowToDeleteBody: { english: "Profile → My data → Delete all my data, anytime.", hinglish: "Profile → Meri data → Meri saari data delete karo, kabhi bhi.", hindi: "प्रोफ़ाइल → मेरा डेटा → मेरा सारा डेटा हटाएं, कभी भी।" },
   privacyContactTitle: { english: "Contact", hinglish: "Contact", hindi: "संपर्क" },
   aboutTitle: { english: "About", hinglish: "About", hindi: "हमारे बारे में" },
+  fullDisclaimerTitle: { english: "Please read this", hinglish: "Ye zaroor padhein", hindi: "कृपया इसे पढ़ें" },
+  fullDisclaimerBody: {
+    english: "AstroGuide is an AI guide, not a human astrologer, doctor, lawyer or financial advisor. Readings are guidance based on a chart, meant to prompt your own reflection — not predictions of fact. We never predict death, illness, pregnancy outcomes, court outcomes or investment returns. If you are in crisis, contact Tele-MANAS (14416) or local emergency services, not this app.",
+    hinglish: "AstroGuide ek AI guide hai, koi insaan astrologer, doctor, lawyer ya financial advisor nahi. Readings chart par based guidance hain, jo aapko sochne mein madad karti hain — fact ki prediction nahi. Hum kabhi death, illness, pregnancy outcome, court outcome ya investment returns predict nahi karte. Agar aap crisis mein ho, Tele-MANAS (14416) ya local emergency services se contact karo, is app se nahi.",
+    hindi: "AstroGuide एक AI गाइड है, कोई मानव ज्योतिषी, डॉक्टर, वकील या वित्तीय सलाहकार नहीं। रीडिंग कुंडली पर आधारित मार्गदर्शन है, जो आपके खुद के चिंतन के लिए है — तथ्य की भविष्यवाणी नहीं। हम कभी मृत्यु, बीमारी, गर्भावस्था के परिणाम, अदालती परिणाम या निवेश रिटर्न की भविष्यवाणी नहीं करते। यदि आप संकट में हैं, तो टेली-मानस (14416) या स्थानीय आपातकालीन सेवाओं से संपर्क करें, इस ऐप से नहीं।",
+  },
   disclaimer: {
     english: "Guidance, not medical, legal or financial advice.",
     hinglish: "Guidance hai, medical, legal ya financial advice nahi.",
@@ -228,6 +234,12 @@ export const T = {
   distressBody: { english: "You don't have to handle it alone.", hinglish: "Akele handle karna zaroori nahi.", hindi: "आपको इसे अकेले संभालने की ज़रूरत नहीं है।" },
   callHelpline: { english: "Call Tele-MANAS (14416)", hinglish: "Tele-MANAS (14416) ko call karo", hindi: "टेली-मानस (14416) को कॉल करें" },
   talkToSomeone: { english: "Please also talk to someone you trust.", hinglish: "Kisi bharose wale se bhi baat zaroor karo.", hindi: "कृपया किसी भरोसेमंद व्यक्ति से भी बात करें।" },
+  distressTalkButton: { english: "Call Tele-MANAS now (14416)", hinglish: "Abhi Tele-MANAS ko call karo (14416)", hindi: "अभी टेली-मानस को कॉल करें (14416)" },
+  outOfScopeNextStep: {
+    english: "A gentler next step: write down the one thing about this you can actually control today.",
+    hinglish: "Ek aasaan next step: aaj aap is baare mein jo control kar sakte ho wo likh lo.",
+    hindi: "एक सरल अगला कदम: आज आप इस बारे में जो नियंत्रित कर सकते हैं वह लिख लें।",
+  },
   outOfScope: {
     english: "This is outside what astrology guidance here covers. Here's a next step instead.",
     hinglish: "Ye yahan ki astrology guidance ke bahar hai. Iske bajaye ek next step lo.",

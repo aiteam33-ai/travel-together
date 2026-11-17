@@ -2,10 +2,12 @@
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "../../components/AppShell";
 import { PaywallSheet } from "../../components/PaywallSheet";
+import { OutOfScopeCard, SupportCard } from "../../components/SupportCard";
 import { Chip, Page, ReadingCard } from "../../components/ui";
 import { useAppState, useT } from "../../lib/AppStateContext";
 import { askQuestion } from "../../lib/api";
 import { PAYWALL_ENABLED } from "../../lib/config";
+import { containsDistressSignal, matchedBlockedTopic } from "../../lib/mock/safety";
 
 const EMPTY_CHIPS = ["areaCareer", "areaRelationship", "areaMarriage", "areaSelfDoubt", "areaFamily", "areaMoney"];
 const TOPIC_FOLLOWUPS = {
@@ -56,6 +58,19 @@ export default function ChatPage() {
     if (!questionText) return;
     setInput("");
     if (topicKey) setLastTopic(topicKey);
+
+    if (containsDistressSignal(questionText)) {
+      const entry = { id: crypto.randomUUID(), question: questionText, kind: "safety", createdAt: new Date().toISOString() };
+      update((prev) => ({ chat: [...prev.chat, entry] }));
+      return;
+    }
+
+    const blockedTopic = matchedBlockedTopic(questionText);
+    if (blockedTopic) {
+      const entry = { id: crypto.randomUUID(), question: questionText, kind: "blocked", createdAt: new Date().toISOString() };
+      update((prev) => ({ chat: [...prev.chat, entry] }));
+      return;
+    }
 
     const existing = state.chat.find((e) => e.question.trim().toLowerCase() === questionText.toLowerCase());
     if (existing) {
@@ -118,42 +133,48 @@ export default function ChatPage() {
                   {t("askedBefore", { date: new Date(entry.repeatOf).toLocaleDateString() })}
                 </p>
               )}
-              <ReadingCard t={t} reading={entry.reading} />
-              <button
-                type="button"
-                onClick={() => setShowBadgeInfo(showBadgeInfo === entry.id ? null : entry.id)}
-                className="text-sm text-accent underline self-start"
-              >
-                {t("sameChartBadge")}
-              </button>
-              {showBadgeInfo === entry.id && <p className="text-base text-fg-muted">{t("sameChartExplain")}</p>}
-              <div className="flex items-center gap-4 flex-wrap">
-                <button
-                  type="button"
-                  onClick={() => setFeedback(entry.id, "helpful")}
-                  className={`min-h-[48px] px-4 rounded-2xl border ${
-                    entry.feedback === "helpful" ? "border-accent bg-bg-elevated" : "border-border"
-                  }`}
-                >
-                  👍 {t("helpful")}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFeedback(entry.id, "not_helpful")}
-                  className={`min-h-[48px] px-4 rounded-2xl border ${
-                    entry.feedback === "not_helpful" ? "border-accent bg-bg-elevated" : "border-border"
-                  }`}
-                >
-                  👎 {t("notHelpful")}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setOpenQuestion(entry.question)}
-                  className="text-base underline ml-auto"
-                >
-                  {state.openQuestion === entry.question ? "✓" : t("setAsOpenQuestion")}
-                </button>
-              </div>
+              {entry.kind === "safety" && <SupportCard t={t} />}
+              {entry.kind === "blocked" && <OutOfScopeCard t={t} />}
+              {!entry.kind && (
+                <>
+                  <ReadingCard t={t} reading={entry.reading} />
+                  <button
+                    type="button"
+                    onClick={() => setShowBadgeInfo(showBadgeInfo === entry.id ? null : entry.id)}
+                    className="text-sm text-accent underline self-start"
+                  >
+                    {t("sameChartBadge")}
+                  </button>
+                  {showBadgeInfo === entry.id && <p className="text-base text-fg-muted">{t("sameChartExplain")}</p>}
+                  <div className="flex items-center gap-4 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => setFeedback(entry.id, "helpful")}
+                      className={`min-h-[48px] px-4 rounded-2xl border ${
+                        entry.feedback === "helpful" ? "border-accent bg-bg-elevated" : "border-border"
+                      }`}
+                    >
+                      👍 {t("helpful")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFeedback(entry.id, "not_helpful")}
+                      className={`min-h-[48px] px-4 rounded-2xl border ${
+                        entry.feedback === "not_helpful" ? "border-accent bg-bg-elevated" : "border-border"
+                      }`}
+                    >
+                      👎 {t("notHelpful")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setOpenQuestion(entry.question)}
+                      className="text-base underline ml-auto"
+                    >
+                      {state.openQuestion === entry.question ? "✓" : t("setAsOpenQuestion")}
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           ))}
           {loading && <p className="text-base text-fg-muted">{t(TYPING_MESSAGES[typingIdx])}</p>}

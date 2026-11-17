@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useAppState, useT } from "../lib/AppStateContext";
 
 const TABS = [
@@ -15,8 +16,13 @@ export function AppShell({ children }) {
   const t = useT();
   const pathname = usePathname();
 
-  const todayKey = new Date().toISOString().slice(0, 10);
-  const todayUnread = state.openQuestion && state.todaySeenDate !== todayKey;
+  const [todayKey, setTodayKey] = useState(null);
+  useEffect(() => {
+    // Reads the client's current date (an external system), once on mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setTodayKey(new Date().toISOString().slice(0, 10));
+  }, []);
+  const todayUnread = todayKey && state.openQuestion && state.todaySeenDate !== todayKey;
 
   return (
     <>
