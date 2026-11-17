@@ -2,6 +2,8 @@ import { Geist, Geist_Mono, Baloo_2 } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "./CartContext";
 import Nav from "./Nav";
+import HelpButton from "./HelpButton";
+import ScrollProgressBar from "./ScrollProgressBar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,8 +34,10 @@ export default function RootLayout({ children }) {
     >
       <body className="flex min-h-full flex-col bg-background text-foreground">
         <CartProvider>
+          <ScrollProgressBar />
           <Nav />
           <main className="mx-auto w-full max-w-2xl flex-1 p-4">{children}</main>
+          <HelpButton />
         </CartProvider>
       </body>
     </html>

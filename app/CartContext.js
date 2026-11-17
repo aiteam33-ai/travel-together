@@ -8,6 +8,8 @@ const CartContext = createContext(null);
 const CART_KEY = "menuAppCart";
 const ORDERS_KEY = "menuAppOrders";
 
+export const TRACKING_STEPS = ["Placed", "Preparing", "On the way", "Delivered"];
+
 export function CartProvider({ children }) {
   const [cart, setCart] = useState({});
   const [orders, setOrders] = useState([]);
@@ -99,9 +101,19 @@ export function CartProvider({ children }) {
     return order;
   }
 
+  function advanceOrders() {
+    setOrders((prev) =>
+      prev.map((order) => {
+        const idx = TRACKING_STEPS.indexOf(order.status);
+        if (idx === -1 || idx >= TRACKING_STEPS.length - 1) return order;
+        return { ...order, status: TRACKING_STEPS[idx + 1] };
+      })
+    );
+  }
+
   return (
     <CartContext.Provider
-      value={{ cart, orders, addToCart, changeQty, cartCount, cartTotal, placeOrder }}
+      value={{ cart, orders, addToCart, changeQty, cartCount, cartTotal, placeOrder, advanceOrders }}
     >
       {children}
     </CartContext.Provider>

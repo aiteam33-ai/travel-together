@@ -1,9 +1,17 @@
 "use client";
 
+import { useEffect } from "react";
 import { useCart } from "../CartContext";
+import OrderTracker from "../OrderTracker";
 
 export default function OrdersPage() {
-  const { orders } = useCart();
+  const { orders, advanceOrders } = useCart();
+
+  useEffect(() => {
+    const interval = setInterval(() => advanceOrders(), 10000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (orders.length === 0) {
     return (
@@ -22,7 +30,7 @@ export default function OrdersPage() {
         {orders.map((order) => (
           <div
             key={order.number}
-            className="flex flex-col gap-2 rounded-xl border border-border bg-surface p-4 shadow-sm"
+            className="flex flex-col gap-4 rounded-xl border border-border bg-surface p-4 shadow-sm"
           >
             <div className="font-[family-name:var(--font-heading)] text-lg font-bold">
               Order {order.number}
@@ -40,7 +48,8 @@ export default function OrdersPage() {
             </ul>
 
             <div className="text-lg font-bold">Total: Rs {order.total}</div>
-            <div className="text-base text-foreground-muted">Status: {order.status}</div>
+
+            <OrderTracker status={order.status} />
           </div>
         ))}
       </div>

@@ -3,9 +3,18 @@
 import { useEffect, useRef, useState } from "react";
 import { MENU, RESTAURANT_NAME } from "../lib/menu";
 import { useCart } from "./CartContext";
+import CartFab from "./CartFab";
+import BackToTop from "./BackToTop";
+
+// Floating-button stacking, bottom-right corner, help button is the base
+// layer shared by every page — these sit above it, above each other.
+const HELP_BOTTOM = 16;
+const HELP_SIZE = 56;
+const GAP = 12;
+const CART_FAB_BOTTOM = HELP_BOTTOM + HELP_SIZE + GAP; // 84
 
 export default function MenuPage() {
-  const { addToCart } = useCart();
+  const { addToCart, cartCount } = useCart();
   const [activeGroup, setActiveGroup] = useState(MENU[0].group);
   const sectionRefs = useRef({});
   const chipRefs = useRef({});
@@ -40,8 +49,13 @@ export default function MenuPage() {
     window.scrollTo({ top, behavior: "smooth" });
   }
 
+  const cartFabVisible = cartCount() > 0;
+  const backToTopBottom = cartFabVisible
+    ? CART_FAB_BOTTOM + HELP_SIZE + GAP
+    : CART_FAB_BOTTOM;
+
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 pb-40">
       <h1 className="font-[family-name:var(--font-heading)] text-3xl font-extrabold">
         {RESTAURANT_NAME}
       </h1>
@@ -114,6 +128,9 @@ export default function MenuPage() {
           </section>
         ))}
       </div>
+
+      <CartFab bottom={CART_FAB_BOTTOM} />
+      <BackToTop bottom={backToTopBottom} />
     </div>
   );
 }
