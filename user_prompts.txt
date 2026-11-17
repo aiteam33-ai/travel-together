@@ -1,0 +1,334 @@
+PROMPT 1:
+Build me a food ordering page for a restaurant called Masala Lane. I want to open it by double-clicking, so make it a simple web page that needs no installs and no internet.
+
+Here is the menu:
+Starters: Paneer Tikka Rs 220 (veg), Veg Samosa (2 pcs) Rs 60 (veg), Hara Bhara Kebab* Rs 200 (veg), Crispy Corn* Rs 180 (veg), Dahi Ke Kebab* Rs 210 (veg)
+Mains: Paneer Butter Masala Rs 260 (veg), Dal Tadka Rs 180 (veg), Veg Biryani Rs 220 (veg), Palak Paneer* Rs 270 (veg), Chole Masala* Rs 200 (veg), Kadai Paneer* Rs 280 (veg), Malai Kofta* Rs 270 (veg), Dal Makhani* Rs 230 (veg)
+Breads: Butter Naan Rs 50 (veg), Tandoori Roti Rs 30 (veg), Garlic Naan* Rs 70 (veg), Laccha Paratha* Rs 60 (veg)
+Drinks: Masala Chai Rs 30 (veg), Sweet Lassi Rs 80 (veg), Mango Lassi* Rs 90 (veg), Jaljeera* Rs 50 (veg)
+Desserts: Gulab Jamun (2 pcs) Rs 70 (veg), Rasmalai (2 pcs)* Rs 90 (veg), Gajar Halwa* Rs 100 (veg), Kulfi* Rs 80 (veg), Rasgulla (2 pcs)* Rs 60 (veg), Moong Dal Halwa* Rs 110 (veg)
+
+The page shows the restaurant name at the top, then every dish under its group. Each dish shows its name, a green dot for veg or a red dot for non-veg, its price like "Rs 220", and an Add button. The Add button does nothing yet.
+Keep the menu in one place, separate from the page design, so that changing a price later is easy.
+Design it for a phone first: one column, big text, big buttons, warm and friendly colours. It must also look good on a laptop.
+When you are done, tell me how to open it.
+
+---
+
+PROMPT 2:
+Open my page in my browser.
+
+---
+
+PROMPT 3:
+Change the price of Veg Biryani to Rs 240. Then add one new dish under Desserts: Shahi Tukda, Rs 120, veg. Only change the menu, nothing else.
+
+---
+
+PROMPT 4:
+Add a cart to the page.
+1. The Add button puts the dish in the cart. Adding the same dish again increases its quantity.
+2. A bar at the bottom of the screen shows how many items are in the cart and the total in rupees. Tapping the bar opens the cart.
+3. In the cart, each dish shows its name, a minus button, the quantity, a plus button, and its price for that quantity. Minus at quantity 1 removes the dish. When the cart is empty it says "Your cart is empty" in a friendly way.
+4. The cart shows the total at the bottom.
+5. Remember the cart if I refresh the page.
+Tell me what to click to test it.
+
+---
+
+PROMPT 5:
+Add checkout. In the cart, add a "Checkout" button that opens a form with these questions: Name, Phone (10 digits), Delivery address, and how to pay (Cash on delivery or UPI, with Cash on delivery chosen already). Show the order total above the form.
+Refuse the order and show a short, friendly message next to the question when: the cart is empty, the name is empty, the phone is not exactly 10 digits, or the address is empty. Do not use pop-up boxes.
+The Place order button only checks these rules for now.
+Tell me what to click to test it, with one example that should be refused for each rule.
+
+---
+
+PROMPT 6:
+Make Place order work.
+1. When everything is filled in correctly, save the order in the browser so it is still there after a refresh. Each order has: an order number (the first is 1001, then 1002 and so on), the time, the customer's name, phone, address and how they pay, the dishes (name, price and quantity as they were in the cart), the total, and a status that starts as "Placed".
+2. Empty the cart and show a confirmation: "Order 1001 placed", a summary of the dishes and the total, and a button "Track my order".
+3. Add a "My orders" page: the newest order first, each showing its number, time, total and current status. Link to it from the top of the main page. Tapping an order opens its tracking page.
+4. Add a tracking page: it shows the order number, the dishes and the total, and four steps in a row: Placed, Preparing, On the way, Delivered. The current step is highlighted and the earlier steps are ticked.
+5. There is no kitchen yet, so make this a demo: on the tracking page, move the status forward by itself every 10 seconds (Placed, Preparing, On the way, Delivered) and save each change. Show a small grey note: "Demo: in a real restaurant the kitchen moves this."
+Tell me what to click to test it.
+
+---
+
+PROMPT 7 (follow-up message sent while the above was being worked on):
+Change the colour theme of the Masala Lane ordering page to purple and black. Only change colours. Do not change the menu, the dishes, the prices, the cart, the layout, or how anything works.
+
+1. Background
+* The page background is black (or a very deep near-black).
+* Dish cards, the cart panel, and the bottom bar use a dark purple surface so they stand out from the black background.
+
+2. Accent colour
+* Use one bright purple for buttons (Add, plus, minus, Close), the bottom bar, and the restaurant name highlight.
+* Buttons get a lighter purple when pressed or hovered.
+
+3. Text
+* Main text is white or very light lavender.
+* Secondary text (like group names or small labels) is a softer light purple-grey.
+* All text must be easy to read against its background, including the text on purple buttons.
+
+4. Veg dot
+* Keep the green dot for veg exactly as it is, so it stays clearly visible on the dark background.
+* Keep the red dot for non-veg if it is still used anywhere.
+
+5. Details
+* Borders and dividers are a subtle darker or lighter purple, not white.
+* The cart overlay behind the cart panel is a dark, slightly see-through black.
+* Keep keyboard focus outlines clearly visible in a bright colour.
+
+6. Rules
+* Put all the colours in one place at the top of the style section (as named colour variables), so I can change the purple later by editing one line.
+* It must still open by double-clicking with no installs and no internet, and still look good on a phone and on a laptop.
+
+---
+
+PROMPT 8:
+Change the colour theme of the Masala Lane ordering page to purple and white. Only change colours. Do not change the menu, the dishes, the prices, the cart, the layout, or how anything works.
+
+1. Background
+* The page background is white (or a very light lavender-white).
+* Dish cards are white with a thin soft purple border.
+* Buttons (Add, plus, minus, Close), the bottom bar, and the restaurant name use one strong purple.
+
+2. Colours
+* Main text is dark purple or near-black. Text on purple buttons and on the bottom bar is white.
+* All text must be easy to read on its background.
+* Keep the green dot for veg and the red dot for non-veg clearly visible.
+* Put all the colours in one place at the top of the style section as named variables, so I can change the purple later by editing one line.
+
+3. Horizontal food options
+* Instead of listing each group's dishes one under another, show each group (Starters, Mains, Breads, Drinks, Desserts) as a horizontal row of dish cards that scrolls sideways with a swipe on a phone.
+* Each group keeps its heading above its row, and the groups stay stacked one below the other.
+* Each card shows the dish name, the veg or non-veg dot, the price like "Rs 220", and the Add button.
+* Cards have a fixed comfortable width, so about one and a half cards are visible on a phone, which hints that the row scrolls.
+* On a laptop, show the cards in the row with a visible scrollbar or left and right arrow buttons, so mouse users can scroll too.
+* Add buttons stay big and easy to tap.
+
+4. Rules
+* The menu stays in its own place, separate from the page design, and the cart and bottom bar keep working as before.
+* It must still open by double-clicking with no installs and no internet, and look good on a phone and on a laptop.
+
+---
+
+PROMPT 9:
+Fix the "Order not found" page on the Food Truck ordering site. When I open an order, I see a purple header that says "Order not found" with a "← Back to My Orders" link, and no order details or status updates. Find the cause and fix it. Do not change the menu, the dishes, the prices, the colours, or how the cart works.
+
+1. Find the cause
+* Check how an order is saved when the customer places it: does it get a unique id, and is it stored in the browser together with its items, quantities, total, time, and status?
+* Check how the order page finds the order: does the id it reads from the page address match the id that was saved exactly (same type, same spelling, no extra characters)?
+* Check that the order page runs after the saved orders have loaded, not before.
+* Check that it works when the page is opened by double-clicking the file. Many browsers handle page addresses with "?" and "#" differently for local files, so use a method that works for local files.
+* Check that the "My Orders" list links to the same id format that the order page expects.
+
+2. Fix it
+* Placing an order must save it, then take the customer straight to that order's page, showing the items, quantities, price for each, the total, the order time, and the current status.
+* Opening an order from My Orders must show that same order every time, including after a refresh and after closing and reopening the page.
+* The order status must update on the page (for example Placed, Preparing, Ready) and the page must show the latest status when it is opened or refreshed.
+
+3. Handle problems kindly
+* If an order really cannot be found, show a friendly message such as "We could not find this order. It may have been cleared from this browser," with a clear "Back to My Orders" button. Never show a blank page.
+* If the saved data is damaged, start with an empty orders list instead of breaking the page.
+
+4. Rules
+* Keep the purple and white theme and the "Food Truck" name.
+* It must still open by double-clicking with no installs and no internet, and work on a phone and on a laptop.
+
+---
+
+PROMPT 10 (follow-up, screenshot attached, mid-turn):
+ADD IT TO THE LOCAL DISC AND UPDTE IT AND OPEN THE WEB PAGE TILL NOW IT HAS ONLY THISS
+[screenshot of the "Order not found" screen]
+
+---
+
+PROMPT 11 (follow-up, screenshot attached):
+have a look on this that it is always oming like this after placing the order and not able to find the order
+[screenshot of the "Order not found" screen]
+
+---
+
+PROMPT 12 (this one was a garbled/duplicated paste that bundled several earlier requests together verbatim, plus two new unfilled-template asks and one new concrete ask; shown as sent):
+Make Place order work.
+1. When everything is filled in correctly, save the order in the browser so it is still there after a refresh. Each order has: an order number (the first is 1001, then 1002 and so on), the time, the customer's name, phone, address and how they pay, the dishes (name, price and quantity as they were in the cart), the total, and a status that starts as "Placed".
+2. Empty the cart and show a confirmation: "Order 1001 placed", a summary of the dishes and the total, and a button "Track my order".
+3. Add a "My orders" page: the newest order first, each showing its number, time, total and current status. Link to it from the top of the main page. Tapping an order opens its tracking page.
+4. Add a tracking page: it shows the order number, the dishes and the total, and four steps in a row: Placed, Preparing, On the way, Delivered. The current step is highlighted and the earlier steps are ticked.
+5. There is no kitchen yet, so make this a demo: on the tracking page, move the status forward by itself every 10 seconds (Placed, Preparing, On the way, Delivered) and save each change. Show a small grey note: "Demo: in a real restaurant the kitchen moves this."
+Tell me what to click to test it.I tested my ordering page and found these problems. Fix each one, and tell me what you changed:
+1. (what I did, what I expected, what I saw)
+2. (what I did, what I expected, what I saw)Change the restaurant name to (your restaurant's name). Replace all the dishes with (the kind of food, or your 12 favourite dishes), each with a group, a price in rupees, and whether it is veg. Only change the menu and the name, nothing else.Add a "Veg only" switch at the top of the menu. When it is on, hide every non-veg dish. Keep the choice after a refresh.
+
+---
+
+PROMPT 13 (follow-up answer to a clarifying question about the rename/menu-replace part of Prompt 12):
+Keep Masala Lane as-is
+
+---
+
+PROMPT 14 (the big multi-part feature request):
+Make these changes to the Food Truck ordering page. Keep the menu in its own place, separate from the page design, and keep everything not mentioned here working exactly as it does now. It must still open by double-clicking with no installs and no internet, and look good on a phone and on a laptop.
+1. Change the colours to brown and beige
+* Replace every purple on the page with brown and beige: the header, buttons, bottom bar, headings, borders, and the cart panel.
+* Light mode: the page background is warm beige, dish cards are a lighter cream, and buttons, the header and the bottom bar are a rich brown. Text is dark brown, and text on brown buttons and the header is cream or white.
+* Dark mode: the page background is very dark brown, dish cards and the cart panel are a slightly lighter chocolate brown, text is light beige, and buttons are a warm caramel brown with dark text for good contrast.
+* All text must be easy to read on its background in both modes.
+* Keep the green dot for veg and the red dot for non-veg clearly visible in both modes.
+* Put all colours for both modes in one place at the top of the style section as named variables, so I can change a shade by editing one line.
+
+2. Remove "Veg only"
+* Delete the "Veg only" row completely: the green dot, the label and the toggle switch.
+* Remove all the code and any saved setting that goes with it, so no empty gap is left.
+* Every dish always shows.
+
+3. Dark mode and light mode
+* Add a toggle button in the header next to "My Orders", with a sun icon in dark mode and a moon icon in light mode. Make it at least 44px tall, with a clear label such as "Switch to dark mode" for screen readers.
+* Switching is instant, with no page reload and no flash.
+* Remember the choice in the browser so it survives a refresh. On the very first visit, follow the device's own light or dark setting.
+
+4. Coupon code for the first customer
+* Code: FIRST10. It gives 10% off the whole order total.
+* In the cart panel, above the total, add a "Have a coupon?" input with an Apply button.
+* The code is not case sensitive, so "first10" works too. Ignore extra spaces.
+* It works only for a customer's first order. Once an order has been placed from this browser, the code is no longer valid.
+* When applied, show the cart as: Subtotal, Discount (FIRST10, 10%) as a negative amount, and the final Total. The discount is calculated from the cart contents, never typed in, and rounded to the nearest rupee.
+* The discount updates instantly when dishes are added or removed. The bottom bar shows the discounted total.
+* Messages are friendly and specific: "FIRST10 applied. You saved Rs 33." for success, "This code is only for your first order." if already used, and "That code is not valid." for anything else.
+* Include a Remove button next to the applied coupon.
+* Remember the applied coupon if the page is refreshed. On the order page and in My Orders, show the subtotal, discount and final total that were charged.
+* Keep the coupon code, the discount percentage and the "first order only" rule in the menu or settings file, not buried in the cart code, so I can change them later.
+
+5. Best Sellers on the landing page
+* Directly below the header, at the top of the page, add a "Best Sellers" section with one dish from each group:
+   * Starters: Paneer Tikka
+   * Mains: Paneer Butter Masala
+   * Breads: Butter Naan
+   * Drinks: Masala Chai
+   * Desserts: Gulab Jamun
+* Show them as a horizontally scrolling row of cards, in the same style as the other rows. Each card shows the dish name, its group name in small text, the veg dot, the price like "Rs 220", a small "Best Seller" badge, and an Add button that works exactly like the normal Add button.
+* Mark best sellers in the menu data with a simple flag on the dish (for example, bestSeller: true), one per group, so the section builds itself from the menu. To change a best seller later, I only move the flag.
+* If a group has no flagged dish, skip it without breaking the page. If a price changes, the best seller card shows the new price automatically.
+* Also show the "Best Seller" badge on that dish's card in its own group.
+
+6. Rules
+* Buttons are at least 44px tall, and everything works by tap and by keyboard with clearly visible focus outlines.
+* All prices, discounts and totals are calculated from the menu data.
+* If saved data is damaged, start fresh instead of breaking the page.
+
+When you finish, tell me exactly what to click to test it:
+* Confirm the page is brown and beige everywhere, with no purple left, in both light and dark mode.
+* Confirm the "Veg only" row is gone.
+* Switch between dark and light mode, refresh, and check the choice is remembered.
+* Add dishes from Best Sellers and from the groups, then apply FIRST10 and check the 10% discount.
+* Try a wrong code, remove the coupon, place an order, and check FIRST10 is refused on the next order.
+* Tell me how to reset the saved data to test the first-order coupon again.
+
+---
+
+PROMPT 15 (follow-up mid-turn, interrupted the work on Prompt 14):
+Turn the ordering site into an Italian restaurant called THE PANNEL HOUSE, and add a welcome page that people see before the menu. Replace "Food Truck" with "THE PANNEL HOUSE" everywhere it appears: the headings, the browser tab title, the welcome screen, the cart, the order pages and My Orders. Keep everything that already works exactly as it is: the menu in its own place, separate from the page design, the cart, FIRST10 coupon, orders, dark and light mode, Best Sellers, horizontal rows, and the brown and beige theme. It must still open by double-clicking with no installs and no internet, and look good on a phone and on a laptop.
+
+1. The new Italian menu (replace the old menu completely)
+Keep it all vegetarian, with a green dot on every dish. Keep the menu in its own place so prices are easy to change. Show the Italian group names with a short English line under each name.
+
+Antipasti (Starters)
+* Bruschetta al Pomodoro Rs 180 (veg)
+* Garlic Focaccia Bites Rs 160 (veg)
+* Caprese Salad Rs 220 (veg)
+* Arancini (3 pcs) Rs 240 (veg)
+* Stuffed Mushrooms Rs 230 (veg)
+
+Pizza
+* Margherita Rs 320 (veg)
+* Four Cheese (Quattro Formaggi) Rs 420 (veg)
+* Garden Veggie (Ortolana) Rs 380 (veg)
+* Pesto Paneer Rs 400 (veg)
+* Mushroom and Truffle Rs 440 (veg)
+
+Pasta
+* Penne Arrabbiata Rs 300 (veg)
+* Spaghetti Aglio e Olio Rs 290 (veg)
+* Fettuccine Alfredo Rs 340 (veg)
+* Pesto Genovese Rs 330 (veg)
+* Baked Lasagna Rs 380 (veg)
+* Mushroom Ravioli Rs 360 (veg)
+
+Risotto and Mains
+* Mushroom Risotto Rs 350 (veg)
+* Spinach and Ricotta Cannelloni Rs 370 (veg)
+* Eggplant Parmigiana Rs 340 (veg)
+
+Breads and Sides
+* Garlic Bread Rs 120 (veg)
+* Cheese Garlic Bread Rs 160 (veg)
+* Rosemary Focaccia Rs 150 (veg)
+* Parmesan Fries Rs 140 (veg)
+
+Bevande (Drinks)
+* Espresso Rs 90 (veg)
+* Cappuccino Rs 130 (veg)
+* Iced Peach Tea Rs 120 (veg)
+* Italian Soda Rs 110 (veg)
+* Fresh Lemonade Rs 90 (veg)
+
+Dolci (Desserts)
+* Tiramisu Rs 220 (veg)
+* Panna Cotta Rs 200 (veg)
+* Cannoli (2 pcs) Rs 190 (veg)
+* Gelato, two scoops Rs 160 (veg)
+* Affogato Rs 180 (veg)
+
+Best Sellers, one flagged per group in the menu data with bestSeller: true: Bruschetta al Pomodoro, Margherita, Fettuccine Alfredo, Mushroom Risotto, Garlic Bread, Cappuccino, Tiramisu. Today's Special flagged with todaysSpecial: true: Mushroom and Truffle Pizza.
+
+Rename the "Add" wording, the Best Sellers section and every other piece of text so it fits an Italian restaurant, for example "Our Favourites" can stay as "Best Sellers", and the empty cart message becomes "Your table is empty. Add something delicious from the menu!"
+
+2. The welcome screen
+* It fills the whole screen and appears every time the page is opened, before the menu.
+* It shows "THE PANNEL HOUSE" in large elegant type, a short Italian-style tagline such as "Wood-fired pizza, fresh pasta, made with love", and one big "Start Ordering" button, at least 56px tall.
+* Replace the food truck drawing with a simple wood-fired pizza oven drawn in plain CSS or inline SVG, with no image files and no internet. A pizza slides out on a paddle once when the screen loads, and steam rises from it.
+* Respect the device's reduced-motion setting: if it is on, skip the animation and show the pizza already out.
+
+3. Entering the main page
+* Tapping "Start Ordering" slides or fades the welcome screen away to reveal the menu, in about half a second. The menu is already loaded underneath, so there is no wait.
+* Pressing Enter or Space on the button works too. The browser's Back button must not bring the welcome screen back by accident.
+* Do not show the welcome screen on top of an order page or My Orders if the person is returning to those.
+
+4. Make it useful, not just pretty
+* Show a greeting by time of day in Italian with English beside it: "Buongiorno, good morning", "Buon pomeriggio, good afternoon", "Buonasera, good evening".
+* Show a "Today's Special" line with the flagged dish's name and price, and an "Add to cart" button that adds it and enters the menu. If no dish is flagged, hide that line without breaking the page.
+* If the cart already has items from an earlier visit, show a "Continue your order" button with the item count, which goes straight to the menu with the cart open.
+* If the FIRST10 coupon is still available, show a small banner: "New here? Use FIRST10 for 10% off your first order." Hide it once the coupon has been used.
+* Show a row of three short facts: "100% Vegetarian", "Wood-fired", "Freshly made".
+* Include the dark and light mode toggle on the welcome screen too, and remember the choice as before.
+
+5. Settings in one place
+* Keep the restaurant name, the tagline, the three facts, the greeting wording, the Today's Special flag and the coupon rules in the menu or settings file, so I can change them without touching the page design.
+
+6. Rules
+* Both modes use the brown and beige colour variables already defined, with nothing hard-coded, and all text must be easy to read.
+* Everything works by tap and by keyboard with visible focus outlines. The "Start Ordering" button is focused automatically when the page opens.
+* Buttons are at least 44px tall.
+* All prices, discounts and totals are calculated from the menu data.
+* If saved data is damaged, ignore it and show the welcome screen normally. If the old Food Truck menu is saved in the cart, quietly drop dishes that no longer exist.
+
+When you finish, tell me exactly what to click to test it:
+* Open the file and check the name, tagline, pizza oven animation and greeting.
+* Tap "Start Ordering" and check the Italian menu appears with all the groups.
+* Check Best Sellers shows one dish per group, and Today's Special shows on the welcome screen.
+* Add a dish, refresh, and check "Continue your order" appears.
+* Apply FIRST10, place an order, and check the banner disappears.
+* Switch dark and light mode.
+* Tell me how to change the name, a price, and today's special.
+
+---
+
+PROMPT 16:
+give me all the prompts which i have given u
+
+---
+
+PROMPT 17:
+i need to train an ai so give me all the prompts to gether e
