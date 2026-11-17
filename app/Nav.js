@@ -7,15 +7,15 @@ export default function Nav() {
   const { cartCount } = useCart();
 
   return (
-    <nav className="w-full border-b border-gray-300 px-4 py-4">
-      <div className="mx-auto flex max-w-md flex-wrap gap-5 text-lg">
-        <Link href="/" className="underline">
+    <nav className="w-full border-b border-border bg-surface px-4 py-4 shadow-sm">
+      <div className="mx-auto flex max-w-2xl flex-wrap gap-6 font-[family-name:var(--font-heading)] text-lg font-semibold">
+        <Link href="/" className="rounded-lg px-2 py-2 text-foreground hover:text-accent">
           Menu
         </Link>
-        <Link href="/cart" className="underline">
+        <Link href="/cart" className="rounded-lg px-2 py-2 text-foreground hover:text-accent">
           Cart ({cartCount()})
         </Link>
-        <Link href="/orders" className="underline">
+        <Link href="/orders" className="rounded-lg px-2 py-2 text-foreground hover:text-accent">
           Orders
         </Link>
       </div>

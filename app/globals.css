@@ -1,19 +1,33 @@
 @import "tailwindcss";
 
+/* ======================================================
+   THEME — warm & friendly. Edit these values to retheme.
+   ====================================================== */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fdf6ec; /* cream page background */
+  --surface: #fffaf2; /* card / row background, slightly lighter than bg */
+  --foreground: #3b2415; /* dark brown text */
+  --foreground-muted: #8a6a52; /* softer brown for secondary text */
+  --accent: #c1440e; /* deep red-orange for buttons and highlights */
+  --accent-strong: #9c360a; /* pressed/active state */
+  --border: #e8d9c3; /* soft divider / border colour */
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
   --color-foreground: var(--foreground);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-border: var(--border);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-heading-rounded);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
