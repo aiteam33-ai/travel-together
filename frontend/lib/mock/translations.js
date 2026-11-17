@@ -133,6 +133,8 @@ export const T = {
   areaMind: { english: "Health of mind", hinglish: "Mann ki sehat", hindi: "मन का स्वास्थ्य" },
   areaMoney: { english: "Money", hinglish: "Paisa", hindi: "पैसा" },
   areaMove: { english: "Move or travel", hinglish: "Move ya travel", hindi: "स्थानांतरण या यात्रा" },
+  areaMarriage: { english: "Marriage", hinglish: "Shaadi", hindi: "विवाह" },
+  areaSelfDoubt: { english: "Self-doubt", hinglish: "Self-doubt", hindi: "आत्म-संदेह" },
   illnessNote: { english: "We don't predict illness.", hinglish: "Hum illness predict nahi karte.", hindi: "हम बीमारी की भविष्यवाणी नहीं करते।" },
   chartReason: { english: "Chart reason", hinglish: "Chart ki wajah", hindi: "कुंडली का कारण" },
   whatDoesMean: { english: "What does this mean?", hinglish: "Iska matlab kya hai?", hindi: "इसका मतलब क्या है?" },
@@ -187,6 +189,7 @@ export const T = {
   benefitNoUpsell: { english: "No upsells or paid reports", hinglish: "Koi upsell ya paid report nahi", hindi: "कोई अपसेल या सशुल्क रिपोर्ट नहीं" },
   benefitCancel: { english: "Cancel anytime", hinglish: "Kabhi bhi cancel karo", hindi: "कभी भी रद्द करें" },
   paymentsComingSoon: { english: "Payments coming soon", hinglish: "Payments jald aa rahe hain", hindi: "भुगतान जल्द आ रहा है" },
+  processingPayment: { english: "Processing...", hinglish: "Process ho raha hai...", hindi: "प्रक्रिया जारी है..." },
   thankYouSubscribed: { english: "Thank you! You're subscribed.", hinglish: "Shukriya! Aap subscribe ho gaye.", hindi: "धन्यवाद! आप सदस्यता ले चुके हैं।" },
 
   profileTitle: { english: "Profile", hinglish: "Profile", hindi: "प्रोफ़ाइल" },
@@ -206,6 +209,15 @@ export const T = {
   needHelp: { english: "Need to talk to someone?", hinglish: "Kisi se baat karni hai?", hindi: "किसी से बात करनी है?" },
 
   privacyTitle: { english: "Privacy", hinglish: "Privacy", hindi: "गोपनीयता" },
+  privacyWhatTitle: { english: "What we collect", hinglish: "Hum kya lete hain", hindi: "हम क्या एकत्र करते हैं" },
+  privacyWhyTitle: { english: "Why", hinglish: "Kyun", hindi: "क्यों" },
+  privacyWhoSeesTitle: { english: "Who sees it", hinglish: "Kaun dekhta hai", hindi: "कौन देखता है" },
+  privacyWhoSeesBody: { english: "No one. Not even our team, beyond what's needed to run the app.", hinglish: "Koi nahi. Hamari team bhi nahi, sirf app chalane ke liye jo zaroori hai.", hindi: "कोई नहीं। हमारी टीम भी नहीं, सिवाय इसके जो ऐप चलाने के लिए ज़रूरी है।" },
+  privacyHowLongTitle: { english: "How long we keep it", hinglish: "Kitne din rakhte hain", hindi: "कितने समय तक रखते हैं" },
+  privacyHowLongBody: { english: "Until you delete it, or your account has been inactive for a long time.", hinglish: "Jab tak aap delete na karo, ya account bahut din se inactive na ho.", hindi: "जब तक आप इसे हटा न दें, या खाता लंबे समय से निष्क्रिय न हो।" },
+  privacyHowToDeleteTitle: { english: "How to delete it", hinglish: "Kaise delete karein", hindi: "कैसे हटाएं" },
+  privacyHowToDeleteBody: { english: "Profile → My data → Delete all my data, anytime.", hinglish: "Profile → Meri data → Meri saari data delete karo, kabhi bhi.", hindi: "प्रोफ़ाइल → मेरा डेटा → मेरा सारा डेटा हटाएं, कभी भी।" },
+  privacyContactTitle: { english: "Contact", hinglish: "Contact", hindi: "संपर्क" },
   aboutTitle: { english: "About", hinglish: "About", hindi: "हमारे बारे में" },
   disclaimer: {
     english: "Guidance, not medical, legal or financial advice.",

@@ -24,6 +24,12 @@ export async function getDailyUpdate(birthDetails, openQuestion) {
   return fakeDailyUpdate(birthDetails, openQuestion);
 }
 
+export async function submitTrustResult(result) {
+  await delay(200);
+  console.log("trust test result (fake, logged only):", result);
+  return { success: true };
+}
+
 export async function startSubscription() {
   await delay(1500);
   return { success: true };

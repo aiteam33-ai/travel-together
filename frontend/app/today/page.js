@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Page, PrimaryButton, ReadingCard, SecondaryButton, TopLinks } from "../../components/ui";
+import { AppShell } from "../../components/AppShell";
+import { Page, PrimaryButton, ReadingCard, SecondaryButton } from "../../components/ui";
 import { useAppState, useT } from "../../lib/AppStateContext";
 import { getDailyUpdate } from "../../lib/api";
 
@@ -32,8 +33,7 @@ export default function TodayPage() {
   }
 
   return (
-    <>
-      <TopLinks t={t} />
+    <AppShell>
       <Page>
         {loading || !update_ ? (
           <p className="text-base text-fg-muted">{t("readingChart")}</p>
@@ -68,7 +68,7 @@ export default function TodayPage() {
           </>
         )}
       </Page>
-    </>
+    </AppShell>
   );
 }
 

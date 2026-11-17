@@ -13,7 +13,6 @@ const DEFAULT_STATE = {
   whatsappDailyRequested: false,
   subscribed: false,
   freeReadingUsed: false,
-  paywallDisabled: true, // lets first testers use it free; flip to false to enable paywall
 };
 
 export function loadState() {

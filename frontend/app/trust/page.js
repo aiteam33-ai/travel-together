@@ -1,9 +1,9 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Chip, Page, PrimaryButton, ReadingCard, SecondaryButton } from "../../components/ui";
+import { Chip, Page, PrimaryButton, SecondaryButton } from "../../components/ui";
 import { useAppState, useT } from "../../lib/AppStateContext";
-import { askQuestion } from "../../lib/api";
+import { askQuestion, submitTrustResult } from "../../lib/api";
 
 const AREAS = ["areaCareer", "areaRelationship", "areaFamily", "areaMind", "areaMoney", "areaMove"];
 
@@ -23,6 +23,7 @@ export default function TrustPage() {
   const [reading, setReading] = useState(null);
   const [feedback, setFeedback] = useState(null);
   const [note, setNote] = useState("");
+  const [showMeaning, setShowMeaning] = useState(false);
 
   const canSubmit = event.trim() && monthYear.trim() && area;
 
@@ -31,19 +32,21 @@ export default function TrustPage() {
     const result = await askQuestion(state.birthDetails, `${event} ${monthYear} ${area}`);
     setReading(result);
     setLoading(false);
+    update({ freeReadingUsed: true });
   }
 
   function handleFeedback(choice) {
     setFeedback(choice);
-    update({
-      trustTest: { event, monthYear, area, result: reading, feedback: choice, note: "" },
-    });
+    const result = { event, monthYear, area, result: reading, feedback: choice, note: "" };
+    update({ trustTest: result });
+    submitTrustResult(result);
   }
 
   function handleNoteSubmit() {
     update((prev) => ({
       trustTest: { ...prev.trustTest, note },
     }));
+    submitTrustResult({ ...state.trustTest, note });
   }
 
   if (loading) {
@@ -58,7 +61,23 @@ export default function TrustPage() {
     return (
       <Page>
         <h1 className="text-2xl font-bold">{t("trustTitle")}</h1>
-        <ReadingCard t={t} reading={reading} />
+
+        <div className="border border-border rounded-2xl p-4 bg-bg-elevated flex flex-col gap-4">
+          <div>
+            <p className="text-sm font-semibold text-fg-muted mb-2">{t("chartReason")}</p>
+            <p className="text-base">{reading.chartReason}</p>
+          </div>
+          <button type="button" onClick={() => setShowMeaning((v) => !v)} className="text-base underline text-left">
+            {t("whatDoesMean")}
+          </button>
+          {showMeaning && <p className="text-base text-fg-muted">{reading.whatItMeans}</p>}
+          <div className="bg-bg rounded-2xl p-4 border border-accent">
+            <p className="text-sm font-semibold text-accent mb-2">{t("nextStep")}</p>
+            <p className="text-base font-medium">{reading.nextStep}</p>
+          </div>
+          <p className="text-base text-fg-muted">{t("disclaimer")}</p>
+        </div>
+
         {!feedback && (
           <div className="flex gap-2">
             <Chip onClick={() => handleFeedback("matches")}>{t("matches")}</Chip>

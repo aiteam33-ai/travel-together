@@ -1,7 +1,8 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Page, PrimaryButton, SecondaryButton, TopLinks } from "../../components/ui";
+import { AppShell } from "../../components/AppShell";
+import { Page, PrimaryButton, SecondaryButton } from "../../components/ui";
 import { useAppState, useT } from "../../lib/AppStateContext";
 import { LANGS } from "../../lib/mock/translations";
 
@@ -40,8 +41,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <>
-      <TopLinks t={t} />
+    <AppShell>
       <Page>
         <h1 className="text-2xl font-bold">{t("profileTitle")}</h1>
 
@@ -97,12 +97,15 @@ export default function ProfilePage() {
         <section className="flex flex-col gap-2">
           <h2 className="text-lg font-semibold">{t("subscriptionStatus")}</h2>
           <p className="text-base">{state.subscribed ? t("thankYouSubscribed") : t("firstFreeNote")}</p>
+          {state.subscribed && (
+            <SecondaryButton onClick={() => update({ subscribed: false })}>{t("cancel")}</SecondaryButton>
+          )}
         </section>
 
         <a href="tel:14416" className="text-base underline">
           {t("needHelp")}
         </a>
       </Page>
-    </>
+    </AppShell>
   );
 }
