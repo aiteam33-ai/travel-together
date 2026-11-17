@@ -73,7 +73,7 @@ export default function TrustPage() {
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder={t("whatWasDifferent")}
-              className="min-h-[48px] border border-gray-300 rounded-md px-4 text-base"
+              className="min-h-[48px] border border-border rounded-2xl px-4 bg-bg-elevated text-fg text-base"
             />
             <SecondaryButton onClick={handleNoteSubmit}>{t("continue")}</SecondaryButton>
           </div>
@@ -81,7 +81,7 @@ export default function TrustPage() {
         {feedback && (
           <>
             <p className="text-base">{t("thankYouHonest")}</p>
-            <div className="flex flex-col gap-3 mt-2">
+            <div className="flex flex-col gap-4 mt-2">
               <SecondaryButton
                 onClick={() => {
                   setReading(null);
@@ -120,7 +120,7 @@ export default function TrustPage() {
           type="text"
           value={event}
           onChange={(e) => setEvent(e.target.value)}
-          className="min-h-[48px] border border-gray-300 rounded-md px-4 text-lg"
+          className="min-h-[48px] border border-border rounded-2xl px-4 bg-bg-elevated text-fg text-lg"
         />
       </label>
 
@@ -130,7 +130,7 @@ export default function TrustPage() {
           type="month"
           value={monthYear}
           onChange={(e) => setMonthYear(e.target.value)}
-          className="min-h-[48px] border border-gray-300 rounded-md px-4 text-lg"
+          className="min-h-[48px] border border-border rounded-2xl px-4 bg-bg-elevated text-fg text-lg"
         />
       </label>
 
@@ -143,7 +143,7 @@ export default function TrustPage() {
             </Chip>
           ))}
         </div>
-        {area === "areaMind" && <p className="text-sm text-gray-500">{t("illnessNote")}</p>}
+        {area === "areaMind" && <p className="text-base text-fg-muted">{t("illnessNote")}</p>}
       </div>
 
       <PrimaryButton disabled={!canSubmit} onClick={handleSubmit}>

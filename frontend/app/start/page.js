@@ -17,14 +17,14 @@ export default function LanguagePage() {
   return (
     <Page>
       <h1 className="text-2xl font-bold mt-4">{t("chooseLanguage")}</h1>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-4">
         {LANGS.map((lang) => (
           <button
             key={lang}
             type="button"
             onClick={() => choose(lang)}
-            className={`min-h-[48px] rounded-md border px-4 text-left text-lg ${
-              selected === lang ? "border-black bg-gray-100" : "border-gray-300"
+            className={`min-h-[48px] rounded-2xl border px-4 text-left text-lg ${
+              selected === lang ? "border-accent bg-bg-elevated" : "border-border"
             }`}
           >
             {t(lang)}

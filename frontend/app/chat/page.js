@@ -63,12 +63,12 @@ export default function ChatPage() {
             <div key={entry.id} className="flex flex-col gap-2">
               <p className="text-base font-medium">{entry.question}</p>
               <ReadingCard t={t} reading={entry.reading} />
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <button
                   type="button"
                   onClick={() => setFeedback(entry.id, "helpful")}
-                  className={`min-h-[48px] px-3 rounded-md border ${
-                    entry.feedback === "helpful" ? "border-black bg-gray-100" : "border-gray-300"
+                  className={`min-h-[48px] px-4 rounded-2xl border ${
+                    entry.feedback === "helpful" ? "border-accent bg-bg-elevated" : "border-border"
                   }`}
                 >
                   👍 {t("helpful")}
@@ -76,8 +76,8 @@ export default function ChatPage() {
                 <button
                   type="button"
                   onClick={() => setFeedback(entry.id, "not_helpful")}
-                  className={`min-h-[48px] px-3 rounded-md border ${
-                    entry.feedback === "not_helpful" ? "border-black bg-gray-100" : "border-gray-300"
+                  className={`min-h-[48px] px-4 rounded-2xl border ${
+                    entry.feedback === "not_helpful" ? "border-accent bg-bg-elevated" : "border-border"
                   }`}
                 >
                   👎 {t("notHelpful")}
@@ -92,7 +92,7 @@ export default function ChatPage() {
               </div>
             </div>
           ))}
-          {loading && <p className="text-base text-gray-500">{t("readingChart")}</p>}
+          {loading && <p className="text-base text-fg-muted">{t("readingChart")}</p>}
         </div>
 
         <form
@@ -100,19 +100,19 @@ export default function ChatPage() {
             e.preventDefault();
             send();
           }}
-          className="flex gap-2 mt-auto sticky bottom-0 bg-white pt-2"
+          className="flex gap-2 mt-auto sticky bottom-0 bg-bg pt-2"
         >
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={t("askAnything")}
-            className="flex-1 min-h-[48px] border border-gray-300 rounded-md px-4 text-base"
+            className="flex-1 min-h-[48px] border border-border rounded-2xl px-4 bg-bg-elevated text-fg text-base"
           />
           <button
             type="submit"
             disabled={!input.trim()}
-            className="min-h-[48px] px-5 rounded-md bg-black text-white disabled:bg-gray-300"
+            className="min-h-[48px] px-6 rounded-2xl bg-accent text-bg font-medium disabled:bg-bg-elevated disabled:text-fg-muted"
           >
             {t("send")}
           </button>

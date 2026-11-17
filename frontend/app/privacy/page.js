@@ -11,7 +11,7 @@ export default function PrivacyPage() {
       <p className="text-base">{t("consentWhy")}</p>
       <p className="text-base">{t("consentShare")}</p>
       <p className="text-base">{t("consentDelete")}</p>
-      <p className="text-sm text-gray-500">support@astroguide.example</p>
+      <p className="text-sm text-fg-muted">support@astroguide.example</p>
     </Page>
   );
 }

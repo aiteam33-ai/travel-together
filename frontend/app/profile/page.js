@@ -51,7 +51,7 @@ export default function ProfilePage() {
           <p className="text-base">{bd.date}</p>
           <p className="text-base">{bd.timeUnknown ? bd.roughTime : bd.time}</p>
           <p className="text-base">{bd.place ? `${bd.place.name}, ${bd.place.state}` : ""}</p>
-          <p className="text-sm text-gray-500">{t("editWarning")}</p>
+          <p className="text-base text-fg-muted">{t("editWarning")}</p>
           <SecondaryButton onClick={() => router.push("/start/birth/name")}>{t("edit")}</SecondaryButton>
         </section>
 
@@ -63,8 +63,8 @@ export default function ProfilePage() {
                 key={lang}
                 type="button"
                 onClick={() => update({ language: lang })}
-                className={`min-h-[48px] px-4 rounded-md border ${
-                  state.language === lang ? "border-black bg-gray-100" : "border-gray-300"
+                className={`min-h-[48px] px-4 rounded-2xl border ${
+                  state.language === lang ? "border-accent bg-bg-elevated" : "border-border"
                 }`}
               >
                 {t(lang)}
@@ -85,7 +85,7 @@ export default function ProfilePage() {
                 value={confirmText}
                 onChange={(e) => setConfirmText(e.target.value)}
                 placeholder={t("typeDeleteToConfirm")}
-                className="min-h-[48px] border border-gray-300 rounded-md px-4 text-base"
+                className="min-h-[48px] border border-border rounded-2xl px-4 bg-bg-elevated text-fg text-base"
               />
               <PrimaryButton disabled={confirmText !== "DELETE"} onClick={handleDelete}>
                 {t("deleteAllData")}

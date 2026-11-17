@@ -35,7 +35,7 @@ export default function SummaryPage() {
   return (
     <Page>
       <h1 className="text-2xl font-bold">{t("summaryTitle")}</h1>
-      <div className="border border-gray-300 rounded-md divide-y">
+      <div className="border border-border rounded-2xl divide-y divide-border bg-bg-elevated">
         <SummaryRow label={t("nameQuestion")} value={bd.name} editHref="/start/birth/name" editLabel={t("edit")} />
         <SummaryRow label={t("dateQuestion")} value={bd.date} editHref="/start/birth/date" editLabel={t("edit")} />
         <SummaryRow
@@ -51,7 +51,7 @@ export default function SummaryPage() {
           editLabel={t("edit")}
         />
       </div>
-      <div className="flex gap-3 mt-4">
+      <div className="flex gap-4 mt-4">
         <SecondaryButton onClick={() => router.push("/start/birth/place")}>{t("back")}</SecondaryButton>
         <PrimaryButton onClick={() => setDrawing(true)}>{t("drawChart")}</PrimaryButton>
       </div>
@@ -62,9 +62,9 @@ export default function SummaryPage() {
 function SummaryRow({ label, value, editHref, editLabel }) {
   const router = useRouter();
   return (
-    <div className="flex items-center justify-between px-4 py-3 min-h-[48px]">
+    <div className="flex items-center justify-between px-4 py-4 min-h-[48px]">
       <div>
-        <p className="text-sm text-gray-500">{label}</p>
+        <p className="text-sm text-fg-muted">{label}</p>
         <p className="text-base">{value || "—"}</p>
       </div>
       <button type="button" onClick={() => router.push(editHref)} className="text-base underline min-h-[48px]">

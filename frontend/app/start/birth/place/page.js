@@ -32,24 +32,24 @@ export default function PlacePage() {
   return (
     <Page>
       <ProgressBar step={4} total={4} />
-      <p className="text-sm text-gray-500">{t("stepOf", { n: 4, total: 4 })}</p>
+      <p className="text-base text-fg-muted">{t("stepOf", { n: 4, total: 4 })}</p>
       <h1 className="text-2xl font-bold">{t("placeQuestion")}</h1>
-      <p className="text-sm text-gray-500">{t("placeReason")}</p>
+      <p className="text-base text-fg-muted">{t("placeReason")}</p>
       <input
         type="text"
         value={query}
         onChange={(e) => handleChange(e.target.value)}
-        className="min-h-[48px] border border-gray-300 rounded-md px-4 text-lg"
+        className="min-h-[48px] border border-border rounded-2xl px-4 bg-bg-elevated text-fg text-lg"
         autoFocus
       />
       {results.length > 0 && (
-        <ul className="border border-gray-300 rounded-md divide-y">
+        <ul className="border border-border rounded-2xl divide-y divide-border bg-bg-elevated">
           {results.map((city) => (
             <li key={city.name}>
               <button
                 type="button"
                 onClick={() => handleSelect(city)}
-                className="w-full text-left min-h-[48px] px-4 py-2"
+                className="w-full text-left min-h-[48px] px-4 py-4"
               >
                 {city.name}, {city.state}, India
               </button>
@@ -58,10 +58,10 @@ export default function PlacePage() {
         </ul>
       )}
       {query && !selected && results.length === 0 && (
-        <p className="text-sm text-gray-500">{t("placeNoMatch")}</p>
+        <p className="text-base text-fg-muted">{t("placeNoMatch")}</p>
       )}
 
-      <div className="flex gap-3 mt-4">
+      <div className="flex gap-4 mt-4">
         <SecondaryButton onClick={() => router.push("/start/birth/time")}>{t("back")}</SecondaryButton>
         <PrimaryButton disabled={!selected} onClick={handleNext}>
           {t("next")}

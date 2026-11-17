@@ -1,5 +1,25 @@
+import { Cormorant_Garamond, Inter, Noto_Sans_Devanagari, Noto_Serif_Devanagari } from "next/font/google";
 import "./globals.css";
 import { AppStateProvider } from "../lib/AppStateContext";
+
+const heading = Cormorant_Garamond({
+  variable: "--font-heading",
+  subsets: ["latin"],
+  weight: ["600", "700"],
+});
+const body = Inter({
+  variable: "--font-body",
+  subsets: ["latin"],
+});
+const headingHi = Noto_Serif_Devanagari({
+  variable: "--font-heading-hi",
+  subsets: ["devanagari"],
+  weight: ["600", "700"],
+});
+const bodyHi = Noto_Sans_Devanagari({
+  variable: "--font-body-hi",
+  subsets: ["devanagari"],
+});
 
 export const metadata = {
   title: "AstroGuide",
@@ -8,8 +28,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="h-full">
-      <body className="min-h-full flex flex-col bg-white text-black">
+    <html
+      lang="en"
+      className={`h-full ${heading.variable} ${body.variable} ${headingHi.variable} ${bodyHi.variable}`}
+    >
+      <body className="min-h-full flex flex-col bg-bg text-fg">
+        <div className="starfield" aria-hidden="true" />
         <AppStateProvider>{children}</AppStateProvider>
       </body>
     </html>

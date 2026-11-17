@@ -39,7 +39,7 @@ export default function ConsentPage() {
   return (
     <Page>
       <h1 className="text-2xl font-bold mt-4">{t("consentTitle")}</h1>
-      <ul className="flex flex-col gap-3 text-base">
+      <ul className="flex flex-col gap-4 text-base">
         <li>{t("consentWhat")}</li>
         <li>{t("consentWhy")}</li>
         <li>{t("consentShare")}</li>
@@ -47,20 +47,20 @@ export default function ConsentPage() {
       </ul>
       <Link href="/privacy" className="text-base underline">{t("privacyLink")}</Link>
 
-      <label className="flex items-center gap-3 min-h-[48px] text-base">
+      <label className="flex items-center gap-4 min-h-[48px] text-base">
         <input
           type="checkbox"
-          className="w-6 h-6"
+          className="w-6 h-6 accent-[var(--color-accent)]"
           checked={age18}
           onChange={(e) => handleAge18(e.target.checked)}
         />
         {t("consentAgree18")}
       </label>
 
-      <label className="flex items-center gap-3 min-h-[48px] text-base">
+      <label className="flex items-center gap-4 min-h-[48px] text-base">
         <input
           type="checkbox"
-          className="w-6 h-6"
+          className="w-6 h-6 accent-[var(--color-accent)]"
           checked={agree}
           onChange={(e) => setAgree(e.target.checked)}
         />

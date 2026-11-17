@@ -24,7 +24,7 @@ export default function PlansPage() {
         </ul>
 
         {clicked ? (
-          <p className="text-base text-gray-500">{t("paymentsComingSoon")}</p>
+          <p className="text-base text-fg-muted">{t("paymentsComingSoon")}</p>
         ) : (
           <PrimaryButton onClick={() => setClicked(true)}>{t("payWithUpi")}</PrimaryButton>
         )}

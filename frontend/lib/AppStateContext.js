@@ -21,6 +21,11 @@ export function AppStateProvider({ children }) {
     if (hydrated) saveState(state);
   }, [state, hydrated]);
 
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.documentElement.lang = state.language === "hindi" ? "hi" : "en";
+  }, [state.language]);
+
   function update(patch) {
     setState((prev) => ({ ...prev, ...(typeof patch === "function" ? patch(prev) : patch) }));
   }

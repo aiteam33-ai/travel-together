@@ -8,7 +8,7 @@ export default function AboutPage() {
     <Page>
       <h1 className="text-2xl font-bold">{t("aboutTitle")}</h1>
       <p className="text-base">{t("promise")}</p>
-      <p className="text-sm text-gray-500">{t("disclaimer")}</p>
+      <p className="text-base text-fg-muted">{t("disclaimer")}</p>
     </Page>
   );
 }
