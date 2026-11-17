@@ -39,3 +39,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# frontend (Next.js app in frontend/)
+/frontend/node_modules
+/frontend/.next
+
+# backend (Python/FastAPI app in backend/)
+/backend/.venv
+/backend/__pycache__
+**/__pycache__
+/backend/.pytest_cache
+/backend/sample_chart_output.json
+/backend/sample_chart_err.txt

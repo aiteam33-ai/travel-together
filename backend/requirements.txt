@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+psycopg2-binary
+pyswisseph
+pytest
+pydantic
+pydantic-settings
+python-dotenv
+cryptography
+httpx

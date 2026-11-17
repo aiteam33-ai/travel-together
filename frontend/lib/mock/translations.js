@@ -1,0 +1,213 @@
+// Single source of truth for all on-screen text. Pages must never hardcode text.
+export const LANGS = ["english", "hinglish", "hindi"];
+
+export const T = {
+  appName: { english: "AstroGuide", hinglish: "AstroGuide", hindi: "AstroGuide" },
+  nextStep: { english: "Your one next step", hinglish: "Aapka ek next step", hindi: "आपका एक अगला कदम" },
+  promise: {
+    english: "Private, consistent astrology answers to the questions you can't ask anyone.",
+    hinglish: "Private, consistent astrology answers un sawaalon ke liye jo kisi aur se nahi pooch sakte.",
+    hindi: "निजी, स्थिर ज्योतिष उत्तर उन सवालों के लिए जो आप किसी और से नहीं पूछ सकते।",
+  },
+  getFreeReading: { english: "Get my free reading", hinglish: "Mera free reading lo", hindi: "मुफ़्त रीडिंग पाएं" },
+  pointPrivate: { english: "Private", hinglish: "Private", hindi: "निजी" },
+  pointConsistent: { english: "Same answer every time", hinglish: "Har baar same jawaab", hindi: "हर बार एक जैसा उत्तर" },
+  pointNextStep: { english: "One clear next step", hinglish: "Ek clear next step", hindi: "एक स्पष्ट अगला कदम" },
+
+  chooseLanguage: { english: "Choose your language", hinglish: "Apni language chuno", hindi: "अपनी भाषा चुनें" },
+  english: { english: "English", hinglish: "English", hindi: "अंग्रेज़ी" },
+  hinglish: { english: "Hinglish", hinglish: "Hinglish", hindi: "हिंग्लिश" },
+  hindi: { english: "Hindi", hinglish: "Hindi", hindi: "हिंदी" },
+  continue: { english: "Continue", hinglish: "Continue karo", hindi: "जारी रखें" },
+  back: { english: "Back", hinglish: "Peeche", hindi: "पीछे" },
+  next: { english: "Next", hinglish: "Aage", hindi: "अगला" },
+
+  consentTitle: { english: "Before we start", hinglish: "Shuru karne se pehle", hindi: "शुरू करने से पहले" },
+  consentWhat: {
+    english: "We collect your name, date, time and place of birth.",
+    hinglish: "Hum aapka naam, janm ki date, time aur jagah lete hain.",
+    hindi: "हम आपका नाम, जन्म तिथि, समय और स्थान लेते हैं।",
+  },
+  consentWhy: {
+    english: "This is needed to draw your birth chart.",
+    hinglish: "Ye aapka birth chart banane ke liye zaroori hai.",
+    hindi: "यह आपकी जन्म कुंडली बनाने के लिए ज़रूरी है।",
+  },
+  consentShare: {
+    english: "Nothing is shared with anyone.",
+    hinglish: "Kisi ke saath kuch share nahi hota.",
+    hindi: "किसी के साथ कुछ भी साझा नहीं किया जाता।",
+  },
+  consentDelete: {
+    english: "You can delete everything, anytime.",
+    hinglish: "Aap kabhi bhi sab kuch delete kar sakte hain.",
+    hindi: "आप कभी भी सब कुछ हटा सकते हैं।",
+  },
+  consentAgree18: { english: "I am 18 or older", hinglish: "Main 18 ya usse zyada ka hoon", hindi: "मैं 18 वर्ष या उससे अधिक का हूँ" },
+  consentAgree: { english: "I agree", hinglish: "Main agree karta/karti hoon", hindi: "मैं सहमत हूँ" },
+  privacyLink: { english: "Read full Privacy policy", hinglish: "Privacy policy padhein", hindi: "पूरी गोपनीयता नीति पढ़ें" },
+  under18: {
+    english: "Sorry, you need to be 18 or older to use AstroGuide.",
+    hinglish: "Sorry, AstroGuide use karne ke liye 18+ hona zaroori hai.",
+    hindi: "क्षमा करें, AstroGuide उपयोग करने के लिए आपकी आयु 18 या उससे अधिक होनी चाहिए।",
+  },
+
+  stepOf: { english: "Step {n} of {total}", hinglish: "Step {n} of {total}", hindi: "चरण {n} / {total}" },
+  nameQuestion: { english: "What's your name?", hinglish: "Aapka naam kya hai?", hindi: "आपका नाम क्या है?" },
+  nameReason: {
+    english: "We use your first name only to personalise your reading.",
+    hinglish: "Hum sirf naam ka use aapki reading personal banane ke liye karte hain.",
+    hindi: "हम केवल आपका नाम आपकी रीडिंग को व्यक्तिगत बनाने के लिए उपयोग करते हैं।",
+  },
+  dateQuestion: { english: "When were you born?", hinglish: "Aapka janm kab hua?", hindi: "आपका जन्म कब हुआ?" },
+  dateReason: {
+    english: "Your birth date fixes your chart's planets and signs.",
+    hinglish: "Aapki birth date se chart ke grah aur raashi tay hoti hai.",
+    hindi: "आपकी जन्म तिथि से कुंडली के ग्रह और राशियाँ तय होती हैं।",
+  },
+  timeQuestion: { english: "What time were you born?", hinglish: "Aapka janm kis time hua?", hindi: "आपका जन्म किस समय हुआ?" },
+  timeReason: {
+    english: "Your birth time decides your ascendant. Even a rough time helps.",
+    hinglish: "Birth time se ascendant tay hota hai. Rough time bhi kaafi help karta hai.",
+    hindi: "आपका जन्म समय आपका लग्न तय करता है। अनुमानित समय भी सहायक है।",
+  },
+  dontKnowTime: { english: "I don't know my exact time", hinglish: "Mujhe exact time nahi pata", hindi: "मुझे सही समय नहीं पता" },
+  roughTimeQuestion: { english: "Roughly, when?", hinglish: "Roughly, kab?", hindi: "लगभग, कब?" },
+  morning: { english: "Morning", hinglish: "Subah", hindi: "सुबह" },
+  afternoon: { english: "Afternoon", hinglish: "Dopahar", hindi: "दोपहर" },
+  evening: { english: "Evening", hinglish: "Shaam", hindi: "शाम" },
+  night: { english: "Night", hinglish: "Raat", hindi: "रात" },
+  timeUnknownNote: {
+    english: "Your reading will be a little less precise without an exact time.",
+    hinglish: "Exact time ke bina reading thodi less precise hogi.",
+    hindi: "सही समय के बिना आपकी रीडिंग थोड़ी कम सटीक होगी।",
+  },
+  placeQuestion: { english: "Where were you born?", hinglish: "Aap kahaan paida hue?", hindi: "आपका जन्म कहाँ हुआ?" },
+  placeReason: {
+    english: "Your birth place fixes the exact sky above you at that moment.",
+    hinglish: "Birth place se us waqt ka exact aasmaan tay hota hai.",
+    hindi: "जन्म स्थान से उस क्षण का सटीक आकाश तय होता है।",
+  },
+  placeNoMatch: { english: "No match. Try a nearby bigger city.", hinglish: "Koi match nahi mila. Paas ka bada shehar try karo.", hindi: "कोई मेल नहीं मिला। पास का बड़ा शहर आज़माएँ।" },
+  summaryTitle: { english: "Your details", hinglish: "Aapki details", hindi: "आपका विवरण" },
+  edit: { english: "Edit", hinglish: "Edit karo", hindi: "संपादित करें" },
+  drawChart: { english: "Draw my chart", hinglish: "Mera chart banao", hindi: "मेरी कुंडली बनाएं" },
+  drawingChart: { english: "Drawing your chart...", hinglish: "Aapka chart ban raha hai...", hindi: "आपकी कुंडली बन रही है..." },
+
+  trustTitle: { english: "First, test us on something that already happened.", hinglish: "Pehle, humein kisi hui hui baat par test karo.", hindi: "पहले, हमें किसी हो चुकी घटना पर परखें।" },
+  trustPastEvent: { english: "What happened?", hinglish: "Kya hua tha?", hindi: "क्या हुआ था?" },
+  trustMonthYear: { english: "Approximate month and year", hinglish: "Lagbhag mahina aur saal", hindi: "लगभग महीना और वर्ष" },
+  trustArea: { english: "Area", hinglish: "Area", hindi: "क्षेत्र" },
+  trustSubmit: { english: "Read my chart", hinglish: "Mera chart padho", hindi: "मेरी कुंडली पढ़ें" },
+  areaCareer: { english: "Career", hinglish: "Career", hindi: "करियर" },
+  areaRelationship: { english: "Relationship", hinglish: "Relationship", hindi: "रिश्ता" },
+  areaFamily: { english: "Family", hinglish: "Family", hindi: "परिवार" },
+  areaMind: { english: "Health of mind", hinglish: "Mann ki sehat", hindi: "मन का स्वास्थ्य" },
+  areaMoney: { english: "Money", hinglish: "Paisa", hindi: "पैसा" },
+  areaMove: { english: "Move or travel", hinglish: "Move ya travel", hindi: "स्थानांतरण या यात्रा" },
+  illnessNote: { english: "We don't predict illness.", hinglish: "Hum illness predict nahi karte.", hindi: "हम बीमारी की भविष्यवाणी नहीं करते।" },
+  chartReason: { english: "Chart reason", hinglish: "Chart ki wajah", hindi: "कुंडली का कारण" },
+  whatDoesMean: { english: "What does this mean?", hinglish: "Iska matlab kya hai?", hindi: "इसका मतलब क्या है?" },
+  matches: { english: "Matches", hinglish: "Matches", hindi: "मेल खाता है" },
+  partly: { english: "Partly", hinglish: "Partly", hindi: "आंशिक रूप से" },
+  noMatch: { english: "Doesn't match", hinglish: "Match nahi karta", hindi: "मेल नहीं खाता" },
+  whatWasDifferent: { english: "What was different? (optional)", hinglish: "Kya alag tha? (optional)", hindi: "क्या अलग था? (वैकल्पिक)" },
+  thankYouHonest: { english: "Thank you. This helps us get more accurate.", hinglish: "Shukriya. Isse hum aur accurate bante hain.", hindi: "धन्यवाद। इससे हम अधिक सटीक बनते हैं।" },
+  tryAnotherPast: { english: "Try another past question", hinglish: "Ek aur purani baat try karo", hindi: "एक और पुराना प्रश्न आज़माएँ" },
+  askAboutFuture: { english: "Ask about my future", hinglish: "Mere future ke baare mein pucho", hindi: "मेरे भविष्य के बारे में पूछें" },
+  continueToChat: { english: "Continue to ask anything", hinglish: "Kuch bhi poochne ke liye aage badho", hindi: "कुछ भी पूछने के लिए जारी रखें" },
+
+  chatTitle: { english: "Chat", hinglish: "Chat", hindi: "चैट" },
+  askAnything: { english: "Ask anything...", hinglish: "Kuch bhi pucho...", hindi: "कुछ भी पूछें..." },
+  send: { english: "Send", hinglish: "Bhejo", hindi: "भेजें" },
+  readingChart: { english: "Reading your chart...", hinglish: "Aapka chart padh rahe hain...", hindi: "आपकी कुंडली पढ़ रहे हैं..." },
+  checkingDasha: { english: "Checking your current dasha...", hinglish: "Aapki current dasha check kar rahe hain...", hindi: "आपकी वर्तमान दशा जाँच रहे हैं..." },
+  sameChartBadge: { english: "Same chart, same answer", hinglish: "Same chart, same jawaab", hindi: "एक ही कुंडली, एक ही उत्तर" },
+  sameChartExplain: {
+    english: "Your chart doesn't change, so we give the same core answer every time you ask the same question.",
+    hinglish: "Aapka chart badalta nahi, isliye same sawaal par hum hamesha same core jawaab dete hain.",
+    hindi: "आपकी कुंडली नहीं बदलती, इसलिए एक ही प्रश्न पर हम हमेशा एक जैसा मुख्य उत्तर देते हैं।",
+  },
+  helpful: { english: "Helpful", hinglish: "Helpful", hindi: "सहायक" },
+  notHelpful: { english: "Not helpful", hinglish: "Helpful nahi", hindi: "सहायक नहीं" },
+  jumpToLatest: { english: "Jump to latest", hinglish: "Latest par jao", hindi: "नवीनतम पर जाएँ" },
+  setAsOpenQuestion: { english: "Set as my open question", hinglish: "Mera open question banao", hindi: "मेरा खुला प्रश्न सेट करें" },
+  askedBefore: { english: "You asked this on {date}. Your chart's answer hasn't changed.", hinglish: "Aapne ye {date} ko poocha tha. Chart ka jawaab nahi badla.", hindi: "आपने यह {date} को पूछा था। आपकी कुंडली का उत्तर नहीं बदला है।" },
+
+  todayTitle: { english: "Today", hinglish: "Today", hindi: "आज" },
+  yourDay: { english: "Your day", hinglish: "Aapka din", hindi: "आपका दिन" },
+  aboutYourQuestion: { english: "About your question: {q}", hinglish: "Aapke sawaal ke baare mein: {q}", hindi: "आपके प्रश्न के बारे में: {q}" },
+  noOpenQuestion: { english: "You haven't set an open question yet.", hinglish: "Aapne abhi tak open question set nahi kiya.", hindi: "आपने अभी तक कोई खुला प्रश्न सेट नहीं किया है।" },
+  chooseQuestion: { english: "Choose a question to follow", hinglish: "Follow karne ke liye sawaal chuno", hindi: "अनुसरण करने के लिए प्रश्न चुनें" },
+  goodTimeFor: { english: "Good time for", hinglish: "Good time hai", hindi: "अच्छा समय है" },
+  beCarefulWith: { english: "Be careful with", hinglish: "Savdhaan rahein", hindi: "सावधान रहें" },
+  luckyColour: { english: "Lucky colour", hinglish: "Lucky colour", hindi: "भाग्यशाली रंग" },
+  whatsappDaily: { english: "Get this on WhatsApp every morning", hinglish: "Ye WhatsApp par roz subah pao", hindi: "इसे हर सुबह व्हाट्सएप पर पाएं" },
+  comingSoon: { english: "Coming soon", hinglish: "Jald aa raha hai", hindi: "जल्द आ रहा है" },
+
+  plansTitle: { english: "Plans", hinglish: "Plans", hindi: "योजनाएं" },
+  firstFreeNote: { english: "Your first reading is free.", hinglish: "Aapki pehli reading free hai.", hindi: "आपकी पहली रीडिंग मुफ़्त है।" },
+  priceLine: { english: "₹199/month flat", hinglish: "₹199/month flat", hindi: "₹199/माह फ्लैट" },
+  noUpsells: { english: "No upsells. No paid reports. Cancel anytime.", hinglish: "Koi upsell nahi. Koi paid report nahi. Kabhi bhi cancel karo.", hindi: "कोई अपसेल नहीं। कोई सशुल्क रिपोर्ट नहीं। कभी भी रद्द करें।" },
+  payWithUpi: { english: "Pay with UPI", hinglish: "UPI se pay karo", hindi: "यूपीआई से भुगतान करें" },
+  maybeLater: { english: "Maybe later", hinglish: "Shayad baad mein", hindi: "शायद बाद में" },
+  keepGoingFor: { english: "Keep going for {price}/month", hinglish: "{price}/month mein aage badho", hindi: "{price}/माह में जारी रखें" },
+  benefitUnlimited: { english: "Unlimited questions", hinglish: "Unlimited sawaal", hindi: "असीमित प्रश्न" },
+  benefitDaily: { english: "Daily updates on your open question", hinglish: "Aapke open question par daily update", hindi: "आपके प्रश्न पर दैनिक अपडेट" },
+  benefitConsistent: { english: "Same consistent system", hinglish: "Same consistent system", hindi: "वही सुसंगत प्रणाली" },
+  benefitPrivate: { english: "Private", hinglish: "Private", hindi: "निजी" },
+  benefitNoUpsell: { english: "No upsells or paid reports", hinglish: "Koi upsell ya paid report nahi", hindi: "कोई अपसेल या सशुल्क रिपोर्ट नहीं" },
+  benefitCancel: { english: "Cancel anytime", hinglish: "Kabhi bhi cancel karo", hindi: "कभी भी रद्द करें" },
+  paymentsComingSoon: { english: "Payments coming soon", hinglish: "Payments jald aa rahe hain", hindi: "भुगतान जल्द आ रहा है" },
+  thankYouSubscribed: { english: "Thank you! You're subscribed.", hinglish: "Shukriya! Aap subscribe ho gaye.", hindi: "धन्यवाद! आप सदस्यता ले चुके हैं।" },
+
+  profileTitle: { english: "Profile", hinglish: "Profile", hindi: "प्रोफ़ाइल" },
+  birthDetails: { english: "Birth details", hinglish: "Birth details", hindi: "जन्म विवरण" },
+  editWarning: {
+    english: "Your chart will be redrawn and future answers will change.",
+    hinglish: "Aapka chart dobara banega aur future answers badal jayenge.",
+    hindi: "आपकी कुंडली फिर से बनेगी और भविष्य के उत्तर बदल जाएंगे।",
+  },
+  myData: { english: "My data", hinglish: "Meri data", hindi: "मेरा डेटा" },
+  downloadData: { english: "Download my data", hinglish: "Meri data download karo", hindi: "मेरा डेटा डाउनलोड करें" },
+  deleteAllData: { english: "Delete all my data", hinglish: "Meri saari data delete karo", hindi: "मेरा सारा डेटा हटाएं" },
+  typeDeleteToConfirm: { english: "Type DELETE to confirm", hinglish: "Confirm karne ke liye DELETE likho", hindi: "पुष्टि करने के लिए DELETE लिखें" },
+  dataDeleted: { english: "All your data has been deleted.", hinglish: "Aapki saari data delete ho gayi hai.", hindi: "आपका सारा डेटा हटा दिया गया है।" },
+  subscriptionStatus: { english: "Subscription status", hinglish: "Subscription status", hindi: "सदस्यता स्थिति" },
+  cancel: { english: "Cancel", hinglish: "Cancel karo", hindi: "रद्द करें" },
+  needHelp: { english: "Need to talk to someone?", hinglish: "Kisi se baat karni hai?", hindi: "किसी से बात करनी है?" },
+
+  privacyTitle: { english: "Privacy", hinglish: "Privacy", hindi: "गोपनीयता" },
+  aboutTitle: { english: "About", hinglish: "About", hindi: "हमारे बारे में" },
+  disclaimer: {
+    english: "Guidance, not medical, legal or financial advice.",
+    hinglish: "Guidance hai, medical, legal ya financial advice nahi.",
+    hindi: "यह मार्गदर्शन है, चिकित्सा, कानूनी या वित्तीय सलाह नहीं।",
+  },
+  distressTitle: { english: "It sounds like you're going through something really heavy.", hinglish: "Lagta hai aap kuch bahut heavy se guzar rahe ho.", hindi: "ऐसा लगता है आप कुछ बहुत भारी से गुज़र रहे हैं।" },
+  distressBody: { english: "You don't have to handle it alone.", hinglish: "Akele handle karna zaroori nahi.", hindi: "आपको इसे अकेले संभालने की ज़रूरत नहीं है।" },
+  callHelpline: { english: "Call Tele-MANAS (14416)", hinglish: "Tele-MANAS (14416) ko call karo", hindi: "टेली-मानस (14416) को कॉल करें" },
+  talkToSomeone: { english: "Please also talk to someone you trust.", hinglish: "Kisi bharose wale se bhi baat zaroor karo.", hindi: "कृपया किसी भरोसेमंद व्यक्ति से भी बात करें।" },
+  outOfScope: {
+    english: "This is outside what astrology guidance here covers. Here's a next step instead.",
+    hinglish: "Ye yahan ki astrology guidance ke bahar hai. Iske bajaye ek next step lo.",
+    hindi: "यह यहाँ की ज्योतिष मार्गदर्शन के दायरे से बाहर है। इसके बजाय एक अगला कदम लें।",
+  },
+
+  chatLinks: { english: "Chat", hinglish: "Chat", hindi: "चैट" },
+  todayLinks: { english: "Today", hinglish: "Today", hindi: "आज" },
+  plansLinks: { english: "Plans", hinglish: "Plans", hindi: "योजनाएं" },
+  profileLinks: { english: "Profile", hinglish: "Profile", hindi: "प्रोफ़ाइल" },
+};
+
+export function t(key, lang, vars) {
+  const entry = T[key];
+  if (!entry) return key;
+  let text = entry[lang] || entry.english || key;
+  if (vars) {
+    for (const [k, v] of Object.entries(vars)) {
+      text = text.replace(`{${k}}`, v);
+    }
+  }
+  return text;
+}
