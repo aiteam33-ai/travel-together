@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Page, PrimaryButton } from "../../../components/ui";
 import { useAppState, useT } from "../../../lib/AppStateContext";
+import { track } from "../../../lib/analytics";
 
 export default function ConsentPage() {
   const { state, update } = useAppState();
@@ -24,6 +25,7 @@ export default function ConsentPage() {
 
   function handleContinue() {
     update({ consentGiven: true, ageConfirmed: true });
+    track("consent_given");
     router.push("/start/birth/name");
   }
 

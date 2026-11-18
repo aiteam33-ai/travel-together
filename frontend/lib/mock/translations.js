@@ -174,6 +174,11 @@ export const T = {
   beCarefulWith: { english: "Be careful with", hinglish: "Savdhaan rahein", hindi: "सावधान रहें" },
   luckyColour: { english: "Lucky colour", hinglish: "Lucky colour", hindi: "भाग्यशाली रंग" },
   whatsappDaily: { english: "Get this on WhatsApp every morning", hinglish: "Ye WhatsApp par roz subah pao", hindi: "इसे हर सुबह व्हाट्सएप पर पाएं" },
+  shareMyDay: { english: "Share my day", hinglish: "Apna din share karo", hindi: "अपना दिन साझा करें" },
+  shareToWhatsapp: { english: "Share to WhatsApp", hinglish: "WhatsApp par share karo", hindi: "व्हाट्सएप पर साझा करें" },
+  shareToInstagram: { english: "Share to Instagram", hinglish: "Instagram par share karo", hindi: "इंस्टाग्राम पर साझा करें" },
+  downloadImage: { english: "Download", hinglish: "Download karo", hindi: "डाउनलोड करें" },
+  shareVibeGetReading: { english: "Get your free reading at astroguide.example", hinglish: "astroguide.example par free reading lo", hindi: "astroguide.example पर मुफ़्त रीडिंग पाएं" },
   comingSoon: { english: "Coming soon", hinglish: "Jald aa raha hai", hindi: "जल्द आ रहा है" },
 
   plansTitle: { english: "Plans", hinglish: "Plans", hindi: "योजनाएं" },

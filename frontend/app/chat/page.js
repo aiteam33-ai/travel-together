@@ -3,8 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import { AppShell } from "../../components/AppShell";
 import { PaywallSheet } from "../../components/PaywallSheet";
 import { OutOfScopeCard, SupportCard } from "../../components/SupportCard";
-import { Chip, Page, ReadingCard } from "../../components/ui";
+import { Chip, Page } from "../../components/ui";
+import { ReadingCard } from "../../components/ReadingCard";
 import { useAppState, useT } from "../../lib/AppStateContext";
+import { track } from "../../lib/analytics";
 import { askQuestion } from "../../lib/api";
 import { PAYWALL_ENABLED } from "../../lib/config";
 import { containsDistressSignal, matchedBlockedTopic } from "../../lib/mock/safety";
@@ -83,8 +85,11 @@ export default function ChatPage() {
     if (PAYWALL_ENABLED && !state.subscribed && !isFirstEverReading) {
       setPendingQuestion(questionText);
       setPaywallOpen(true);
+      track("paywall_shown");
       return;
     }
+
+    if (state.chat.length === 0) track("first_chat_question");
 
     setLoading(true);
     const reading = await askQuestion(state.birthDetails, questionText);
@@ -103,10 +108,12 @@ export default function ChatPage() {
     update((prev) => ({
       chat: prev.chat.map((e) => (e.id === id ? { ...e, feedback: value } : e)),
     }));
+    track("answer_feedback", { value });
   }
 
   function setOpenQuestion(questionText) {
     update({ openQuestion: questionText });
+    track("open_question_set");
   }
 
   const suggestedKeys = lastTopic ? TOPIC_FOLLOWUPS[lastTopic] || EMPTY_CHIPS.slice(0, 2) : EMPTY_CHIPS;
@@ -233,6 +240,7 @@ export default function ChatPage() {
             }}
             onSubscribed={() => {
               update({ subscribed: true });
+              track("subscribed");
               setPaywallOpen(false);
               setJustSubscribed(true);
               setTimeout(() => setJustSubscribed(false), 3000);

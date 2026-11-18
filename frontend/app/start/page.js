@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { Page, PrimaryButton } from "../../components/ui";
 import { useAppState, useT } from "../../lib/AppStateContext";
+import { track } from "../../lib/analytics";
 import { LANGS } from "../../lib/mock/translations";
 
 export default function LanguagePage() {
@@ -12,6 +13,7 @@ export default function LanguagePage() {
 
   function choose(lang) {
     update({ language: lang });
+    track("language_chosen", { lang });
   }
 
   return (

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AppShell } from "../../components/AppShell";
 import { Page, PrimaryButton, SecondaryButton } from "../../components/ui";
 import { useAppState, useT } from "../../lib/AppStateContext";
+import { track } from "../../lib/analytics";
 import { LANGS } from "../../lib/mock/translations";
 
 export default function ProfilePage() {
@@ -17,6 +18,7 @@ export default function ProfilePage() {
 
   function handleDelete() {
     if (confirmText !== "DELETE") return;
+    track("data_deleted");
     resetAll();
     setDeleted(true);
     setTimeout(() => router.push("/"), 1200);

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { AppShell } from "../../components/AppShell";
 import { Page, PrimaryButton } from "../../components/ui";
 import { useAppState, useT } from "../../lib/AppStateContext";
+import { track } from "../../lib/analytics";
 import { startSubscription } from "../../lib/api";
 
 export default function PlansPage() {
@@ -11,9 +12,11 @@ export default function PlansPage() {
   const [paying, setPaying] = useState(false);
 
   async function handlePay() {
+    track("upi_clicked");
     setPaying(true);
     await startSubscription();
     update({ subscribed: true });
+    track("subscribed");
     setPaying(false);
   }
 

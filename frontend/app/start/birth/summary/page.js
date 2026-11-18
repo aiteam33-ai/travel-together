@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ChartWheel } from "../../../../components/ChartWheel";
 import { Page, PrimaryButton, SecondaryButton } from "../../../../components/ui";
 import { useAppState, useT } from "../../../../lib/AppStateContext";
+import { track } from "../../../../lib/analytics";
 import { getChart } from "../../../../lib/api";
 
 export default function SummaryPage() {
@@ -18,7 +19,10 @@ export default function SummaryPage() {
     if (!drawing) return;
     let active = true;
     getChart(bd).then(() => {
-      if (active) setChartReady(true);
+      if (active) {
+        setChartReady(true);
+        track("chart_drawn");
+      }
     });
     return () => {
       active = false;
@@ -62,7 +66,14 @@ export default function SummaryPage() {
       </div>
       <div className="flex gap-4 mt-4">
         <SecondaryButton onClick={() => router.push("/start/birth/place")}>{t("back")}</SecondaryButton>
-        <PrimaryButton onClick={() => setDrawing(true)}>{t("drawChart")}</PrimaryButton>
+        <PrimaryButton
+          onClick={() => {
+            track("birth_details_completed");
+            setDrawing(true);
+          }}
+        >
+          {t("drawChart")}
+        </PrimaryButton>
       </div>
     </Page>
   );

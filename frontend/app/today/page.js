@@ -2,8 +2,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell } from "../../components/AppShell";
-import { Page, PrimaryButton, ReadingCard, SecondaryButton } from "../../components/ui";
+import { ShareDayCard } from "../../components/ShareDayCard";
+import { Page, PrimaryButton, SecondaryButton } from "../../components/ui";
+import { ReadingCard } from "../../components/ReadingCard";
 import { useAppState, useT } from "../../lib/AppStateContext";
+import { track } from "../../lib/analytics";
 import { getDailyUpdate } from "../../lib/api";
 
 export default function TodayPage() {
@@ -15,6 +18,7 @@ export default function TodayPage() {
 
   useEffect(() => {
     let active = true;
+    track("today_viewed");
     getDailyUpdate(state.birthDetails, state.openQuestion).then((data) => {
       if (active) {
         setUpdateData(data);
@@ -30,6 +34,7 @@ export default function TodayPage() {
 
   function requestWhatsapp() {
     update({ whatsappDailyRequested: true });
+    track("whatsapp_daily_requested");
   }
 
   return (
@@ -65,6 +70,8 @@ export default function TodayPage() {
             ) : (
               <PrimaryButton onClick={requestWhatsapp}>{t("whatsappDaily")}</PrimaryButton>
             )}
+
+            <ShareDayCard t={t} date={update_.date} luckyColour={update_.luckyColour} />
           </>
         )}
       </Page>

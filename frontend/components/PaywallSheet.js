@@ -1,12 +1,14 @@
 "use client";
 import { useState } from "react";
 import { PrimaryButton, SecondaryButton } from "./ui";
+import { track } from "../lib/analytics";
 import { startSubscription } from "../lib/api";
 
 export function PaywallSheet({ t, onClose, onSubscribed }) {
   const [paying, setPaying] = useState(false);
 
   async function handlePay() {
+    track("upi_clicked");
     setPaying(true);
     await startSubscription();
     onSubscribed();

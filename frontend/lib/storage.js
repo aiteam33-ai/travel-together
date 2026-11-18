@@ -13,6 +13,7 @@ const DEFAULT_STATE = {
   whatsappDailyRequested: false,
   subscribed: false,
   freeReadingUsed: false,
+  firstVisitAt: null, // ISO date string, set once on first landing view
 };
 
 export function loadState() {

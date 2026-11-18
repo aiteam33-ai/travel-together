@@ -1,21 +1,50 @@
 "use client";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect } from "react";
 import { Page, PrimaryButton } from "../components/ui";
-import { useT } from "../lib/AppStateContext";
+import { useAppState, useT } from "../lib/AppStateContext";
+import { track } from "../lib/analytics";
 import { pickReading } from "../lib/mock/chart";
 
 const DEMO_BIRTH = { date: "1997-04-10", time: "08:15", place: { name: "Mumbai" } };
+const KNOWN_SOURCES = ["instagram", "whatsapp", "youtube"];
 
 export default function Landing() {
+  return (
+    <Suspense fallback={null}>
+      <LandingInner />
+    </Suspense>
+  );
+}
+
+function LandingInner() {
   const t = useT();
+  const { state, update, hydrated } = useAppState();
+  const searchParams = useSearchParams();
   const demoReading = pickReading(DEMO_BIRTH, t("demoQuestion"));
+
+  useEffect(() => {
+    if (!hydrated) return;
+    const raw = (searchParams.get("utm_source") || "").toLowerCase();
+    const where = KNOWN_SOURCES.includes(raw) ? raw : "other";
+    track("landing_viewed", { where });
+
+    if (!state.firstVisitAt) {
+      update({ firstVisitAt: new Date().toISOString() });
+    } else {
+      const days = Math.floor((Date.now() - new Date(state.firstVisitAt).getTime()) / 86400000);
+      if (days > 0) track("returned_after_days", { days });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrated]);
 
   return (
     <Page>
       <h1 className="text-3xl font-bold mt-6">{t("appName")}</h1>
       <p className="text-lg">{t("promise")}</p>
       <p className="text-base text-fg-muted">{t("landingSubline")}</p>
-      <Link href="/start">
+      <Link href="/start" onClick={() => track("get_started_clicked")}>
         <PrimaryButton>{t("getFreeReading")}</PrimaryButton>
       </Link>
 
@@ -44,7 +73,7 @@ export default function Landing() {
         <p className="text-base text-fg-muted">{t("dataStaysYoursBody")}</p>
       </section>
 
-      <Link href="/start" className="mt-2">
+      <Link href="/start" className="mt-2" onClick={() => track("get_started_clicked")}>
         <PrimaryButton>{t("getFreeReading")}</PrimaryButton>
       </Link>
       <p className="text-base text-fg-muted mb-8">{t("disclaimer")}</p>

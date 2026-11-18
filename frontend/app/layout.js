@@ -24,6 +24,12 @@ const bodyHi = Noto_Sans_Devanagari({
 export const metadata = {
   title: "AstroGuide",
   description: "Private, consistent astrology answers to the questions you can't ask anyone.",
+  manifest: "/manifest.json",
+  icons: { icon: "/icon.svg", apple: "/icon.svg" },
+};
+
+export const viewport = {
+  themeColor: "#11122b",
 };
 
 export default function RootLayout({ children }) {

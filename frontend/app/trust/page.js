@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Chip, Page, PrimaryButton, SecondaryButton } from "../../components/ui";
 import { useAppState, useT } from "../../lib/AppStateContext";
+import { track } from "../../lib/analytics";
 import { askQuestion, submitTrustResult } from "../../lib/api";
 
 const AREAS = ["areaCareer", "areaRelationship", "areaFamily", "areaMind", "areaMoney", "areaMove"];
@@ -40,6 +41,7 @@ export default function TrustPage() {
     const result = { event, monthYear, area, result: reading, feedback: choice, note: "" };
     update({ trustTest: result });
     submitTrustResult(result);
+    track("trust_test_answered", { result: choice });
   }
 
   function handleNoteSubmit() {
