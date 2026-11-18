@@ -11,6 +11,7 @@
   --color-fg-muted: #b7b6cf;
   --color-accent: #e8b84b;
   --color-border: #343563;
+  --color-danger: #e5484d;
 }
 
 body {

@@ -1,10 +1,12 @@
 "use client";
 import { useState } from "react";
 import { AppShell } from "../../components/AppShell";
+import { TrustProofBlock } from "../../components/TrustProofBlock";
 import { Page, PrimaryButton } from "../../components/ui";
 import { useAppState, useT } from "../../lib/AppStateContext";
 import { track } from "../../lib/analytics";
 import { startSubscription } from "../../lib/api";
+import { DAILY_PRICE_INR, PRICE_INR } from "../../lib/config";
 
 export default function PlansPage() {
   const { state, update } = useAppState();
@@ -25,7 +27,16 @@ export default function PlansPage() {
       <Page>
         <h1 className="text-2xl font-bold">{t("plansTitle")}</h1>
         <p className="text-base">{t("firstFreeNote")}</p>
-        <p className="text-xl font-bold">{t("priceLine")}</p>
+
+        <TrustProofBlock t={t} trustTestResults={state.trustTest ? [state.trustTest] : []} />
+
+        <p className="text-base text-fg-muted">{t("astrologerComparison")}</p>
+
+        <div>
+          <p className="text-xl font-bold">{t("priceLine", { price: PRICE_INR })}</p>
+          <p className="text-base text-fg-muted">{t("dailyPriceLine", { daily: DAILY_PRICE_INR })}</p>
+        </div>
+
         <ul className="flex flex-col gap-2 text-base">
           <li>• {t("benefitUnlimited")}</li>
           <li>• {t("benefitDaily")}</li>

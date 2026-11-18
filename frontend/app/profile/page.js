@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AppShell } from "../../components/AppShell";
-import { Page, PrimaryButton, SecondaryButton } from "../../components/ui";
+import { DangerButton, Page, SecondaryButton } from "../../components/ui";
 import { useAppState, useT } from "../../lib/AppStateContext";
 import { track } from "../../lib/analytics";
 import { LANGS } from "../../lib/mock/translations";
@@ -78,22 +78,6 @@ export default function ProfilePage() {
         <section className="flex flex-col gap-2">
           <h2 className="text-lg font-semibold">{t("myData")}</h2>
           <SecondaryButton onClick={handleDownload}>{t("downloadData")}</SecondaryButton>
-          {!showConfirm ? (
-            <SecondaryButton onClick={() => setShowConfirm(true)}>{t("deleteAllData")}</SecondaryButton>
-          ) : (
-            <div className="flex flex-col gap-2">
-              <input
-                type="text"
-                value={confirmText}
-                onChange={(e) => setConfirmText(e.target.value)}
-                placeholder={t("typeDeleteToConfirm")}
-                className="min-h-[48px] border border-border rounded-2xl px-4 bg-bg-elevated text-fg text-base"
-              />
-              <PrimaryButton disabled={confirmText !== "DELETE"} onClick={handleDelete}>
-                {t("deleteAllData")}
-              </PrimaryButton>
-            </div>
-          )}
         </section>
 
         <section className="flex flex-col gap-2">
@@ -107,6 +91,29 @@ export default function ProfilePage() {
         <a href="tel:14416" className="text-base underline">
           {t("needHelp")}
         </a>
+
+        <section className="flex flex-col gap-4 mt-8 p-4 border border-danger/40 rounded-2xl">
+          <h2 className="text-lg font-semibold text-danger">{t("dangerZone")}</h2>
+          {!showConfirm ? (
+            <DangerButton onClick={() => setShowConfirm(true)}>
+              🗑️ {t("deleteAllData")}
+            </DangerButton>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <input
+                type="text"
+                value={confirmText}
+                onChange={(e) => setConfirmText(e.target.value)}
+                placeholder={t("typeDeleteToConfirm")}
+                className="min-h-[48px] border border-border rounded-2xl px-4 bg-bg-elevated text-fg text-base"
+              />
+              <DangerButton disabled={confirmText !== "DELETE"} onClick={handleDelete}>
+                🗑️ {t("deleteAllData")}
+              </DangerButton>
+            </div>
+          )}
+          <p className="text-base text-fg-muted">{t("deleteWarningLine")}</p>
+        </section>
       </Page>
     </AppShell>
   );

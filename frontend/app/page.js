@@ -6,6 +6,7 @@ import { Page, PrimaryButton } from "../components/ui";
 import { useAppState, useT } from "../lib/AppStateContext";
 import { track } from "../lib/analytics";
 import { pickReading } from "../lib/mock/chart";
+import { GET_STARTED_MINUTES } from "../lib/config";
 
 const DEMO_BIRTH = { date: "1997-04-10", time: "08:15", place: { name: "Mumbai" } };
 const KNOWN_SOURCES = ["instagram", "whatsapp", "youtube"];
@@ -44,9 +45,14 @@ function LandingInner() {
       <h1 className="text-3xl font-bold mt-6">{t("appName")}</h1>
       <p className="text-lg">{t("promise")}</p>
       <p className="text-base text-fg-muted">{t("landingSubline")}</p>
-      <Link href="/start" onClick={() => track("get_started_clicked")}>
-        <PrimaryButton>{t("getFreeReading")}</PrimaryButton>
-      </Link>
+      <div className="flex flex-col gap-2">
+        <Link href="/start" onClick={() => track("get_started_clicked")}>
+          <PrimaryButton>{t("getFreeReading")}</PrimaryButton>
+        </Link>
+        <p className="text-sm text-fg-muted text-center whitespace-nowrap overflow-x-auto">
+          {t("trustStrip", { minutes: GET_STARTED_MINUTES })}
+        </p>
+      </div>
 
       <div className="mt-4 border border-border rounded-2xl p-4 bg-bg-elevated flex flex-col gap-4">
         <p className="text-sm font-medium">{t("demoQuestion")}</p>
@@ -73,9 +79,14 @@ function LandingInner() {
         <p className="text-base text-fg-muted">{t("dataStaysYoursBody")}</p>
       </section>
 
-      <Link href="/start" className="mt-2" onClick={() => track("get_started_clicked")}>
-        <PrimaryButton>{t("getFreeReading")}</PrimaryButton>
-      </Link>
+      <div className="flex flex-col gap-2 mt-2">
+        <Link href="/start" onClick={() => track("get_started_clicked")}>
+          <PrimaryButton>{t("getFreeReading")}</PrimaryButton>
+        </Link>
+        <p className="text-sm text-fg-muted text-center whitespace-nowrap overflow-x-auto">
+          {t("trustStrip", { minutes: GET_STARTED_MINUTES })}
+        </p>
+      </div>
       <p className="text-base text-fg-muted mb-8">{t("disclaimer")}</p>
     </Page>
   );

@@ -24,7 +24,6 @@ export default function TrustPage() {
   const [reading, setReading] = useState(null);
   const [feedback, setFeedback] = useState(null);
   const [note, setNote] = useState("");
-  const [showMeaning, setShowMeaning] = useState(false);
 
   const canSubmit = event.trim() && monthYear.trim() && area;
 
@@ -69,10 +68,14 @@ export default function TrustPage() {
             <p className="text-sm font-semibold text-fg-muted mb-2">{t("chartReason")}</p>
             <p className="text-base">{reading.chartReason}</p>
           </div>
-          <button type="button" onClick={() => setShowMeaning((v) => !v)} className="text-base underline text-left">
-            {t("whatDoesMean")}
-          </button>
-          {showMeaning && <p className="text-base text-fg-muted">{reading.whatItMeans}</p>}
+          <div>
+            <p className="text-sm font-semibold text-fg-muted mb-2">{t("whatDoesMean")}</p>
+            <p className="text-base">{reading.whatItMeans}</p>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-fg-muted mb-2">{t("whatWasHappening")}</p>
+            <p className="text-base">{event}</p>
+          </div>
           <div className="bg-bg rounded-2xl p-4 border border-accent glow-once">
             <p className="text-sm font-semibold text-accent mb-2">{t("nextStep")}</p>
             <p className="text-base font-medium">{reading.nextStep}</p>

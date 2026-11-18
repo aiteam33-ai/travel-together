@@ -27,6 +27,19 @@ export function SecondaryButton({ children, onClick, disabled, type = "button", 
   );
 }
 
+export function DangerButton({ children, onClick, disabled, type = "button", className = "" }) {
+  return (
+    <button
+      type={type}
+      onClick={onClick}
+      disabled={disabled}
+      className={`w-full min-h-[48px] rounded-2xl border border-danger text-danger font-medium px-6 py-4 flex items-center justify-center gap-2 transition-shadow hover:shadow-[0_0_14px_rgba(229,72,77,0.3)] disabled:border-border disabled:text-fg-muted disabled:shadow-none ${className}`}
+    >
+      {children}
+    </button>
+  );
+}
+
 export function Chip({ children, onClick, selected = false }) {
   return (
     <button
