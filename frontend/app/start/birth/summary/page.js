@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { ChartWheel } from "../../../../components/ChartWheel";
 import { Page, PrimaryButton, SecondaryButton } from "../../../../components/ui";
 import { useAppState, useT } from "../../../../lib/AppStateContext";
 import { getChart } from "../../../../lib/api";
@@ -10,13 +11,14 @@ export default function SummaryPage() {
   const t = useT();
   const router = useRouter();
   const [drawing, setDrawing] = useState(false);
+  const [chartReady, setChartReady] = useState(false);
   const bd = state.birthDetails || {};
 
   useEffect(() => {
     if (!drawing) return;
     let active = true;
     getChart(bd).then(() => {
-      if (active) router.push("/trust");
+      if (active) setChartReady(true);
     });
     return () => {
       active = false;
@@ -27,7 +29,14 @@ export default function SummaryPage() {
   if (drawing) {
     return (
       <Page>
-        <p className="text-lg text-center mt-20">{t("drawingChart")}</p>
+        <p className="text-lg text-center mt-10">{t("drawingChart")}</p>
+        <ChartWheel
+          birthDetails={bd}
+          chartReady={chartReady}
+          onDone={() => router.push("/trust")}
+          onSkip={() => router.push("/trust")}
+          t={t}
+        />
       </Page>
     );
   }

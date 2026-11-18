@@ -121,6 +121,7 @@ export const T = {
   edit: { english: "Edit", hinglish: "Edit karo", hindi: "संपादित करें" },
   drawChart: { english: "Draw my chart", hinglish: "Mera chart banao", hindi: "मेरी कुंडली बनाएं" },
   drawingChart: { english: "Drawing your chart...", hinglish: "Aapka chart ban raha hai...", hindi: "आपकी कुंडली बन रही है..." },
+  skip: { english: "Skip", hinglish: "Skip karo", hindi: "छोड़ें" },
 
   trustTitle: { english: "First, test us on something that already happened.", hinglish: "Pehle, humein kisi hui hui baat par test karo.", hindi: "पहले, हमें किसी हो चुकी घटना पर परखें।" },
   trustPastEvent: { english: "What happened?", hinglish: "Kya hua tha?", hindi: "क्या हुआ था?" },
