@@ -71,20 +71,36 @@ export default function TrustPage() {
             {t("whatDoesMean")}
           </button>
           {showMeaning && <p className="text-base text-fg-muted">{reading.whatItMeans}</p>}
-          <div className="bg-bg rounded-2xl p-4 border border-accent">
+          <div className="bg-bg rounded-2xl p-4 border border-accent glow-once">
             <p className="text-sm font-semibold text-accent mb-2">{t("nextStep")}</p>
             <p className="text-base font-medium">{reading.nextStep}</p>
           </div>
           <p className="text-base text-fg-muted">{t("disclaimer")}</p>
         </div>
 
-        {!feedback && (
-          <div className="flex gap-2">
-            <Chip onClick={() => handleFeedback("matches")}>{t("matches")}</Chip>
-            <Chip onClick={() => handleFeedback("partly")}>{t("partly")}</Chip>
-            <Chip onClick={() => handleFeedback("no_match")}>{t("noMatch")}</Chip>
-          </div>
-        )}
+        <div className="flex gap-2">
+          {[
+            { key: "matches", label: t("matches") },
+            { key: "partly", label: t("partly") },
+            { key: "no_match", label: t("noMatch") },
+          ].map((opt) => (
+            <button
+              key={opt.key}
+              type="button"
+              disabled={!!feedback}
+              onClick={() => handleFeedback(opt.key)}
+              className={`min-h-[48px] px-4 rounded-full border text-base ${
+                feedback === opt.key
+                  ? "bg-accent text-bg border-accent pop-once"
+                  : feedback
+                    ? "border-border text-fg fade-dim"
+                    : "border-border text-fg"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
         {feedback && feedback !== "matches" && (
           <div className="flex flex-col gap-2">
             <input

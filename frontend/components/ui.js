@@ -70,7 +70,7 @@ export function ReadingCard({ t, reading }) {
       <div>
         <p className="text-base">{reading.whatItMeans}</p>
       </div>
-      <div className="bg-bg rounded-2xl p-4 border border-accent">
+      <div className="bg-bg rounded-2xl p-4 border border-accent glow-once">
         <p className="text-sm font-semibold text-accent mb-2">{t("nextStep") || "Your one next step"}</p>
         <p className="text-base font-medium">{reading.nextStep}</p>
       </div>

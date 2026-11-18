@@ -151,7 +151,11 @@ export default function ChatPage() {
                       type="button"
                       onClick={() => setFeedback(entry.id, "helpful")}
                       className={`min-h-[48px] px-4 rounded-2xl border ${
-                        entry.feedback === "helpful" ? "border-accent bg-bg-elevated" : "border-border"
+                        entry.feedback === "helpful"
+                          ? "border-accent bg-bg-elevated pop-once"
+                          : entry.feedback
+                            ? "border-border fade-dim"
+                            : "border-border"
                       }`}
                     >
                       👍 {t("helpful")}
@@ -160,7 +164,11 @@ export default function ChatPage() {
                       type="button"
                       onClick={() => setFeedback(entry.id, "not_helpful")}
                       className={`min-h-[48px] px-4 rounded-2xl border ${
-                        entry.feedback === "not_helpful" ? "border-accent bg-bg-elevated" : "border-border"
+                        entry.feedback === "not_helpful"
+                          ? "border-accent bg-bg-elevated pop-once"
+                          : entry.feedback
+                            ? "border-border fade-dim"
+                            : "border-border"
                       }`}
                     >
                       👎 {t("notHelpful")}

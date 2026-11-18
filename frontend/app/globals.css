@@ -36,6 +36,70 @@ h3 {
   font-family: var(--font-heading-hi, Arial, Helvetica, sans-serif);
 }
 
+/* Phase 6: tiny animations. All under 0.3s (pop/press) or 0.6s (glow,
+   once only), pure CSS, and fully disabled under reduced motion below. */
+button,
+a.btn-like {
+  transition: transform 150ms ease;
+}
+button:active {
+  transform: scale(0.96);
+}
+@media (hover: hover) {
+  button:hover,
+  a.btn-like:hover {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes pop-once {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.pop-once {
+  animation: pop-once 250ms ease;
+}
+.fade-dim {
+  transition: opacity 200ms ease;
+  opacity: 0.5;
+}
+
+@keyframes glow-once {
+  0% {
+    box-shadow: 0 0 0 rgba(232, 184, 75, 0);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(232, 184, 75, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(232, 184, 75, 0);
+  }
+}
+.glow-once {
+  animation: glow-once 600ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button,
+  a.btn-like,
+  .pop-once,
+  .glow-once {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+  .fade-dim {
+    opacity: 1;
+  }
+}
+
 /* Faint static starfield, pure CSS, behind all content. */
 .starfield {
   position: fixed;
