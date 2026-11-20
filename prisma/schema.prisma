@@ -27,6 +27,7 @@ model User {
   leads         Lead[]
   sessions      Session[]
   supportRequests SupportRequest[]
+  groupMemberships GroupMember[]
 }
 
 model Session {
@@ -79,6 +80,8 @@ model Tour {
   wishlist      WishlistItem[]
   savedCalcs    SavedCalculation[]
   bookings      Booking[]
+  groups        Group[]
+  shortlistedIn GroupShortlistItem[]
 }
 
 model Departure {
@@ -219,10 +222,155 @@ model Booking {
   trackerStage  String   @default("BOOKED") // BOOKED, DOCUMENTS_RECEIVED, BALANCE_PAID, VOUCHERS_ISSUED, TRIP_COMPLETED
   balanceDueDate DateTime?
   documentsNeededNote String?
+  groupId       String?
   user          User     @relation(fields: [userId], references: [id])
   tour          Tour     @relation(fields: [tourId], references: [id])
   departure     Departure @relation(fields: [departureId], references: [id])
   payments      Payment[]
+  group         Group?   @relation(fields: [groupId], references: [id])
+}
+
+// ===================== My Socials =====================
+// GroupMember is the one and only "who's in this group" relationship.
+// A Booking traveller (named in Booking.travellersJson) and an
+// ExpenseParticipant (below) are deliberately separate — joining a group
+// never makes someone a traveller, and a traveller need not be a member.
+
+model Group {
+  id              String   @id @default(cuid())
+  name            String
+  organiserUserId String
+  tourId          String?
+  departureId     String?
+  status          String   @default("ACTIVE") // ACTIVE, ARCHIVED
+  estimateSnapshotJson String?
+  createdAt       DateTime @default(now())
+  members         GroupMember[]
+  inviteLinks     GroupInviteLink[]
+  shortlist       GroupShortlistItem[]
+  feedItems       GroupFeedItem[]
+  expenses        Expense[]
+  settlements     Settlement[]
+  bookings        Booking[]
+  tour            Tour?    @relation(fields: [tourId], references: [id])
+}
+
+model GroupMember {
+  id        String   @id @default(cuid())
+  groupId   String
+  userId    String?  // set once this invitee has signed in and matched by phone, or immediately for the organiser
+  name      String
+  phone     String?
+  role      String   @default("MEMBER") // ORGANISER, MEMBER
+  status    String   @default("INVITED") // INVITED, JOINED, LEFT
+  consentAt DateTime?
+  createdAt DateTime @default(now())
+  group     Group    @relation(fields: [groupId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id])
+  feedItems GroupFeedItem[]
+  shortlistAdds GroupShortlistItem[]
+  expensesPaid  Expense[] @relation("ExpensePayer")
+  expensesCreated Expense[] @relation("ExpenseCreator")
+  participations ExpenseParticipant[]
+  settlementsFrom Settlement[] @relation("SettlementFrom")
+  settlementsTo   Settlement[] @relation("SettlementTo")
+
+  @@unique([groupId, phone])
+}
+
+model GroupInviteLink {
+  id        String   @id @default(cuid())
+  groupId   String
+  token     String   @unique
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  group     Group    @relation(fields: [groupId], references: [id])
+}
+
+model GroupShortlistItem {
+  id            String   @id @default(cuid())
+  groupId       String
+  tourId        String
+  addedByMemberId String
+  selected      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  group         Group    @relation(fields: [groupId], references: [id])
+  tour          Tour     @relation(fields: [tourId], references: [id])
+  addedBy       GroupMember @relation(fields: [addedByMemberId], references: [id])
+}
+
+model GroupFeedItem {
+  id             String   @id @default(cuid())
+  groupId        String
+  type           String   // POST, COMMENT, SYSTEM
+  authorMemberId String?
+  text           String
+  parentId       String?
+  deletedAt      DateTime?
+  createdAt      DateTime @default(now())
+  group          Group    @relation(fields: [groupId], references: [id])
+  author         GroupMember? @relation(fields: [authorMemberId], references: [id])
+}
+
+model Expense {
+  id              String   @id @default(cuid())
+  groupId         String
+  description     String
+  amountPaise     Int
+  date            DateTime
+  paidByMemberId  String
+  splitType       String   // EQUAL, CUSTOM
+  createdByMemberId String
+  fromBooking     Boolean  @default(false)
+  deletedAt       DateTime?
+  createdAt       DateTime @default(now())
+  group           Group    @relation(fields: [groupId], references: [id])
+  paidBy          GroupMember @relation("ExpensePayer", fields: [paidByMemberId], references: [id])
+  createdBy       GroupMember @relation("ExpenseCreator", fields: [createdByMemberId], references: [id])
+  participants    ExpenseParticipant[]
+}
+
+model ExpenseParticipant {
+  id              String   @id @default(cuid())
+  expenseId       String
+  memberId        String
+  shareAmountPaise Int
+  expense         Expense  @relation(fields: [expenseId], references: [id])
+  member          GroupMember @relation(fields: [memberId], references: [id])
+
+  @@unique([expenseId, memberId])
+}
+
+model Settlement {
+  id            String   @id @default(cuid())
+  groupId       String
+  fromMemberId  String
+  toMemberId    String
+  amountPaise   Int
+  note          String?
+  createdAt     DateTime @default(now())
+  group         Group    @relation(fields: [groupId], references: [id])
+  fromMember    GroupMember @relation("SettlementFrom", fields: [fromMemberId], references: [id])
+  toMember      GroupMember @relation("SettlementTo", fields: [toMemberId], references: [id])
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  adminUserId String
+  entity      String   // e.g. "TaxConfig", "PricingConfig", "GroupDiscountTier"
+  key         String
+  oldValue    String?
+  newValue    String
+  createdAt   DateTime @default(now())
+}
+
+model ProductEvent {
+  id          String   @id @default(cuid())
+  type        String   // CALCULATOR_USED, GROUP_CREATED, INVITE_SENT, INVITE_ACCEPTED, EXPENSE_ADDED, CHECKOUT_STARTED, BOOKING_CONFIRMED
+  userId      String?
+  metadataJson String?
+  createdAt   DateTime @default(now())
 }
 
 model Payment {
