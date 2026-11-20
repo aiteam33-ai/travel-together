@@ -172,7 +172,12 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
             <p className="text-sm text-foreground-muted">No upcoming departures right now.</p>
           )}
           <div className="mt-4 flex flex-col gap-2">
-            <a href="#book" className="rounded-md bg-accent px-4 py-2 text-center font-semibold text-white hover:bg-accent-strong">Book now</a>
+            <a
+              href={`/checkout/new?departureId=${futureDepartures[0]?.id ?? ""}`}
+              className="rounded-md bg-accent px-4 py-2 text-center font-semibold text-white hover:bg-accent-strong"
+            >
+              Book now
+            </a>
             <EnquireButton tourId={tour.id} tourTitle={tour.title} />
           </div>
         </div>

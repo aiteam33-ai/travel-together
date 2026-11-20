@@ -87,10 +87,10 @@ export default function LoginModal({ onClose }: { onClose: () => void }) {
   }
 
   async function saveName() {
-    const res = await fetch("/api/auth/verify-otp", {
+    const res = await fetch("/api/auth/update-name", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ identifier, code, name, isEmail: mode === "email" }),
+      body: JSON.stringify({ name }),
     });
     if (res.ok) {
       await refresh();
