@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import TripCostCalculator from "../pricing/TripCostCalculator";
 import EnquireButton from "../EnquireButton";
 import SlideOverPanel from "../SlideOverPanel";
+import AddToGroupButton from "../socials/AddToGroupButton";
 import { formatRupees, formatDateIST } from "@/lib/pricing/format";
 import { usePrefersReducedMotion } from "@/lib/motion/reduced-motion";
 import { useFloatingStack, COMPARE_TRAY_HEIGHT, FLOATING_GAP } from "../floating/FloatingStackContext";
@@ -78,6 +79,7 @@ export default function TourPricePanel({
             Book now
           </a>
           <EnquireButton tourId={tourId} tourTitle={tourTitle} />
+          <AddToGroupButton tourId={tourId} />
           <button
             type="button"
             onClick={() => setPanelOpen(true)}
