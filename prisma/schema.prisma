@@ -29,6 +29,10 @@ model User {
   sessions      Session[]
   supportRequests SupportRequest[]
   groupMemberships GroupMember[]
+  friendRequestsSent     FriendRequest[] @relation("FriendRequestFrom")
+  friendRequestsReceived FriendRequest[] @relation("FriendRequestTo")
+  directMessagesSent     DirectMessage[] @relation("DirectMessageFrom")
+  directMessagesReceived DirectMessage[] @relation("DirectMessageTo")
 }
 
 model Session {
@@ -83,6 +87,7 @@ model Tour {
   bookings      Booking[]
   groups        Group[]
   shortlistedIn GroupShortlistItem[]
+  sharedInFeed  GroupFeedItem[]
 }
 
 model Departure {
@@ -254,6 +259,7 @@ model Group {
   settlements     Settlement[]
   bookings        Booking[]
   tour            Tour?    @relation(fields: [tourId], references: [id])
+  tripBudget      TripBudget?
 }
 
 model GroupMember {
@@ -305,6 +311,9 @@ model GroupFeedItem {
   id             String   @id @default(cuid())
   groupId        String
   type           String   // POST, COMMENT, SYSTEM
+  messageKind    String   @default("TEXT") // TEXT, IMAGE, LINK, PACKAGE
+  attachmentUrl  String?  // image or link URL, for IMAGE/LINK kinds
+  attachmentTourId String? // shared tour package, for PACKAGE kind
   authorMemberId String?
   text           String
   parentId       String?
@@ -312,6 +321,51 @@ model GroupFeedItem {
   createdAt      DateTime @default(now())
   group          Group    @relation(fields: [groupId], references: [id])
   author         GroupMember? @relation(fields: [authorMemberId], references: [id])
+  attachmentTour Tour?    @relation(fields: [attachmentTourId], references: [id])
+}
+
+// ===================== My Socials v2: friends, DMs, budget =====================
+
+model FriendRequest {
+  id          String   @id @default(cuid())
+  fromUserId  String
+  toUserId    String
+  status      String   @default("PENDING") // PENDING, ACCEPTED, REJECTED
+  createdAt   DateTime @default(now())
+  respondedAt DateTime?
+  fromUser    User     @relation("FriendRequestFrom", fields: [fromUserId], references: [id])
+  toUser      User     @relation("FriendRequestTo", fields: [toUserId], references: [id])
+
+  @@unique([fromUserId, toUserId])
+}
+
+model DirectMessage {
+  id         String   @id @default(cuid())
+  fromUserId String
+  toUserId   String
+  text       String
+  createdAt  DateTime @default(now())
+  readAt     DateTime?
+  fromUser   User     @relation("DirectMessageFrom", fields: [fromUserId], references: [id])
+  toUser     User     @relation("DirectMessageTo", fields: [toUserId], references: [id])
+}
+
+model TripBudget {
+  id                 String   @id @default(cuid())
+  groupId            String   @unique
+  destination        String
+  travellers         Int
+  days               Int
+  transportPaise     Int      @default(0)
+  accommodationPaise Int      @default(0)
+  foodPaise          Int      @default(0)
+  activitiesPaise    Int      @default(0)
+  shoppingPaise      Int      @default(0)
+  otherPaise         Int      @default(0)
+  budgetLimitPaise   Int?
+  updatedByMemberId  String
+  updatedAt          DateTime @updatedAt
+  group              Group    @relation(fields: [groupId], references: [id])
 }
 
 model Expense {

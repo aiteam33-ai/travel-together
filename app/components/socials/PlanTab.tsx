@@ -24,6 +24,16 @@ export default function PlanTab({ groupId, isOrganiser, shortlist }: { groupId: 
     router.refresh();
   }
 
+  async function shareInChat(item: ShortlistItem) {
+    setBusyId(item.id);
+    await fetch(`/api/groups/${groupId}/feed`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: item.tourTitle, messageKind: "PACKAGE", attachmentTourId: item.tourId }),
+    });
+    setBusyId(null);
+  }
+
   return (
     <div>
       <p className="text-sm text-foreground-muted">
@@ -42,11 +52,16 @@ export default function PlanTab({ groupId, isOrganiser, shortlist }: { groupId: 
                 <Link href={`/tours/${item.tourSlug}`} className="font-semibold hover:text-accent">{item.tourTitle}</Link>
                 <p className="text-xs text-foreground-muted">Added by {item.addedByName}{item.selected && " · Selected"}</p>
               </div>
-              {isOrganiser && !item.selected && (
-                <button type="button" disabled={busyId === item.id} onClick={() => select(item.id)} className="min-h-11 rounded-md border border-border px-3 text-xs font-semibold press-feedback">
-                  Select this tour
+              <div className="flex gap-2">
+                <button type="button" disabled={busyId === item.id} onClick={() => shareInChat(item)} className="min-h-11 rounded-md border border-border px-3 text-xs font-semibold press-feedback">
+                  Share in chat
                 </button>
-              )}
+                {isOrganiser && !item.selected && (
+                  <button type="button" disabled={busyId === item.id} onClick={() => select(item.id)} className="min-h-11 rounded-md border border-border px-3 text-xs font-semibold press-feedback">
+                    Select this tour
+                  </button>
+                )}
+              </div>
             </li>
           ))}
         </ul>

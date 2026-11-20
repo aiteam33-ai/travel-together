@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const TABS = [
   { key: "overview", label: "Overview" },
   { key: "plan", label: "Plan" },
+  { key: "budget", label: "Budget" },
   { key: "expenses", label: "Expenses" },
   { key: "members", label: "Members" },
 ];

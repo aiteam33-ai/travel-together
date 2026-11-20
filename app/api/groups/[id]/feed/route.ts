@@ -13,14 +13,20 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const items = await prisma.groupFeedItem.findMany({
     where: { groupId: id, deletedAt: null },
-    include: { author: true },
+    include: { author: true, attachmentTour: true },
     orderBy: { createdAt: "desc" },
     take: 100,
   });
   return NextResponse.json({ items });
 }
 
-const schema = z.object({ text: z.string().min(1).max(1000), parentId: z.string().optional() });
+const schema = z.object({
+  text: z.string().min(1).max(1000),
+  parentId: z.string().optional(),
+  messageKind: z.enum(["TEXT", "IMAGE", "LINK", "PACKAGE"]).default("TEXT"),
+  attachmentUrl: z.string().url().optional(),
+  attachmentTourId: z.string().optional(),
+});
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
@@ -39,7 +45,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       authorMemberId: ctx.membership.id,
       text: parsed.data.text,
       parentId: parsed.data.parentId,
+      messageKind: parsed.data.messageKind,
+      attachmentUrl: parsed.data.attachmentUrl,
+      attachmentTourId: parsed.data.attachmentTourId,
     },
+    include: { attachmentTour: true },
   });
   return NextResponse.json({ ok: true, item });
 }
