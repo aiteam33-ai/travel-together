@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db/client";
 import TripCostCalculator from "@/app/components/pricing/TripCostCalculator";
 import TourPicker from "@/app/components/TourPicker";
+import AddToGroupButton from "@/app/components/socials/AddToGroupButton";
 import Link from "next/link";
 
 export default async function TripCostCalculatorPage({
@@ -48,6 +49,10 @@ export default async function TripCostCalculatorPage({
       <p className="mt-6 text-sm">
         <Link href={`/tours/${selectedTour.slug}`} className="underline">View the full tour details →</Link>
       </p>
+
+      <div className="mt-4 max-w-xs">
+        <AddToGroupButton tourId={selectedTour.id} label="Share with a group" />
+      </div>
 
       <p className="mt-8 rounded-md border border-border bg-surface p-3 text-xs text-foreground-muted">
         GST and TCS rates, EMI interest, insurance pricing and spending presets are all set in admin with

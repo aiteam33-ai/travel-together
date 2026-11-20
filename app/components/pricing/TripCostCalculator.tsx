@@ -20,19 +20,23 @@ export default function TripCostCalculator({
   departures,
   compact = false,
   onStateChange,
+  groupId,
+  defaultAdults,
 }: {
   tourId: string;
   isInternational: boolean;
   departures: DepartureOption[];
   compact?: boolean;
   onStateChange?: (state: { output: PricingEngineOutput | null; adults: number; departureId: string }) => void;
+  groupId?: string;
+  defaultAdults?: number;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const [departureId, setDepartureId] = useState(searchParams.get("departureId") ?? departures[0]?.id ?? "");
   const [city, setCity] = useState(searchParams.get("city") ?? "MUMBAI");
-  const [adults, setAdults] = useState(Number(searchParams.get("adults") ?? 2));
+  const [adults, setAdults] = useState(Number(searchParams.get("adults") ?? defaultAdults ?? 2));
   const [childrenWithBed, setChildrenWithBed] = useState(Number(searchParams.get("cwb") ?? 0));
   const [childrenWithoutBed, setChildrenWithoutBed] = useState(Number(searchParams.get("cnb") ?? 0));
   const [infants, setInfants] = useState(Number(searchParams.get("infants") ?? 0));
@@ -117,6 +121,25 @@ export default function TripCostCalculator({
     }
     const data = await res.json();
     setSaveMsg(data.ok ? "Saved to your account." : "Could not save.");
+  }
+
+  async function saveToGroup() {
+    if (!groupId) return;
+    const res = await fetch(`/api/groups/${groupId}/estimate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        departureId,
+        departureCity: city,
+        travellers: { adults, childrenWithBed, childrenWithoutBed, infants, rooms, singleOccupancyRooms: singleRooms },
+        joiningMode: joiningAtDestination ? joiningMode : undefined,
+        addOns: { travelInsurance, visaFees },
+        spendPreset,
+        couponCode: couponCode || undefined,
+        amountDuePercentNow,
+      }),
+    });
+    setSaveMsg(res.ok ? "Saved — everyone in the group sees this estimate now." : "Could not save to group.");
   }
 
   function shareOnWhatsApp() {
@@ -229,6 +252,9 @@ export default function TripCostCalculator({
 
         <div className="flex flex-wrap gap-2 pt-2">
           <button type="button" onClick={saveCalculation} className="rounded-md border border-border px-3 py-1.5 text-sm">Save to account</button>
+          {groupId && (
+            <button type="button" onClick={saveToGroup} className="rounded-md border border-accent px-3 py-1.5 text-sm font-semibold text-accent">Save to group</button>
+          )}
           <button type="button" onClick={shareOnWhatsApp} className="rounded-md border border-border px-3 py-1.5 text-sm">Share on WhatsApp</button>
           <button type="button" onClick={downloadPdf} className="rounded-md border border-border px-3 py-1.5 text-sm">
             Download as PDF

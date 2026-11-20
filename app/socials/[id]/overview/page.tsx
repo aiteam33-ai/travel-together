@@ -39,6 +39,11 @@ export default async function GroupOverviewPage({ params }: { params: Promise<{ 
               Group estimate: <strong>{formatRupees(estimate.grandTotal)}</strong> ({formatRupees(estimate.costPerPerson)} per person) — an estimate from the pricing engine.
             </p>
           )}
+          {group.tour && (
+            <Link href={`/socials/${id}/estimate`} className="mt-2 inline-block min-h-11 text-sm font-medium text-accent underline">
+              {estimate ? "Update the group estimate" : "Calculate group cost"}
+            </Link>
+          )}
           {booking ? (
             <p className="mt-2 text-sm">
               Booking status: <strong>{booking.status}</strong>
