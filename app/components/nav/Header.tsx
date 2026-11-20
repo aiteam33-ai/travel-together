@@ -9,6 +9,7 @@ import LoginModal from "../auth/LoginModal";
 import { useAuth } from "../auth/AuthContext";
 import { useWishlist } from "../WishlistContext";
 import { useCompare } from "../CompareContext";
+import { useSocials } from "../SocialsContext";
 import MegaMenu from "./MegaMenu";
 import Breadcrumbs from "./Breadcrumbs";
 
@@ -17,6 +18,7 @@ export default function Header() {
   const { user, loading } = useAuth();
   const { count: wishlistCount } = useWishlist();
   const { ids: compareIds } = useCompare();
+  const { unreadCount } = useSocials();
   const [loginOpen, setLoginOpen] = useState(false);
   const [city, setCity] = useState<DepartureCityCode>("MUMBAI");
   const [condensed, setCondensed] = useState(false);
@@ -78,6 +80,17 @@ export default function Header() {
               </span>
             )}
           </Link>
+
+          {user && (
+            <Link href="/socials" className="relative hidden min-h-11 items-center rounded-md px-2 text-sm font-medium lg:flex" aria-label="My Socials">
+              My Socials
+              {unreadCount > 0 && (
+                <span className="badge-pop absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-xs font-semibold text-white">
+                  {unreadCount}
+                </span>
+              )}
+            </Link>
+          )}
 
           <Link href="/compare" className="relative hidden min-h-11 min-w-11 items-center justify-center rounded-md lg:flex" aria-label="Compare">
             <span aria-hidden="true">⇄</span>

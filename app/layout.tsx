@@ -7,6 +7,7 @@ import { AuthProvider } from "./components/auth/AuthContext";
 import { CompareProvider } from "./components/CompareContext";
 import { ToastProvider } from "./components/ToastContext";
 import { WishlistProvider } from "./components/WishlistContext";
+import { SocialsProvider } from "./components/SocialsContext";
 import Header from "./components/nav/Header";
 import Footer from "./components/Footer";
 import BottomTabBar from "./components/nav/BottomTabBar";
@@ -34,18 +35,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <CompareProvider>
               <ToastProvider>
                 <WishlistProvider>
-                  <FloatingStackProvider>
-                    <TopLoadingBar />
-                    <Header />
-                    <main id="main-content" className="mx-auto w-full max-w-[1440px] flex-1 px-6 py-8 pb-24 md:pb-8">
-                      <PageTransition>{children}</PageTransition>
-                    </main>
-                    <Footer />
-                    <HelpButton />
-                    <CompareTray />
-                    <BackToTop />
-                    <BottomTabBar />
-                  </FloatingStackProvider>
+                  <SocialsProvider>
+                    <FloatingStackProvider>
+                      <TopLoadingBar />
+                      <Header />
+                      <main id="main-content" className="mx-auto w-full max-w-[1440px] flex-1 px-6 py-8 pb-24 md:pb-8">
+                        <PageTransition>{children}</PageTransition>
+                      </main>
+                      <Footer />
+                      <HelpButton />
+                      <CompareTray />
+                      <BackToTop />
+                      <BottomTabBar />
+                    </FloatingStackProvider>
+                  </SocialsProvider>
                 </WishlistProvider>
               </ToastProvider>
             </CompareProvider>

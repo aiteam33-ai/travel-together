@@ -20,18 +20,44 @@ export default async function HomePage() {
     <div className="flex flex-col gap-16">
       <LandingIntro>
         <section className="rounded-2xl bg-gradient-to-br from-accent/10 to-transparent p-8 md:p-14">
-          <h1 className="font-heading max-w-2xl text-3xl font-extrabold leading-tight md:text-5xl" data-intro="headline">
-            Know your whole trip cost, before you call anyone.
+          <p className="font-heading text-sm font-bold uppercase tracking-wide text-accent" data-intro="headline">Travel, together</p>
+          <h1 className="font-heading mt-2 max-w-2xl text-3xl font-extrabold leading-tight md:text-5xl" data-intro="headline">
+            Plan, book and share the trip with your people.
           </h1>
           <p className="mt-4 max-w-xl text-lg text-foreground-muted" data-intro="headline">
-            Search fixed-departure tours, treks and pilgrimages across India and the world — then see the full
-            door-to-door cost with our Trip Expense Calculator.
+            Search fixed-departure tours, treks and pilgrimages across India and the world, see the full door-to-door
+            cost with our Trip Expense Calculator — and with My Socials, plan it together with the friends or family
+            you&apos;re travelling with.
           </p>
           <div className="mt-8" data-intro="search">
             <SearchBar />
           </div>
         </section>
       </LandingIntro>
+
+      <RevealOnScroll as="section" className="rounded-2xl border border-border bg-surface p-8">
+        <h2 className="font-heading text-2xl font-bold">My Socials: plan the trip with your people</h2>
+        <p className="mt-2 max-w-2xl text-foreground-muted">
+          Group trips usually mean a WhatsApp group, a spreadsheet and a booking site, all disconnected. My Socials
+          puts your group&apos;s plan, cost estimate and shared expenses in one place.
+        </p>
+        <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-3">
+          {[
+            { step: "1", title: "Invite your group", body: "Create a group and invite friends by link or mobile number." },
+            { step: "2", title: "Plan and calculate together", body: "Shortlist tours, post updates, and see the group's cost estimate from the same pricing engine used at checkout." },
+            { step: "3", title: "Book and split expenses", body: "One person books for the group; everyone can record shared expenses and see who owes whom." },
+          ].map((item) => (
+            <div key={item.step} className="rounded-xl border border-border bg-background p-5">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-sm font-bold text-white">{item.step}</span>
+              <h3 className="mt-3 font-semibold">{item.title}</h3>
+              <p className="mt-1 text-sm text-foreground-muted">{item.body}</p>
+            </div>
+          ))}
+        </div>
+        <Link href="/socials" className="mt-6 inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white press-feedback hover:bg-accent-strong">
+          Go to My Socials
+        </Link>
+      </RevealOnScroll>
 
       {fastFilling.length > 0 && (
         <RevealOnScroll as="section">

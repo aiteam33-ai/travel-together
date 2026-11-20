@@ -2,20 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Search, Calculator, Heart, User } from "lucide-react";
-import { useWishlist } from "../WishlistContext";
+import { Home, Search, Calculator, Users, User } from "lucide-react";
+import { useSocials } from "../SocialsContext";
 
 const TABS = [
   { href: "/", label: "Home", Icon: Home },
   { href: "/tours", label: "Search", Icon: Search },
   { href: "/trip-cost-calculator", label: "Calculator", Icon: Calculator },
-  { href: "/account/wishlist", label: "Wishlist", Icon: Heart },
+  { href: "/socials", label: "My Socials", Icon: Users },
   { href: "/account", label: "Account", Icon: User },
 ];
 
 export default function BottomTabBar() {
   const pathname = usePathname();
-  const { count } = useWishlist();
+  const { unreadCount } = useSocials();
 
   return (
     <nav
@@ -35,9 +35,9 @@ export default function BottomTabBar() {
           >
             <Icon size={20} strokeWidth={active ? 2.4 : 1.8} />
             {label}
-            {label === "Wishlist" && count > 0 && (
+            {label === "My Socials" && unreadCount > 0 && (
               <span className="badge-pop absolute right-5 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[9px] font-semibold text-white">
-                {count}
+                {unreadCount}
               </span>
             )}
           </Link>
