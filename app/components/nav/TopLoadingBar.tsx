@@ -27,7 +27,7 @@ export default function TopLoadingBar() {
   if (!visible) return null;
 
   return (
-    <div className="fixed left-0 top-0 z-50 h-[3px] w-full overflow-hidden bg-transparent" aria-hidden="true">
+    <div className="fixed left-0 top-0 z-50 h-[3px] w-full overflow-hidden bg-transparent print:hidden" aria-hidden="true">
       <div className="h-full w-1/3 animate-[loading-bar_0.4s_ease-in-out] bg-accent" />
     </div>
   );

@@ -44,7 +44,7 @@ export default function CompareTray() {
           animate={{ y: 0, opacity: 1 }}
           exit={reduced ? undefined : { y: 100, opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed inset-x-0 bottom-14 z-30 border-t border-border bg-surface-raised px-4 py-3 shadow-[var(--shadow-raised)] md:bottom-0"
+          className="fixed inset-x-0 bottom-14 z-30 border-t border-border bg-surface-raised px-4 py-3 shadow-[var(--shadow-raised)] md:bottom-0 print:hidden"
         >
           <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">

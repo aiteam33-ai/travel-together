@@ -5,7 +5,7 @@ import { FooterCompanyLinks, FooterPolicyLinks, FooterBranchesHeading } from "./
 export default async function Footer() {
   const branches = await prisma.branch.findMany();
   return (
-    <footer className="mt-16 border-t border-border bg-surface">
+    <footer className="mt-16 border-t border-border bg-surface print:hidden">
       <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-8 px-6 py-10 md:grid-cols-4">
         <div>
           <p className="font-heading text-lg font-bold text-accent">{BRAND.shortName}</p>

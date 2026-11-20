@@ -32,7 +32,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur print:hidden">
       <a href="#main-content" className="skip-link">Skip to content</a>
       <div
         className={`mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-6 transition-[padding] duration-200 ${

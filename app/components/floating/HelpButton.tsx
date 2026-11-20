@@ -64,7 +64,7 @@ export default function HelpButton() {
   return (
     <div
       ref={containerRef}
-      className="fixed bottom-[88px] right-4 z-40 flex flex-col items-end gap-3 transition-transform duration-200 md:bottom-6 md:right-6"
+      className="fixed bottom-[88px] right-4 z-40 flex flex-col items-end gap-3 transition-transform duration-200 md:bottom-6 md:right-6 print:hidden"
       style={{ transform: `translateY(-${extraOffset}px)` }}
     >
       <AnimatePresence>

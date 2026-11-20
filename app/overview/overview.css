@@ -1,0 +1,147 @@
+.overview-doc {
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: var(--font-hind), Arial, sans-serif;
+  color: var(--foreground);
+}
+
+.overview-page {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.overview-kicker {
+  color: var(--accent);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.overview-title h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin: var(--space-1) 0 var(--space-3) 0;
+  line-height: 1.25;
+}
+
+.overview-doc h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: var(--space-3) 0 var(--space-1) 0;
+  color: var(--accent-strong);
+}
+
+.overview-doc p {
+  margin: 0 0 var(--space-1) 0;
+  line-height: 1.55;
+  font-size: 0.95rem;
+}
+
+.overview-doc ul {
+  margin: var(--space-1) 0;
+  padding-left: 1.25rem;
+}
+.overview-doc li {
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.overview-emphasis {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.overview-journey {
+  list-style: none;
+  margin: var(--space-2) 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.overview-journey li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+.overview-journey-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.overview-screens {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+.overview-screens figure {
+  margin: 0;
+}
+.overview-screens img {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: block;
+}
+.overview-screens figcaption {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--foreground-muted);
+  margin-top: 4px;
+}
+
+.overview-footer {
+  margin-top: var(--space-3);
+  padding-top: var(--space-1);
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--foreground-muted);
+  text-align: right;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+
+  .overview-doc {
+    max-width: none;
+  }
+
+  .overview-page {
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin-bottom: 0;
+    page-break-after: always;
+  }
+  .overview-page:last-child {
+    page-break-after: auto;
+  }
+}

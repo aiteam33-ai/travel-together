@@ -26,7 +26,7 @@ export default function BackToTop() {
       type="button"
       onClick={() => window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" })}
       aria-label="Back to top"
-      className="fixed bottom-[88px] left-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface-raised text-foreground shadow-[var(--shadow-soft)] press-feedback transition-transform duration-200 md:bottom-6 md:left-6"
+      className="fixed bottom-[88px] left-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface-raised text-foreground shadow-[var(--shadow-soft)] press-feedback transition-transform duration-200 md:bottom-6 md:left-6 print:hidden"
       style={{ transform: `translateY(-${extraOffset}px)` }}
     >
       <ArrowUp size={18} />

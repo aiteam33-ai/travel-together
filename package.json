@@ -10,7 +10,8 @@
     "test": "vitest run",
     "db:seed": "tsx prisma/seed.ts",
     "db:push": "prisma db push",
-    "make-admin": "tsx scripts/make-admin.ts"
+    "make-admin": "tsx scripts/make-admin.ts",
+    "export-overview-pdf": "node scripts/export-overview-pdf.mjs"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
@@ -30,6 +31,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
     "prisma": "^5.22.0",
+    "puppeteer": "^25.18.1",
     "tailwindcss": "4.3.3",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
