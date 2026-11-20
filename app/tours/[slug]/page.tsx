@@ -2,8 +2,10 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getTourBySlug, parseJsonField } from "@/lib/data/tours";
 import TripCostCalculator from "@/app/components/pricing/TripCostCalculator";
-import EnquireButton from "@/app/components/EnquireButton";
+import TourPricePanel from "@/app/components/tour/TourPricePanel";
+import SectionChips from "@/app/components/tour/SectionChips";
 import WishlistButton from "@/app/components/WishlistButton";
+import SeatsBar from "@/app/components/tour/SeatsBar";
 import { formatDateIST } from "@/lib/pricing/format";
 
 interface ItineraryDay { day: number; title: string; description: string }
@@ -28,12 +30,14 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
 
   const futureDepartures = tour.departures
     .filter((d) => d.startDate >= new Date())
-    .map((d) => ({ id: d.id, startDate: d.startDate.toISOString(), seatsLeft: d.totalSeats - d.seatsBooked }));
+    .map((d) => ({ id: d.id, startDate: d.startDate.toISOString(), seatsLeft: d.totalSeats - d.seatsBooked, totalSeats: d.totalSeats }));
 
   return (
-    <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_380px]">
+    <div>
+      <SectionChips />
+      <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_380px]">
       <div className="space-y-10">
-        <div>
+        <div id="overview">
           <div className="grid grid-cols-3 gap-2">
             <div className="relative col-span-2 h-80 overflow-hidden rounded-xl">
               <Image src={tour.heroImage} alt={`${tour.title} — illustrative placeholder photo`} fill className="object-cover" priority />
@@ -56,6 +60,7 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
             ))}
             <WishlistButton tourId={tour.id} />
           </div>
+          {futureDepartures[0] && <SeatsBar seatsLeft={futureDepartures[0].seatsLeft} totalSeats={futureDepartures[0].totalSeats} />}
         </div>
 
         {tour.difficulty && (
@@ -75,7 +80,7 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
           </section>
         )}
 
-        <section aria-labelledby="itinerary-heading">
+        <section id="itinerary" aria-labelledby="itinerary-heading">
           <h2 id="itinerary-heading" className="font-heading text-xl font-bold">Day-wise itinerary</h2>
           <ol className="mt-3 space-y-3">
             {itinerary.map((d) => (
@@ -87,7 +92,7 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
           </ol>
         </section>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div id="inclusions" className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <section>
             <h2 className="font-heading text-xl font-bold">Inclusions</h2>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">{inclusions.map((i) => <li key={i}>{i}</li>)}</ul>
@@ -98,7 +103,7 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
           </section>
         </div>
 
-        <section>
+        <section id="hotels">
           <h2 className="font-heading text-xl font-bold">Hotels</h2>
           <ul className="mt-2 space-y-1 text-sm">{hotels.map((h) => <li key={h.name}>{h.city}: {h.name} ({h.rating}★, indicative)</li>)}</ul>
         </section>
@@ -108,7 +113,7 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">{documentsNeeded.map((d) => <li key={d}>{d}</li>)}</ul>
         </section>
 
-        <section aria-labelledby="cancellation-heading">
+        <section id="policies" aria-labelledby="cancellation-heading">
           <h2 id="cancellation-heading" className="font-heading text-xl font-bold">Cancellation policy</h2>
           <table className="mt-2 w-full text-sm">
             <thead><tr className="text-left"><th className="py-1">Cancelled before departure</th><th>Fee</th></tr></thead>
@@ -136,7 +141,7 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
         </section>
 
         {tour.reviews.length > 0 && (
-          <section aria-labelledby="reviews-heading">
+          <section id="reviews" aria-labelledby="reviews-heading">
             <h2 id="reviews-heading" className="font-heading text-xl font-bold">Reviews</h2>
             <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
               {tour.reviews.map((r) => (
@@ -164,24 +169,10 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
         </section>
       </div>
 
-      <aside className="h-fit space-y-4 lg:sticky lg:top-24">
-        <div className="rounded-xl border border-border bg-surface p-4">
-          {futureDepartures.length > 0 ? (
-            <TripCostCalculator tourId={tour.id} isInternational={tour.isInternational} departures={futureDepartures} compact />
-          ) : (
-            <p className="text-sm text-foreground-muted">No upcoming departures right now.</p>
-          )}
-          <div className="mt-4 flex flex-col gap-2">
-            <a
-              href={`/checkout/new?departureId=${futureDepartures[0]?.id ?? ""}`}
-              className="rounded-md bg-accent px-4 py-2 text-center font-semibold text-white hover:bg-accent-strong"
-            >
-              Book now
-            </a>
-            <EnquireButton tourId={tour.id} tourTitle={tour.title} />
-          </div>
-        </div>
+      <aside className="h-fit space-y-4 lg:sticky lg:top-[150px]">
+        <TourPricePanel tourId={tour.id} tourTitle={tour.title} isInternational={tour.isInternational} departures={futureDepartures} />
       </aside>
+      </div>
     </div>
   );
 }

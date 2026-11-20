@@ -18,11 +18,13 @@ export default function TripCostCalculator({
   isInternational,
   departures,
   compact = false,
+  onStateChange,
 }: {
   tourId: string;
   isInternational: boolean;
   departures: DepartureOption[];
   compact?: boolean;
+  onStateChange?: (state: { output: PricingEngineOutput | null; adults: number; departureId: string }) => void;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -74,6 +76,7 @@ export default function TripCostCalculator({
         const data = await res.json();
         if (!res.ok) throw new Error(data.error?.formErrors?.[0] ?? "Could not calculate pricing.");
         setOutput(data.output);
+        onStateChange?.({ output: data.output, adults, departureId });
       })
       .catch((e) => {
         if (e.name !== "AbortError") setError(e.message);
