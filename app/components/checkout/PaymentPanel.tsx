@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatRupees } from "@/lib/pricing/format";
+import SeatHoldBar from "./SeatHoldBar";
 
 export default function PaymentPanel({
   bookingId,
@@ -23,18 +24,20 @@ export default function PaymentPanel({
   const [simulate, setSimulate] = useState<"RANDOM" | "SUCCESS" | "FAILED" | "PENDING">("SUCCESS");
   const [paying, setPaying] = useState(false);
   const [result, setResult] = useState<string | null>(null);
-  const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
+  const [expired, setExpired] = useState(false);
+  const [reholding, setReholding] = useState(false);
+  const [currentHoldExpiresAt, setCurrentHoldExpiresAt] = useState(holdExpiresAt);
 
-  useEffect(() => {
-    if (!holdExpiresAt || status !== "HELD") return;
-    function tick() {
-      const diff = Math.max(0, Math.floor((new Date(holdExpiresAt!).getTime() - Date.now()) / 1000));
-      setSecondsLeft(diff);
+  async function reholdSeats() {
+    setReholding(true);
+    const res = await fetch(`/api/bookings/${bookingId}/rehold`, { method: "POST" });
+    const data = await res.json();
+    setReholding(false);
+    if (res.ok) {
+      setCurrentHoldExpiresAt(data.holdExpiresAt);
+      setExpired(false);
     }
-    tick();
-    const t = setInterval(tick, 1000);
-    return () => clearInterval(t);
-  }, [holdExpiresAt, status]);
+  }
 
   const remainingDue = amountDue - amountPaid;
   const amountToPay = payFull ? remainingDue : Math.round(amountDue * 0.25) - amountPaid > 0 ? Math.round(amountDue * 0.25) - amountPaid : remainingDue;
@@ -59,14 +62,25 @@ export default function PaymentPanel({
     }
   }
 
-  const expired = secondsLeft === 0 && status === "HELD";
-
   return (
     <div className="space-y-4 rounded-xl border border-border bg-surface p-4">
-      {secondsLeft !== null && status === "HELD" && (
-        <p role="timer" className={`rounded-md p-2 text-center text-sm font-semibold ${expired ? "bg-danger/10 text-danger" : "bg-accent/10"}`}>
-          {expired ? "Seat hold expired" : `Seats held for ${Math.floor(secondsLeft / 60)}:${String(secondsLeft % 60).padStart(2, "0")}`}
-        </p>
+      {currentHoldExpiresAt && status === "HELD" && (
+        <SeatHoldBar holdExpiresAt={currentHoldExpiresAt} onExpired={() => setExpired(true)} />
+      )}
+
+      {expired && (
+        <div className="rounded-md bg-danger-soft p-3 text-sm">
+          <p className="font-semibold text-danger">Your seat hold expired before payment completed.</p>
+          <p className="mt-1 text-foreground-muted">Everything you entered is still here — hold your seats again to continue.</p>
+          <button
+            type="button"
+            onClick={reholdSeats}
+            disabled={reholding}
+            className="mt-2 min-h-11 rounded-md bg-accent px-4 text-sm font-semibold text-white press-feedback disabled:opacity-60"
+          >
+            {reholding ? "Holding seats…" : "Hold seats again"}
+          </button>
+        </div>
       )}
 
       <div>

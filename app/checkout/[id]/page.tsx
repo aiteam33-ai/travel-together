@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
 import PaymentPanel from "@/app/components/checkout/PaymentPanel";
 import PriceBreakdown from "@/app/components/pricing/PriceBreakdown";
+import CheckoutStepper from "@/app/components/checkout/CheckoutStepper";
 import { formatDateIST } from "@/lib/pricing/format";
 
 export default async function CheckoutReviewPage({ params }: { params: Promise<{ id: string }> }) {
@@ -21,6 +22,9 @@ export default async function CheckoutReviewPage({ params }: { params: Promise<{
 
   return (
     <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 lg:grid-cols-[1fr_380px]">
+      <div className="space-y-6 lg:col-span-2">
+        <CheckoutStepper currentStep="Pay" />
+      </div>
       <div className="space-y-6">
         <h1 className="font-heading text-2xl font-bold">Review your booking</h1>
         <div className="rounded-xl border border-border bg-surface p-4">

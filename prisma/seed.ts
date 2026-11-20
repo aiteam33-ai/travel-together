@@ -860,9 +860,75 @@ async function main() {
     ],
   });
 
+  // Demo account with bookings at every tracker stage, so the account
+  // section's booking tracker has something real to show without having to
+  // complete a live checkout first. Log in with +919999900000 to see these.
+  const demoUser = await prisma.user.upsert({
+    where: { phone: "+919999900000" },
+    update: {},
+    create: { phone: "+919999900000", name: "Demo Traveller" },
+  });
+
+  const demoTours = await prisma.tour.findMany({ take: 5, include: { departures: { include: { cityPrices: true }, orderBy: { startDate: "asc" } } } });
+  const trackerStages = ["BOOKED", "DOCUMENTS_RECEIVED", "BALANCE_PAID", "VOUCHERS_ISSUED", "TRIP_COMPLETED"] as const;
+
+  for (const [i, t] of demoTours.entries()) {
+    const departure = t.departures[0];
+    if (!departure) continue;
+    const cityPrice = departure.cityPrices.find((c) => c.city === "MUMBAI");
+    const total = (cityPrice?.pricePerPerson ?? departure.basePricePerPerson) * 2;
+    const stage = trackerStages[i % trackerStages.length];
+    const paidFraction = stage === "BOOKED" ? 0.25 : stage === "DOCUMENTS_RECEIVED" ? 0.25 : 1;
+    const amountPaid = Math.round(total * paidFraction);
+    const balanceDueDate = new Date();
+    balanceDueDate.setDate(balanceDueDate.getDate() + 20);
+
+    await prisma.booking.create({
+      data: {
+        bookingRef: `PHDEMO${i + 1}`,
+        userId: demoUser.id,
+        tourId: t.id,
+        departureId: departure.id,
+        status: stage === "TRIP_COMPLETED" ? "CONFIRMED" : paidFraction >= 1 ? "CONFIRMED" : "PARTIALLY_PAID",
+        travellersJson: JSON.stringify({
+          counts: { adults: 2, childrenWithBed: 0, childrenWithoutBed: 0, infants: 0, rooms: 1, singleOccupancyRooms: 0 },
+          details: [
+            { name: "Demo Traveller", age: 35, mealChoice: "VEG" },
+            { name: "Demo Co-traveller", age: 33, mealChoice: "VEG" },
+          ],
+        }),
+        addOnsJson: "{}",
+        pricingSnapshotJson: JSON.stringify({
+          output: {
+            paidToUs: [{ label: "Package cost (2 adults)", amount: total, isEstimate: false }],
+            paidToUsSubtotal: total,
+            taxes: [{ label: "GST (5%)", amount: Math.round(total * 0.05), isEstimate: false }],
+            taxesSubtotal: Math.round(total * 0.05),
+            ownSpending: [],
+            ownSpendingSubtotal: 0,
+            grandTotal: total + Math.round(total * 0.05),
+            grandTotalWithOwnSpending: total + Math.round(total * 0.05),
+            costPerPerson: Math.round((total + Math.round(total * 0.05)) / 2),
+            costPerDay: Math.round((total + Math.round(total * 0.05)) / t.durationDays),
+            amountDueNow: Math.round(total * 0.25),
+            amountDueLater: total - Math.round(total * 0.25),
+            emiOptions: [],
+            totalTravellers: 2,
+            groupDiscount: { applied: false, perPersonAmount: 0, travellersToNextTier: null, nextTierDiscountPerPerson: null },
+          },
+        }),
+        amountDue: total + Math.round(total * 0.05),
+        amountPaid,
+        trackerStage: stage,
+        balanceDueDate: stage === "BOOKED" || stage === "DOCUMENTS_RECEIVED" ? balanceDueDate : null,
+        documentsNeededNote: stage === "BOOKED" ? "Upload a government photo ID for each traveller" : null,
+      },
+    });
+  }
+
   const tourCount = await prisma.tour.count();
   const departureCount = await prisma.departure.count();
-  console.log(`Seeded ${tourCount} tours with ${departureCount} departures.`);
+  console.log(`Seeded ${tourCount} tours with ${departureCount} departures, and ${demoTours.length} demo bookings for +919999900000.`);
 }
 
 main()

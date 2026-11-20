@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db/client";
 import { parseJsonField } from "@/lib/data/tours";
 import PriceBreakdown from "@/app/components/pricing/PriceBreakdown";
 import CancelBookingButton from "@/app/components/account/CancelBookingButton";
+import BookingTracker from "@/app/components/account/BookingTracker";
 import PrintButton from "@/app/components/PrintButton";
 import { formatDateIST } from "@/lib/pricing/format";
 import { BRAND } from "@/lib/brand";
@@ -30,6 +31,19 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
         <h1 className="font-heading text-2xl font-bold">{booking.tour.title}</h1>
         <p className="text-sm text-foreground-muted">Ref {booking.bookingRef} · {formatDateIST(booking.departure.startDate)} · Status: {booking.status}</p>
       </div>
+
+      {booking.status !== "CANCELLED" && booking.status !== "HELD" && (
+        <section className="rounded-xl border border-border bg-surface p-4">
+          <h2 className="mb-3 font-semibold">What happens next</h2>
+          <BookingTracker
+            trackerStage={booking.trackerStage}
+            amountPaid={booking.amountPaid}
+            amountDue={booking.amountDue}
+            balanceDueDate={booking.balanceDueDate}
+            documentsNeededNote={booking.documentsNeededNote}
+          />
+        </section>
+      )}
 
       <section className="rounded-xl border border-border bg-surface p-4 print:border-0" id="invoice">
         <div className="flex items-center justify-between">

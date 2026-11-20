@@ -216,6 +216,9 @@ model Booking {
   amountPaid    Int      @default(0)
   holdExpiresAt DateTime?
   createdAt     DateTime @default(now())
+  trackerStage  String   @default("BOOKED") // BOOKED, DOCUMENTS_RECEIVED, BALANCE_PAID, VOUCHERS_ISSUED, TRIP_COMPLETED
+  balanceDueDate DateTime?
+  documentsNeededNote String?
   user          User     @relation(fields: [userId], references: [id])
   tour          Tour     @relation(fields: [tourId], references: [id])
   departure     Departure @relation(fields: [departureId], references: [id])
