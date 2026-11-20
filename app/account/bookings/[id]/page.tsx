@@ -34,7 +34,12 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
       <section className="rounded-xl border border-border bg-surface p-4 print:border-0" id="invoice">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold">GST Invoice</h2>
-          <PrintButton />
+          <div className="flex gap-2">
+            <a href={`/api/bookings/${booking.id}/invoice.pdf`} target="_blank" rel="noopener noreferrer" className="rounded-md border border-border px-3 py-1.5 text-sm print:hidden">
+              Download PDF
+            </a>
+            <PrintButton />
+          </div>
         </div>
         <p className="mt-2 text-sm">{BRAND.name} · GSTIN {BRAND.gstin}</p>
         <div className="mt-3">

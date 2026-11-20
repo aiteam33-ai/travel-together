@@ -7,6 +7,8 @@ import { AuthProvider } from "./components/auth/AuthContext";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ContactWidgets from "./components/ContactWidgets";
+import { CompareProvider } from "./components/CompareContext";
+import CompareBar from "./components/CompareBar";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -23,12 +25,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="flex min-h-full flex-col bg-background text-foreground">
         <LocaleProvider>
           <AuthProvider>
-            <Header />
-            <main id="main-content" className="mx-auto w-full max-w-[1440px] flex-1 px-6 py-8">
-              {children}
-            </main>
-            <Footer />
-            <ContactWidgets />
+            <CompareProvider>
+              <Header />
+              <main id="main-content" className="mx-auto w-full max-w-[1440px] flex-1 px-6 py-8">
+                {children}
+              </main>
+              <Footer />
+              <ContactWidgets />
+              <CompareBar />
+            </CompareProvider>
           </AuthProvider>
         </LocaleProvider>
       </body>

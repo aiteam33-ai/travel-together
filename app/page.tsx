@@ -35,6 +35,7 @@ export default async function HomePage() {
             {fastFilling.map((d) => (
               <TourCard
                 key={d.id}
+                tourId={d.tour.id}
                 slug={d.tour.slug}
                 title={d.tour.title}
                 heroImage={d.tour.heroImage}

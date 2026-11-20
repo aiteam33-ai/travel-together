@@ -3,9 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { DEPARTURE_CITIES, DEPARTURE_CITY_LABELS } from "@/lib/pricing/constants";
+import { useLocale } from "@/lib/i18n/LocaleContext";
 
 export default function SearchBar() {
   const router = useRouter();
+  const { t } = useLocale();
   const [destination, setDestination] = useState("");
   const [duration, setDuration] = useState("");
   const [budget, setBudget] = useState("");
@@ -24,7 +26,7 @@ export default function SearchBar() {
   return (
     <form onSubmit={onSubmit} className="flex flex-wrap items-end gap-3 rounded-xl bg-surface p-4 shadow-md" aria-label="Search tours">
       <label className="flex flex-col text-sm font-medium">
-        Destination
+        {t("search.destination")}
         <input
           value={destination}
           onChange={(e) => setDestination(e.target.value)}
@@ -33,7 +35,7 @@ export default function SearchBar() {
         />
       </label>
       <label className="flex flex-col text-sm font-medium">
-        Duration up to (days)
+        {t("search.durationUpTo")}
         <input
           type="number"
           min={1}
@@ -43,7 +45,7 @@ export default function SearchBar() {
         />
       </label>
       <label className="flex flex-col text-sm font-medium">
-        Budget up to (₹)
+        {t("search.budgetUpTo")}
         <input
           type="number"
           min={0}
@@ -54,7 +56,7 @@ export default function SearchBar() {
         />
       </label>
       <label className="flex flex-col text-sm font-medium">
-        Departure city
+        {t("search.city")}
         <select value={city} onChange={(e) => setCity(e.target.value)} className="mt-1 w-40 rounded-md border border-border bg-background px-3 py-2">
           {DEPARTURE_CITIES.map((c) => (
             <option key={c} value={c}>{DEPARTURE_CITY_LABELS[c]}</option>
@@ -62,7 +64,7 @@ export default function SearchBar() {
         </select>
       </label>
       <button type="submit" className="rounded-md bg-accent px-5 py-2 font-semibold text-white hover:bg-accent-strong">
-        Search tours
+        {t("search.submit")}
       </button>
     </form>
   );

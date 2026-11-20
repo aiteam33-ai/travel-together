@@ -53,8 +53,13 @@ account header now links to `/admin`.
 - **Trip Expense Calculator**: standalone page, tour-page sticky panel, and tour-page full breakdown,
   all sharing one component. Breaks totals into "Paid to us" / "Taxes" / "Your own spending (estimate)",
   shows GST/TCS, EMI options (3/6/9/12 months), due-now vs due-later, and a foreign-currency estimate
-  for international tours. Save-to-account and WhatsApp-share both work; PDF export is a **print-to-PDF**
-  button (see "What's mocked or simplified" below).
+  for international tours. Save-to-account, WhatsApp-share and a real generated PDF download
+  (`lib/pdf/invoice.ts`, via `pdf-lib`) all work.
+- **Compare up to 3 tours**: a "Compare" checkbox on every tour card (up to three at a time, persisted in
+  `localStorage`), a floating compare bar, and a `/compare` page that applies the same traveller count and
+  departure city to each tour's pricing output side by side.
+- **Saved travellers**: checkout offers "fill from a saved traveller" (autofill name/age/meal choice) and
+  "save this traveller for next time", both backed by `SavedTraveller` and `/api/saved-travellers`.
 - **Auth**: mobile/email + OTP, resend timer, attempt lockout, change-number link, 30-day session,
   log-out and log-out-of-all-devices.
 - **Checkout & mock payment**: traveller details, 15-minute seat hold with a live countdown, UPI/Card/
@@ -89,17 +94,18 @@ can be swapped in without touching call sites:
 
 ## What's simplified or not fully built
 
-- **PDF export** is implemented as a "Print / Save as PDF" button (`window.print()`) rather than a
-  generated binary — reaches the same end result in a browser but isn't a downloadable file from a
-  server route. Swapping in a library like `pdf-lib` or `@react-pdf/renderer` would close this gap.
-- **Compare up to 3 tours** and **saved-traveller autofill at checkout** have their data model in place
-  (`SavedTraveller`, the wishlist/compare tick on tour cards) but the compare UI and the autofill step
-  in checkout are not wired up.
+- **PDF text is ASCII-only** (`formatRupeesAscii` in `lib/pricing/format.ts`): the standard PDF fonts
+  used (WinAnsi encoding) can't render the ₹ glyph, so generated PDFs show amounts as "Rs. 1,15,500"
+  while the website itself always shows the real ₹ symbol. Embedding a Unicode font (e.g. Noto Sans)
+  would close this gap.
+- The booking-detail page's "Print / Save as PDF" button (for the on-screen invoice view) still uses
+  `window.print()`; the "Download PDF" link next to it uses the real generated PDF.
 - **Enums**: SQLite doesn't support native enums, so category/city/tag fields are plain strings
   validated by `lib/pricing/constants.ts` and Zod schemas rather than DB-level enums. This is noted in
   `prisma/schema.prisma` and is safe to carry into Postgres as a true enum later.
-- **Hindi translation coverage** is a working example (header, hero, calculator labels) rather than
-  exhaustive — see i18n note above.
+- **Hindi translation coverage** now spans header/nav, hero, search, tour cards, calculator labels,
+  account navigation and footer links, but body copy (itineraries, FAQs, policies, blog) is still English
+  only.
 - **WCAG 2.2 AA** has not been run through an automated or manual audit tool; the structural basics
   (focus, zoom, motion, text size, labelled forms) are in place but contrast ratios on every colour
   combination have not been individually verified.

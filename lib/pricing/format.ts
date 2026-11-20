@@ -23,6 +23,11 @@ export function formatLakh(paise: number): string {
   return formatRupees(paise);
 }
 
+// Same as formatRupees but ASCII-only (for PDF generation with WinAnsi-encoded fonts, which can't render ₹).
+export function formatRupeesAscii(paise: number): string {
+  return formatRupees(paise).replace("₹", "Rs. ");
+}
+
 export function rupeesToPaise(rupees: number): number {
   return Math.round(rupees * 100);
 }

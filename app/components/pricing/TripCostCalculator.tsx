@@ -120,6 +120,32 @@ export default function TripCostCalculator({
     window.open(`https://wa.me/?text=${encodeURIComponent(`Here's my trip cost calculation: ${url}`)}`, "_blank");
   }
 
+  async function downloadPdf() {
+    const res = await fetch("/api/pricing/calculate/pdf", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        tourId,
+        departureId,
+        departureCity: city,
+        travellers: { adults, childrenWithBed, childrenWithoutBed, infants, rooms, singleOccupancyRooms: singleRooms },
+        joiningMode: joiningAtDestination ? joiningMode : undefined,
+        addOns: { travelInsurance, visaFees },
+        spendPreset,
+        couponCode: couponCode || undefined,
+        amountDuePercentNow,
+      }),
+    });
+    if (!res.ok) return;
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `trip-cost-${tourId}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className={compact ? "space-y-4" : "grid grid-cols-1 gap-8 lg:grid-cols-2"}>
       <div className="space-y-4 rounded-xl border border-border bg-surface p-4">
@@ -200,8 +226,8 @@ export default function TripCostCalculator({
         <div className="flex flex-wrap gap-2 pt-2">
           <button type="button" onClick={saveCalculation} className="rounded-md border border-border px-3 py-1.5 text-sm">Save to account</button>
           <button type="button" onClick={shareOnWhatsApp} className="rounded-md border border-border px-3 py-1.5 text-sm">Share on WhatsApp</button>
-          <button type="button" onClick={() => window.print()} className="rounded-md border border-border px-3 py-1.5 text-sm">
-            Print / Save as PDF
+          <button type="button" onClick={downloadPdf} className="rounded-md border border-border px-3 py-1.5 text-sm">
+            Download as PDF
           </button>
         </div>
         {saveMsg && <p className="text-sm text-foreground-muted" role="status">{saveMsg}</p>}

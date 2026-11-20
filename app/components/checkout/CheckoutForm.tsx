@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
 import LoginModal from "../auth/LoginModal";
 import { DEPARTURE_CITIES, DEPARTURE_CITY_LABELS, MEAL_PLAN_TYPES } from "@/lib/pricing/constants";
@@ -10,6 +10,14 @@ interface TravellerForm {
   name: string;
   age: number;
   mealChoice: "VEG" | "JAIN" | "NON_VEG";
+  saveForLater: boolean;
+}
+
+interface SavedTraveller {
+  id: string;
+  name: string;
+  age: number;
+  mealChoice: string;
 }
 
 export default function CheckoutForm({
@@ -28,17 +36,33 @@ export default function CheckoutForm({
   const [showLogin, setShowLogin] = useState(false);
   const [city, setCity] = useState(defaultCity);
   const [travellers, setTravellers] = useState<TravellerForm[]>(
-    Array.from({ length: Math.max(1, defaultAdults) }, () => ({ name: "", age: 30, mealChoice: "VEG" as const }))
+    Array.from({ length: Math.max(1, defaultAdults) }, () => ({ name: "", age: 30, mealChoice: "VEG" as const, saveForLater: false }))
   );
+  const [savedTravellers, setSavedTravellers] = useState<SavedTraveller[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  function updateTraveller(i: number, field: keyof TravellerForm, value: string | number) {
+  useEffect(() => {
+    if (!user) return;
+    fetch("/api/saved-travellers")
+      .then((r) => r.json())
+      .then((data) => setSavedTravellers(data.travellers ?? []));
+  }, [user]);
+
+  function updateTraveller(i: number, field: keyof TravellerForm, value: string | number | boolean) {
     setTravellers((prev) => prev.map((t, idx) => (idx === i ? { ...t, [field]: value } : t)));
   }
 
+  function applySavedTraveller(i: number, savedId: string) {
+    const saved = savedTravellers.find((s) => s.id === savedId);
+    if (!saved) return;
+    setTravellers((prev) =>
+      prev.map((t, idx) => (idx === i ? { ...t, name: saved.name, age: saved.age, mealChoice: saved.mealChoice as TravellerForm["mealChoice"] } : t))
+    );
+  }
+
   function addTraveller() {
-    setTravellers((prev) => [...prev, { name: "", age: 30, mealChoice: "VEG" }]);
+    setTravellers((prev) => [...prev, { name: "", age: 30, mealChoice: "VEG", saveForLater: false }]);
   }
 
   async function submit(e: React.FormEvent) {
@@ -75,6 +99,17 @@ export default function CheckoutForm({
       setError(data.error?.formErrors?.[0] ?? data.error ?? "Could not create booking.");
       return;
     }
+    await Promise.all(
+      travellers
+        .filter((t) => t.saveForLater)
+        .map((t) =>
+          fetch("/api/saved-travellers", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: t.name, age: t.age, mealChoice: t.mealChoice }),
+          })
+        )
+    );
     router.push(`/checkout/${data.bookingId}`);
   }
 
@@ -97,6 +132,17 @@ export default function CheckoutForm({
           {travellers.map((t, i) => (
             <fieldset key={i} className="grid grid-cols-1 gap-3 rounded-md border border-border p-3 sm:grid-cols-4">
               <legend className="px-1 text-sm font-medium">Traveller {i + 1}</legend>
+              {savedTravellers.length > 0 && (
+                <label className="text-sm sm:col-span-4">
+                  Fill from a saved traveller
+                  <select defaultValue="" onChange={(e) => e.target.value && applySavedTraveller(i, e.target.value)} className="mt-1 w-full max-w-xs rounded-md border border-border bg-background px-2 py-1.5">
+                    <option value="">— Choose —</option>
+                    {savedTravellers.map((s) => (
+                      <option key={s.id} value={s.id}>{s.name} (Age {s.age})</option>
+                    ))}
+                  </select>
+                </label>
+              )}
               <label className="text-sm">
                 Name (as on ID)
                 <input required value={t.name} onChange={(e) => updateTraveller(i, "name", e.target.value)} className="mt-1 w-full rounded-md border border-border bg-background px-2 py-1.5" />
@@ -119,6 +165,10 @@ export default function CheckoutForm({
                   <input className="mt-1 w-full rounded-md border border-border bg-background px-2 py-1.5" />
                 </label>
               )}
+              <label className="flex items-center gap-2 text-sm sm:col-span-4">
+                <input type="checkbox" checked={t.saveForLater} onChange={(e) => updateTraveller(i, "saveForLater", e.target.checked)} />
+                Save this traveller to my account for next time
+              </label>
             </fieldset>
           ))}
         </div>

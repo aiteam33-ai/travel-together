@@ -1,8 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { formatRupees, formatDateIST } from "@/lib/pricing/format";
+import CompareCheckbox from "./CompareCheckbox";
+import { useLocale } from "@/lib/i18n/LocaleContext";
 
 interface TourCardProps {
+  tourId: string;
   slug: string;
   title: string;
   heroImage: string;
@@ -13,7 +18,8 @@ interface TourCardProps {
   seatsLeft?: number;
 }
 
-export default function TourCard({ slug, title, heroImage, durationDays, durationNights, cheapestPricePerPerson, nextDates, seatsLeft }: TourCardProps) {
+export default function TourCard({ tourId, slug, title, heroImage, durationDays, durationNights, cheapestPricePerPerson, nextDates, seatsLeft }: TourCardProps) {
+  const { t } = useLocale();
   const emiFrom = cheapestPricePerPerson ? Math.round(cheapestPricePerPerson / 100 / 6) : null;
   return (
     <article className="flex flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-sm transition hover:shadow-md">
@@ -32,25 +38,26 @@ export default function TourCard({ slug, title, heroImage, durationDays, duratio
         )}
         {nextDates.length > 0 && (
           <p className="text-xs text-foreground-muted">
-            Next dates: {nextDates.slice(0, 3).map((d) => formatDateIST(d)).join(", ")}
+            {t("card.nextDates")}: {nextDates.slice(0, 3).map((d) => formatDateIST(d)).join(", ")}
           </p>
         )}
         <div className="mt-auto">
           {cheapestPricePerPerson ? (
             <>
-              <p className="text-lg font-bold">{formatRupees(cheapestPricePerPerson)} <span className="text-xs font-normal text-foreground-muted">per person, twin sharing</span></p>
-              {emiFrom && <p className="text-xs text-foreground-muted">EMI from ₹{emiFrom.toLocaleString("en-IN")}/mo</p>}
+              <p className="text-lg font-bold">{formatRupees(cheapestPricePerPerson)} <span className="text-xs font-normal text-foreground-muted">{t("price.perPerson")}</span></p>
+              {emiFrom && <p className="text-xs text-foreground-muted">{t("price.emiFrom")} ₹{emiFrom.toLocaleString("en-IN")}/mo</p>}
             </>
           ) : (
-            <p className="text-sm text-foreground-muted">No upcoming departures</p>
+            <p className="text-sm text-foreground-muted">{t("card.noDepartures")}</p>
           )}
         </div>
         <Link
           href={`/tours/${slug}`}
           className="mt-2 inline-block rounded-md bg-accent px-3 py-2 text-center text-sm font-semibold text-white hover:bg-accent-strong"
         >
-          View details
+          {t("card.viewDetails")}
         </Link>
+        <CompareCheckbox tourId={tourId} />
       </div>
     </article>
   );

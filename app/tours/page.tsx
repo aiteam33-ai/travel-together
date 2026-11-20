@@ -111,6 +111,7 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
             {results.map(({ tour, futureDepartures, cheapestPricePerPerson }) => (
               <TourCard
                 key={tour.id}
+                tourId={tour.id}
                 slug={tour.slug}
                 title={tour.title}
                 heroImage={tour.heroImage}

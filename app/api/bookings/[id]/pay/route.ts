@@ -41,8 +41,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         holdExpiresAt: null,
       },
     });
-    await sendMessage("EMAIL", "traveller@example.com", `Your booking ${booking.bookingRef} is confirmed. Amount paid: ${(parsed.data.amount / 100).toFixed(2)} INR.`, "Booking confirmed — Parikrama Holidays");
-    await sendMessage("WHATSAPP", "traveller", `Your booking ${booking.bookingRef} is confirmed!`);
+    const contact = user.email ?? user.phone ?? "unknown";
+    await sendMessage("EMAIL", contact, `Your booking ${booking.bookingRef} is confirmed. Amount paid: ₹${(parsed.data.amount / 100).toLocaleString("en-IN")}.`, "Booking confirmed — Parikrama Holidays");
+    if (user.phone) {
+      await sendMessage("WHATSAPP", user.phone, `Your booking ${booking.bookingRef} is confirmed!`);
+    }
   }
 
   return NextResponse.json({ ok: true, result });

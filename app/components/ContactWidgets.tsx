@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { BRAND } from "@/lib/brand";
+import { useLocale } from "@/lib/i18n/LocaleContext";
 
 export default function ContactWidgets() {
+  const { t } = useLocale();
   const [open, setOpen] = useState(false);
   const [sent, setSent] = useState(false);
   const [name, setName] = useState("");
@@ -48,7 +50,7 @@ export default function ContactWidgets() {
           className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold shadow"
           aria-expanded={open}
         >
-          Request a callback
+          {t("callback.request")}
         </button>
         <a
           href={`https://wa.me/${BRAND.whatsappNumber}`}
@@ -56,7 +58,7 @@ export default function ContactWidgets() {
           rel="noopener noreferrer"
           className="rounded-full bg-success px-4 py-2 text-sm font-semibold text-white shadow"
         >
-          WhatsApp us
+          {t("whatsapp.us")}
         </a>
       </div>
     </div>
