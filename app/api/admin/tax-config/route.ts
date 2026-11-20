@@ -10,8 +10,20 @@ export async function POST(req: NextRequest) {
   if (!user || !user.isAdmin) return NextResponse.json({ error: "Admin only" }, { status: 403 });
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+
+  const previous = await prisma.taxConfig.findFirst({ where: { key: parsed.data.key }, orderBy: { effectiveFrom: "desc" } });
+
   await prisma.taxConfig.create({
     data: { key: parsed.data.key, value: parsed.data.value, effectiveFrom: new Date(), note: "Confirm with your accountant" },
+  });
+  await prisma.auditLog.create({
+    data: {
+      adminUserId: user.id,
+      entity: "TaxConfig",
+      key: parsed.data.key,
+      oldValue: previous ? String(previous.value) : null,
+      newValue: String(parsed.data.value),
+    },
   });
   return NextResponse.json({ ok: true });
 }

@@ -11,5 +11,14 @@ export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) return NextResponse.json({ error: "Invalid tier" }, { status: 400 });
   await prisma.groupDiscountTier.create({ data: { ...parsed.data, effectiveFrom: new Date() } });
+  await prisma.auditLog.create({
+    data: {
+      adminUserId: user.id,
+      entity: "GroupDiscountTier",
+      key: `minTravellers:${parsed.data.minTravellers}`,
+      oldValue: null,
+      newValue: String(parsed.data.discountPerPersonPaise),
+    },
+  });
   return NextResponse.json({ ok: true });
 }

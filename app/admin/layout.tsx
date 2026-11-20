@@ -17,6 +17,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <Link className="block rounded-md px-2 py-1.5 hover:bg-surface" href="/admin/coupons">Coupons</Link>
         <Link className="block rounded-md px-2 py-1.5 hover:bg-surface" href="/admin/reviews">Review moderation</Link>
         <Link className="block rounded-md px-2 py-1.5 hover:bg-surface" href="/admin/outbox">Message outbox</Link>
+        <Link className="block rounded-md px-2 py-1.5 hover:bg-surface" href="/admin/audit-log">Audit log</Link>
+        <Link className="block rounded-md px-2 py-1.5 hover:bg-surface" href="/admin/analytics">Analytics</Link>
       </nav>
       <div>{children}</div>
     </div>
