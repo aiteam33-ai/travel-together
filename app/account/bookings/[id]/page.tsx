@@ -18,7 +18,8 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
 
   const { output } = JSON.parse(booking.pricingSnapshotJson);
   const cancellation = parseJsonField<CancellationRule[]>(booking.tour.cancellationPolicy, []);
-  const daysToDeparture = Math.ceil((booking.departure.startDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+  const now = new Date();
+  const daysToDeparture = Math.ceil((booking.departure.startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
   const applicableRule = cancellation.find((r) => daysToDeparture >= r.daysBefore) ?? cancellation[cancellation.length - 1];
   const cancellationFeePercent = applicableRule?.feePercent ?? 100;
   const refundAmount = Math.round(booking.amountPaid * (1 - cancellationFeePercent / 100));

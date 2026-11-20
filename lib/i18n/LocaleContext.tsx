@@ -21,6 +21,7 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       const saved = localStorage.getItem("locale") as Locale | null;
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of persisted preference on mount
       if (saved === "en" || saved === "hi") setLocaleState(saved);
     } catch {}
   }, []);

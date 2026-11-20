@@ -51,6 +51,7 @@ export default function TripCostCalculator({
 
   useEffect(() => {
     if (!departureId) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- standard fetch-on-change pattern
     setLoading(true);
     setError(null);
     const controller = new AbortController();

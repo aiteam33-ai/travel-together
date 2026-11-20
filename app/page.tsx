@@ -82,7 +82,7 @@ export default async function HomePage() {
       <section className="rounded-2xl border border-border bg-surface p-8">
         <h2 className="font-heading text-2xl font-bold">Trip Expense Calculator</h2>
         <p className="mt-2 max-w-2xl text-foreground-muted">
-          Most "starts from" prices grow once you call. Ours doesn&apos;t have to — add your travellers, your
+          Most &ldquo;starts from&rdquo; prices grow once you call. Ours doesn&apos;t have to — add your travellers, your
           departure city and your add-ons, and see the real total, taxes and your own estimated spending, split out
           clearly, before you book.
         </p>
