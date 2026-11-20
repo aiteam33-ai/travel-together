@@ -3,6 +3,7 @@ import { z } from "zod";
 import { verifyOtp } from "@/lib/auth/otp";
 import { createSession } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
+import { addSystemFeedEntry } from "@/lib/groups/feed";
 
 const schema = z.object({
   identifier: z.string().min(5),
@@ -33,5 +34,20 @@ export async function POST(req: NextRequest) {
   }
 
   await createSession(user.id);
+
+  // Someone invited by phone becomes "joined" the moment they sign in with that number.
+  if (!isEmail) {
+    const invitedMemberships = await prisma.groupMember.findMany({
+      where: { phone: identifier, userId: null, status: "INVITED" },
+    });
+    for (const membership of invitedMemberships) {
+      await prisma.groupMember.update({
+        where: { id: membership.id },
+        data: { userId: user.id, status: "JOINED", consentAt: new Date(), name: user.name ?? membership.name },
+      });
+      await addSystemFeedEntry(membership.groupId, `${user.name ?? membership.name} joined.`);
+    }
+  }
+
   return NextResponse.json({ ok: true, isNewUser, user: { id: user.id, name: user.name } });
 }
