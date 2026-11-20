@@ -1,5 +1,5 @@
 import { prisma } from "../db/client";
-import { getTaxRate, getPricingConfig, getEmiOptions, getActiveCoupon, SPEND_PRESET_KEYS } from "./config";
+import { getTaxRate, getPricingConfig, getEmiOptions, getActiveCoupon, getGroupDiscountTiers, SPEND_PRESET_KEYS } from "./config";
 import type { PricingEngineInput, TravellerCounts, AddOnSelections, JoiningTravelSelection, SpendPreset } from "./types";
 
 export interface CalculatorRequestInput {
@@ -59,6 +59,7 @@ export async function buildPricingInput(req: CalculatorRequestInput): Promise<Pr
   const gstRatePercent = await getTaxRate("GST_RATE");
   const tcsRatePercent = departure.tour.isInternational ? await getTaxRate("TCS_RATE_INTL") : await getTaxRate("TCS_RATE_DOMESTIC");
   const emiMonthsOptions = await getEmiOptions();
+  const groupDiscountTiers = await getGroupDiscountTiers();
 
   const spendKey = SPEND_PRESET_KEYS[req.spendPreset] ?? SPEND_PRESET_KEYS.COMFORT;
   const perDayPerPerson = req.spendPerDayOverride ?? (await getPricingConfig(spendKey));
@@ -111,6 +112,7 @@ export async function buildPricingInput(req: CalculatorRequestInput): Promise<Pr
     gstRatePercent,
     tcsRatePercent,
     emiMonthsOptions,
+    groupDiscountTiers,
     foreignCurrency,
     amountDuePercentNow: req.amountDuePercentNow,
   };

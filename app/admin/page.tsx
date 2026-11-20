@@ -1,11 +1,13 @@
 import { prisma } from "@/lib/db/client";
 import TaxConfigForm from "@/app/components/admin/TaxConfigForm";
+import GroupDiscountForm from "@/app/components/admin/GroupDiscountForm";
 
 export default async function AdminPricingPage() {
-  const [taxConfigs, pricingConfigs, emiConfigs] = await Promise.all([
+  const [taxConfigs, pricingConfigs, emiConfigs, groupTiers] = await Promise.all([
     prisma.taxConfig.findMany({ orderBy: { effectiveFrom: "desc" } }),
     prisma.pricingConfig.findMany({ orderBy: { effectiveFrom: "desc" } }),
     prisma.emiConfig.findMany({ orderBy: { months: "asc" } }),
+    prisma.groupDiscountTier.findMany({ where: { active: true }, orderBy: { minTravellers: "asc" } }),
   ]);
 
   const latestByKey = new Map<string, (typeof taxConfigs)[number]>();
@@ -42,6 +44,15 @@ export default async function AdminPricingPage() {
               ))}
           </tbody>
         </table>
+      </section>
+
+      <section>
+        <h2 className="font-semibold">Group discount tiers</h2>
+        <p className="text-xs text-foreground-muted">
+          Applied per paying traveller (infants excluded) once a booking&apos;s party size meets a tier — flows through
+          the same pricing engine as everything else, so the calculator, tour page and checkout always agree.
+        </p>
+        <GroupDiscountForm tiers={groupTiers.map((t) => ({ id: t.id, minTravellers: t.minTravellers, discountPerPersonPaise: t.discountPerPersonPaise }))} />
       </section>
 
       <section>

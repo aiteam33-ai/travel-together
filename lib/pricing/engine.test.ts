@@ -94,4 +94,43 @@ describe("computePricing", () => {
     expect(out.foreignCurrencyEquivalent?.code).toBe("USD");
     expect(out.foreignCurrencyEquivalent?.amount).toBeGreaterThan(0);
   });
+
+  describe("group discount tiers", () => {
+    const tiers = [{ minTravellers: 6, discountPerPersonPaise: 200000 }]; // ₹2,000/person at 6+
+
+    it("does not apply the discount below the threshold", () => {
+      const out = computePricing(baseInput({ travellers: { adults: 5, childrenWithBed: 0, childrenWithoutBed: 0, infants: 0, rooms: 3, singleOccupancyRooms: 0 }, groupDiscountTiers: tiers }));
+      expect(out.groupDiscount.applied).toBe(false);
+      expect(out.paidToUs.find((l) => l.label.includes("Group saving"))).toBeUndefined();
+      expect(out.groupDiscount.travellersToNextTier).toBe(1);
+      expect(out.groupDiscount.nextTierDiscountPerPerson).toBe(200000);
+    });
+
+    it("applies the discount once the party reaches the threshold", () => {
+      const out = computePricing(baseInput({ travellers: { adults: 6, childrenWithBed: 0, childrenWithoutBed: 0, infants: 0, rooms: 3, singleOccupancyRooms: 0 }, groupDiscountTiers: tiers }));
+      expect(out.groupDiscount.applied).toBe(true);
+      expect(out.groupDiscount.perPersonAmount).toBe(200000);
+      const line = out.paidToUs.find((l) => l.label.includes("Group saving"));
+      expect(line?.amount).toBe(-1200000); // 6 travellers x ₹2,000
+      expect(out.groupDiscount.travellersToNextTier).toBeNull();
+    });
+
+    it("counts paying children towards the traveller threshold, but not infants", () => {
+      const out = computePricing(
+        baseInput({
+          travellers: { adults: 4, childrenWithBed: 2, childrenWithoutBed: 0, infants: 3, rooms: 3, singleOccupancyRooms: 0 },
+          groupDiscountTiers: tiers,
+        })
+      );
+      expect(out.groupDiscount.applied).toBe(true); // 4 + 2 = 6 paying travellers, 3 infants don't count
+    });
+
+    it("flows the discount through to GST and the grand total, via the same engine every call site would use", () => {
+      const withoutDiscount = computePricing(baseInput({ travellers: { adults: 5, childrenWithBed: 0, childrenWithoutBed: 0, infants: 0, rooms: 3, singleOccupancyRooms: 0 } }));
+      const withDiscount = computePricing(baseInput({ travellers: { adults: 6, childrenWithBed: 0, childrenWithoutBed: 0, infants: 0, rooms: 3, singleOccupancyRooms: 0 }, groupDiscountTiers: tiers }));
+      // 6th traveller adds a full package cost, minus the group discount on all 6.
+      const sixthTravellerNetCost = withDiscount.grandTotal - withoutDiscount.grandTotal;
+      expect(sixthTravellerNetCost).toBeLessThan(2500000 * 1.05); // less than one undiscounted adult + GST
+    });
+  });
 });

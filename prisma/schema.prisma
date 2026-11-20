@@ -138,6 +138,14 @@ model EmiConfig {
   effectiveFrom DateTime
 }
 
+model GroupDiscountTier {
+  id                     String   @id @default(cuid())
+  minTravellers          Int
+  discountPerPersonPaise Int
+  effectiveFrom          DateTime
+  active                 Boolean  @default(true)
+}
+
 model Coupon {
   id          String   @id @default(cuid())
   code        String   @unique

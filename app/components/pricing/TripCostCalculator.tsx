@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import PriceBreakdown from "./PriceBreakdown";
+import GroupSavingBar from "./GroupSavingBar";
 import { DEPARTURE_CITIES, DEPARTURE_CITY_LABELS, TRAVEL_MODES, SPEND_PRESETS } from "@/lib/pricing/constants";
 import { formatDateIST } from "@/lib/pricing/format";
 import type { PricingEngineOutput } from "@/lib/pricing/types";
@@ -239,7 +240,14 @@ export default function TripCostCalculator({
       <div className="rounded-xl border border-border bg-surface p-4">
         {loading && <p className="text-sm text-foreground-muted">Calculating…</p>}
         {error && <p role="alert" className="text-sm text-danger">{error}</p>}
-        {output && !loading && <PriceBreakdown output={output} />}
+        {output && !loading && (
+          <>
+            <div className="mb-3">
+              <GroupSavingBar groupDiscount={output.groupDiscount} />
+            </div>
+            <PriceBreakdown output={output} />
+          </>
+        )}
         {!loading && !output && !error && <p className="text-sm text-foreground-muted">Choose a departure to see your trip cost.</p>}
       </div>
     </div>

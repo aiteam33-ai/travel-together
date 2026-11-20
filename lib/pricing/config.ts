@@ -23,6 +23,11 @@ export async function getActiveCoupon(code: string) {
   return row;
 }
 
+export async function getGroupDiscountTiers() {
+  const rows = await prisma.groupDiscountTier.findMany({ where: { active: true }, orderBy: { minTravellers: "asc" } });
+  return rows.map((r) => ({ minTravellers: r.minTravellers, discountPerPersonPaise: r.discountPerPersonPaise }));
+}
+
 export const SPEND_PRESET_KEYS: Record<string, string> = {
   BUDGET: "SPEND_BUDGET_PER_DAY",
   COMFORT: "SPEND_COMFORT_PER_DAY",

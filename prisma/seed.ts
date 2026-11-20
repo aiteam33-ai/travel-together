@@ -685,6 +685,7 @@ async function main() {
   await prisma.taxConfig.deleteMany();
   await prisma.pricingConfig.deleteMany();
   await prisma.emiConfig.deleteMany();
+  await prisma.groupDiscountTier.deleteMany();
   await prisma.coupon.deleteMany();
   await prisma.branch.deleteMany();
 
@@ -833,6 +834,10 @@ async function main() {
       { months: 9, annualInterestRate: 13, effectiveFrom },
       { months: 12, annualInterestRate: 14, effectiveFrom },
     ],
+  });
+
+  await prisma.groupDiscountTier.createMany({
+    data: [{ minTravellers: 6, discountPerPersonPaise: 200000, effectiveFrom, active: true }],
   });
 
   await prisma.coupon.createMany({

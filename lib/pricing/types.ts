@@ -43,6 +43,11 @@ export interface PersonalSpendingInput {
   days: number;
 }
 
+export interface GroupDiscountTier {
+  minTravellers: number;
+  discountPerPersonPaise: number;
+}
+
 export interface PricingEngineInput {
   tourId: string;
   departureId: string;
@@ -63,6 +68,8 @@ export interface PricingEngineInput {
   emiMonthsOptions: { months: number; annualInterestRate: number }[];
   foreignCurrency?: { code: string; rateToInr: number }; // e.g. USD 83.2
   amountDuePercentNow: number; // e.g. 25 for booking amount, 100 for full
+  /** Admin-editable, effective-dated tiers; sorted ascending by minTravellers by the caller is not required. */
+  groupDiscountTiers?: GroupDiscountTier[];
 }
 
 export interface LineItem {
@@ -95,4 +102,10 @@ export interface PricingEngineOutput {
   emiOptions: EmiOption[];
   foreignCurrencyEquivalent?: { code: string; amount: number }; // on grandTotal
   totalTravellers: number;
+  groupDiscount: {
+    applied: boolean;
+    perPersonAmount: number; // paise, 0 if not applied
+    travellersToNextTier: number | null; // how many more paying travellers to unlock the next tier, or reach the first one
+    nextTierDiscountPerPerson: number | null; // paise, the discount that next tier would give
+  };
 }

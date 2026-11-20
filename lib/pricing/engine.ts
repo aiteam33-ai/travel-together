@@ -68,6 +68,23 @@ export function computePricing(input: PricingEngineInput): PricingEngineOutput {
     paidToUs.push({ label: "Home-city airport transfers", amount: 0, isEstimate: true });
   }
 
+  // Group discount: per-paying-traveller saving once the party is large enough.
+  // Tiers are admin-editable with effective dates (see lib/pricing/config.ts);
+  // we always apply the single best-matching tier (highest minTravellers met).
+  const payingTravellers = t.adults + t.childrenWithBed + t.childrenWithoutBed;
+  const tiers = [...(input.groupDiscountTiers ?? [])].sort((a, b) => a.minTravellers - b.minTravellers);
+  const matchedTier = [...tiers].reverse().find((tier) => payingTravellers >= tier.minTravellers);
+  const nextTier = tiers.find((tier) => payingTravellers < tier.minTravellers);
+
+  if (matchedTier && matchedTier.discountPerPersonPaise > 0) {
+    const groupDiscountAmount = matchedTier.discountPerPersonPaise * payingTravellers;
+    paidToUs.push({
+      label: `Group saving (${matchedTier.minTravellers}+ travellers)`,
+      amount: -groupDiscountAmount,
+      isEstimate: false,
+    });
+  }
+
   let paidToUsSubtotal = paidToUs.reduce((s, l) => s + l.amount, 0);
 
   // Coupon discount applied before tax
@@ -142,6 +159,12 @@ export function computePricing(input: PricingEngineInput): PricingEngineOutput {
     amountDueLater,
     emiOptions,
     totalTravellers,
+    groupDiscount: {
+      applied: !!matchedTier,
+      perPersonAmount: matchedTier?.discountPerPersonPaise ?? 0,
+      travellersToNextTier: nextTier ? nextTier.minTravellers - payingTravellers : null,
+      nextTierDiscountPerPerson: nextTier?.discountPerPersonPaise ?? null,
+    },
   };
 
   if (input.foreignCurrency) {
