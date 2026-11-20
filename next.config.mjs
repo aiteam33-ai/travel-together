@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   /* config options here */
-  cacheComponents: true,
-  partialPrefetching: true,
+  images: {
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "inline",
+  },
   turbopack: {
     rules: {
       "*.css": {

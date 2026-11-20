@@ -1,0 +1,277 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// SQLite has no native enum support; these string unions are enforced by
+// the Zod schemas in lib/validation instead. See lib/pricing/constants.ts
+// for the canonical value lists (TourCategory, MealPlanType, TravellerTag,
+// DepartureCity).
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  phone         String?   @unique
+  email         String?   @unique
+  createdAt     DateTime  @default(now())
+  isAdmin       Boolean   @default(false)
+  bookings      Booking[]
+  wishlist      WishlistItem[]
+  savedCalcs    SavedCalculation[]
+  savedTravellers SavedTraveller[]
+  carts         Cart[]
+  leads         Lead[]
+  sessions      Session[]
+  supportRequests SupportRequest[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model OtpCode {
+  id        String   @id @default(cuid())
+  identifier String  // phone or email
+  code      String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  consumed  Boolean  @default(false)
+  attempts  Int      @default(0)
+}
+
+model Tour {
+  id            String       @id @default(cuid())
+  slug          String       @unique
+  title         String
+  category      String
+  tags          String       // comma-separated TravellerTag
+  summary       String
+  description   String
+  durationDays  Int
+  durationNights Int
+  mealPlan      String       // comma-separated MealPlanType offered
+  isInternational Boolean    @default(false)
+  difficulty    String?      // for treks: Easy/Moderate/Difficult
+  altitudeMeters Int?
+  fitnessNote   String?
+  gearList      String?
+  heroImage     String
+  gallery       String       // comma-separated local image ids
+  itinerary     String       // JSON string: [{day,title,description}]
+  inclusions    String       // JSON string array
+  exclusions    String       // JSON string array
+  hotels        String       // JSON string array [{city,name,rating}]
+  cancellationPolicy String // JSON string [{daysBefore,feePercent}]
+  faqs          String       // JSON string [{q,a}]
+  documentsNeeded String     // JSON string array
+  createdAt     DateTime     @default(now())
+  departures    Departure[]
+  reviews       Review[]
+  wishlist      WishlistItem[]
+  savedCalcs    SavedCalculation[]
+  bookings      Booking[]
+}
+
+model Departure {
+  id            String    @id @default(cuid())
+  tourId        String
+  startDate     DateTime
+  endDate       DateTime
+  totalSeats    Int
+  seatsBooked   Int       @default(0)
+  basePricePerPerson Int  // in paise, price when joining at destination
+  tour          Tour      @relation(fields: [tourId], references: [id])
+  cityPrices    DepartureCityPrice[]
+  bookings      Booking[]
+}
+
+model DepartureCityPrice {
+  id            String    @id @default(cuid())
+  departureId   String
+  city          String
+  pricePerPerson Int      // in paise
+  singleSupplement Int    @default(0)
+  childWithBedPrice Int?
+  childNoBedPrice   Int?
+  infantPrice       Int?
+  departure     Departure @relation(fields: [departureId], references: [id])
+
+  @@unique([departureId, city])
+}
+
+model FareTableEntry {
+  id          String   @id @default(cuid())
+  fromCity    String
+  mode        String   // FLIGHT, TRAIN_SLEEPER, TRAIN_3AC, TRAIN_2AC, TRAIN_1AC, VANDE_BHARAT_CC
+  pricePerPerson Int   // paise, round trip estimate
+}
+
+model TaxConfig {
+  id            String   @id @default(cuid())
+  key           String   // "GST_RATE", "TCS_RATE_INTL", "TCS_RATE_DOMESTIC"
+  value         Float
+  effectiveFrom DateTime
+  note          String?
+}
+
+model PricingConfig {
+  id            String   @id @default(cuid())
+  key           String   // "INSURANCE_PER_PERSON_PER_DAY", "SPEND_BUDGET_PER_DAY" etc
+  value         Float
+  effectiveFrom DateTime
+  note          String?
+}
+
+model EmiConfig {
+  id            String   @id @default(cuid())
+  months        Int      // 3,6,9,12
+  annualInterestRate Float
+  effectiveFrom DateTime
+}
+
+model Coupon {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  description String
+  discountPercent Float?
+  discountFlat    Int?  // paise
+  validFrom   DateTime
+  validTo     DateTime
+  active      Boolean  @default(true)
+}
+
+model WishlistItem {
+  id        String   @id @default(cuid())
+  userId    String
+  tourId    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  tour      Tour     @relation(fields: [tourId], references: [id])
+
+  @@unique([userId, tourId])
+}
+
+model SavedCalculation {
+  id        String   @id @default(cuid())
+  userId    String
+  tourId    String
+  inputJson String
+  outputJson String
+  createdAt DateTime @default(now())
+  shareToken String  @unique @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  tour      Tour     @relation(fields: [tourId], references: [id])
+}
+
+model SavedTraveller {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  age       Int
+  gender    String
+  mealChoice String
+  passportNumber String?
+  passportExpiry DateTime?
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Cart {
+  id        String   @id @default(cuid())
+  userId    String?
+  sessionKey String  @unique
+  stateJson String
+  updatedAt DateTime @updatedAt
+  expiresAt DateTime
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+model Booking {
+  id            String   @id @default(cuid())
+  bookingRef    String   @unique
+  userId        String
+  tourId        String
+  departureId   String
+  status        String   // HELD, CONFIRMED, PARTIALLY_PAID, CANCELLED
+  travellersJson String
+  addOnsJson    String
+  pricingSnapshotJson String
+  amountDue     Int
+  amountPaid    Int      @default(0)
+  holdExpiresAt DateTime?
+  createdAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id])
+  tour          Tour     @relation(fields: [tourId], references: [id])
+  departure     Departure @relation(fields: [departureId], references: [id])
+  payments      Payment[]
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  bookingId   String
+  amount      Int
+  method      String   // UPI, CARD, NETBANKING, EMI
+  status      String   // SUCCESS, FAILED, PENDING
+  createdAt   DateTime @default(now())
+  booking     Booking  @relation(fields: [bookingId], references: [id])
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  tourId      String
+  name        String
+  rating      Int
+  text        String
+  travelDate  DateTime
+  verifiedBooking Boolean @default(false)
+  isSampleData Boolean @default(true)
+  createdAt   DateTime @default(now())
+  tour        Tour     @relation(fields: [tourId], references: [id])
+}
+
+model Lead {
+  id          String   @id @default(cuid())
+  userId      String?
+  name        String
+  phone       String
+  source      String   // WHATSAPP_BUTTON, CALLBACK_REQUEST, ENQUIRY_FORM
+  tourId      String?
+  message     String?
+  status      String   @default("NEW")
+  createdAt   DateTime @default(now())
+  user        User?    @relation(fields: [userId], references: [id])
+}
+
+model SupportRequest {
+  id        String   @id @default(cuid())
+  userId    String
+  subject   String
+  message   String
+  status    String   @default("OPEN")
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model OutboxMessage {
+  id        String   @id @default(cuid())
+  channel   String   // EMAIL, SMS, WHATSAPP
+  toAddress String
+  subject   String?
+  body      String
+  createdAt DateTime @default(now())
+}
+
+model Branch {
+  id      String @id @default(cuid())
+  city    String
+  address String
+  phone   String
+}

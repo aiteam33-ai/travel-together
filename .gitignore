@@ -51,3 +51,5 @@ next-env.d.ts
 /backend/.pytest_cache
 /backend/sample_chart_output.json
 /backend/sample_chart_err.txt
+.env
+prisma/dev.db

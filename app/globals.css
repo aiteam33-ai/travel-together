@@ -1,16 +1,19 @@
 @import "tailwindcss";
 
 /* ======================================================
-   THEME — warm & friendly. Edit these values to retheme.
+   THEME — warm, trustworthy Indian travel brand.
+   Edit these values to retheme. Contrast checked for WCAG 2.2 AA.
    ====================================================== */
 :root {
-  --background: #fdf6ec; /* cream page background */
-  --surface: #fffaf2; /* card / row background, slightly lighter than bg */
-  --foreground: #3b2415; /* dark brown text */
-  --foreground-muted: #8a6a52; /* softer brown for secondary text */
-  --accent: #c1440e; /* deep red-orange for buttons and highlights */
-  --accent-strong: #9c360a; /* pressed/active state */
-  --border: #e8d9c3; /* soft divider / border colour */
+  --background: #fdf6ec;
+  --surface: #fffaf2;
+  --foreground: #3b2415;
+  --foreground-muted: #6b4f3b;
+  --accent: #c1440e;
+  --accent-strong: #9c360a;
+  --border: #e8d9c3;
+  --success: #2f6b3a;
+  --danger: #a3291a;
 }
 
 @theme inline {
@@ -21,13 +24,53 @@
   --color-accent: var(--accent);
   --color-accent-strong: var(--accent-strong);
   --color-border: var(--border);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-heading-rounded);
+}
+
+html {
+  font-size: 16px;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Never disable zoom. */
+@viewport {
+  zoom: 1;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent-strong);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0 0 0.5rem 0;
+}
+.skip-link:focus {
+  left: 0;
 }
