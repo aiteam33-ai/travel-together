@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { useAuth } from "./AuthContext";
+import { usePrefersReducedMotion } from "@/lib/motion/reduced-motion";
 
 type Step = "identifier" | "otp" | "name";
 
@@ -18,6 +20,7 @@ export default function LoginModal({ onClose }: { onClose: () => void }) {
   const [resendIn, setResendIn] = useState(0);
   const [isNewUser, setIsNewUser] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
+  const reduced = usePrefersReducedMotion();
 
   useEffect(() => {
     const t = setInterval(() => setResendIn((s) => (s > 0 ? s - 1 : 0)), 1000);
@@ -105,11 +108,14 @@ export default function LoginModal({ onClose }: { onClose: () => void }) {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div
+      <motion.div
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="login-title"
+        initial={reduced ? false : { opacity: 0, scale: 0.96, y: 8 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.2 }}
         className="w-full max-w-md rounded-xl bg-surface p-6 shadow-xl"
       >
         <div className="mb-4 flex items-center justify-between">
@@ -215,7 +221,7 @@ export default function LoginModal({ onClose }: { onClose: () => void }) {
             </button>
           </div>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }

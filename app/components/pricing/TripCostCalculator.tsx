@@ -238,7 +238,14 @@ export default function TripCostCalculator({
       </div>
 
       <div className="rounded-xl border border-border bg-surface p-4">
-        {loading && <p className="text-sm text-foreground-muted">Calculating…</p>}
+        {loading && (
+          <div className="space-y-2" aria-busy="true" aria-label="Calculating">
+            <div className="skeleton h-5 w-2/3" />
+            <div className="skeleton h-5 w-1/2" />
+            <div className="skeleton h-5 w-5/6" />
+            <div className="skeleton h-8 w-full" />
+          </div>
+        )}
         {error && <p role="alert" className="text-sm text-danger">{error}</p>}
         {output && !loading && (
           <>

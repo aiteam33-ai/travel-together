@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
 import { formatDateIST, formatRupees } from "@/lib/pricing/format";
 import { BRAND } from "@/lib/brand";
+import BookingConfirmedAnimation from "@/app/components/checkout/BookingConfirmedAnimation";
 
 export default async function ConfirmationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -16,6 +17,7 @@ export default async function ConfirmationPage({ params }: { params: Promise<{ i
 
   return (
     <div className="mx-auto max-w-2xl rounded-xl border border-border bg-surface p-8 text-center print:border-0">
+      <BookingConfirmedAnimation bookingRef={booking.bookingRef} />
       <h1 className="font-heading text-2xl font-bold text-success">Booking confirmed!</h1>
       <p className="mt-2 text-foreground-muted">Ref: {booking.bookingRef}</p>
       <div className="mt-6 space-y-1 text-left text-sm">

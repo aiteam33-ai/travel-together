@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
 import { useLocale } from "@/lib/i18n/LocaleContext";
+import { usePrefersReducedMotion } from "@/lib/motion/reduced-motion";
 
 const MENU_ITEMS: { key: string; href: string }[] = [
   { key: "nav.india", href: "/tours?category=DOMESTIC" },
@@ -21,6 +23,7 @@ export default function MegaMenu() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const itemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const reduced = usePrefersReducedMotion();
 
   function openOnHover(i: number) {
     if (hoverTimer.current) clearTimeout(hoverTimer.current);
@@ -84,21 +87,27 @@ export default function MegaMenu() {
             >
               {t(item.key)}
             </Link>
-            {openIndex === i && (
-              <div
-                role="menu"
-                className="absolute left-0 top-full z-30 mt-1 w-56 rounded-lg border border-border bg-surface-raised p-2 shadow-[var(--shadow-raised)]"
-              >
-                <Link
-                  role="menuitem"
-                  href={item.href}
-                  className="block min-h-11 rounded-md px-3 py-2 text-sm hover:bg-accent-soft"
-                  onClick={() => setOpenIndex(null)}
+            <AnimatePresence>
+              {openIndex === i && (
+                <motion.div
+                  role="menu"
+                  initial={reduced ? false : { opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={reduced ? undefined : { opacity: 0, y: -4 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute left-0 top-full z-30 mt-1 w-56 rounded-lg border border-border bg-surface-raised p-2 shadow-[var(--shadow-raised)]"
                 >
-                  Browse all {t(item.key)}
-                </Link>
-              </div>
-            )}
+                  <Link
+                    role="menuitem"
+                    href={item.href}
+                    className="block min-h-11 rounded-md px-3 py-2 text-sm hover:bg-accent-soft"
+                    onClick={() => setOpenIndex(null)}
+                  >
+                    Browse all {t(item.key)}
+                  </Link>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         );
       })}

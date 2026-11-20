@@ -1,6 +1,7 @@
 "use client";
 
 import { formatRupees } from "@/lib/pricing/format";
+import RollingNumber from "./RollingNumber";
 import type { PricingEngineOutput } from "@/lib/pricing/types";
 
 export default function PriceBreakdown({ output }: { output: PricingEngineOutput }) {
@@ -41,7 +42,7 @@ export default function PriceBreakdown({ output }: { output: PricingEngineOutput
       <div className="rounded-md bg-accent/10 p-3">
         <div className="flex justify-between text-base font-bold">
           <span>Grand total (paid to us + taxes)</span>
-          <span>{formatRupees(output.grandTotal)}</span>
+          <RollingNumber value={output.grandTotal} />
         </div>
         <p className="mt-1 text-xs text-foreground-muted">
           {formatRupees(output.costPerPerson)} per person · {formatRupees(output.costPerDay)} per day
