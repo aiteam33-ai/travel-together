@@ -22,10 +22,10 @@ export default function TourCard({ tourId, slug, title, heroImage, durationDays,
   const { t } = useLocale();
   const emiFrom = cheapestPricePerPerson ? Math.round(cheapestPricePerPerson / 100 / 6) : null;
   return (
-    <article className="flex flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-sm transition hover:shadow-md">
-      <Link href={`/tours/${slug}`} className="block">
-        <div className="relative h-44 w-full">
-          <Image src={heroImage} alt={`${title} — illustrative placeholder photo`} fill className="object-cover" />
+    <article className="card-hover flex flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-[var(--shadow-soft)]">
+      <Link href={`/tours/${slug}`} className="block overflow-hidden">
+        <div className="relative h-44 w-full overflow-hidden">
+          <Image src={heroImage} alt={`${title} — illustrative placeholder photo`} fill className="card-hover-image object-cover" />
         </div>
       </Link>
       <div className="flex flex-1 flex-col gap-2 p-4">
@@ -53,7 +53,7 @@ export default function TourCard({ tourId, slug, title, heroImage, durationDays,
         </div>
         <Link
           href={`/tours/${slug}`}
-          className="mt-2 inline-block rounded-md bg-accent px-3 py-2 text-center text-sm font-semibold text-white hover:bg-accent-strong"
+          className="mt-2 flex min-h-11 items-center justify-center rounded-md bg-accent px-3 text-center text-sm font-semibold text-white press-feedback hover:bg-accent-strong"
         >
           {t("card.viewDetails")}
         </Link>

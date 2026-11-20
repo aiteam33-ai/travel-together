@@ -3,6 +3,9 @@ import { prisma } from "@/lib/db/client";
 import { getTourCounts, getFastFillingDepartures } from "@/lib/data/tours";
 import TourCard from "./components/TourCard";
 import SearchBar from "./components/SearchBar";
+import ScrollRow from "./components/landing/ScrollRow";
+import LandingIntro from "./components/landing/LandingIntro";
+import RevealOnScroll from "./components/motion/RevealOnScroll";
 import { formatRupees, formatDateIST } from "@/lib/pricing/format";
 import { TRAVELLER_TAGS, DEPARTURE_CITIES, DEPARTURE_CITY_LABELS } from "@/lib/pricing/constants";
 
@@ -15,84 +18,87 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col gap-16">
-      <section className="rounded-2xl bg-gradient-to-br from-accent/10 to-transparent p-8 md:p-14">
-        <h1 className="font-heading max-w-2xl text-3xl font-extrabold leading-tight md:text-5xl">
-          Know your whole trip cost, before you call anyone.
-        </h1>
-        <p className="mt-4 max-w-xl text-lg text-foreground-muted">
-          Search fixed-departure tours, treks and pilgrimages across India and the world — then see the full
-          door-to-door cost with our Trip Expense Calculator.
-        </p>
-        <div className="mt-8">
-          <SearchBar />
-        </div>
-      </section>
-
-      {fastFilling.length > 0 && (
-        <section>
-          <h2 className="font-heading mb-4 text-2xl font-bold">Departures filling fast</h2>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {fastFilling.map((d) => (
-              <TourCard
-                key={d.id}
-                tourId={d.tour.id}
-                slug={d.tour.slug}
-                title={d.tour.title}
-                heroImage={d.tour.heroImage}
-                durationDays={d.tour.durationDays}
-                durationNights={d.tour.durationNights}
-                cheapestPricePerPerson={d.basePricePerPerson}
-                nextDates={[d.startDate]}
-                seatsLeft={d.seatsLeft}
-              />
-            ))}
+      <LandingIntro>
+        <section className="rounded-2xl bg-gradient-to-br from-accent/10 to-transparent p-8 md:p-14">
+          <h1 className="font-heading max-w-2xl text-3xl font-extrabold leading-tight md:text-5xl" data-intro="headline">
+            Know your whole trip cost, before you call anyone.
+          </h1>
+          <p className="mt-4 max-w-xl text-lg text-foreground-muted" data-intro="headline">
+            Search fixed-departure tours, treks and pilgrimages across India and the world — then see the full
+            door-to-door cost with our Trip Expense Calculator.
+          </p>
+          <div className="mt-8" data-intro="search">
+            <SearchBar />
           </div>
         </section>
+      </LandingIntro>
+
+      {fastFilling.length > 0 && (
+        <RevealOnScroll as="section">
+          <h2 className="font-heading mb-4 text-2xl font-bold">Departures filling fast</h2>
+          <ScrollRow>
+            {fastFilling.map((d) => (
+              <div key={d.id} className="w-72 shrink-0 snap-start">
+                <TourCard
+                  tourId={d.tour.id}
+                  slug={d.tour.slug}
+                  title={d.tour.title}
+                  heroImage={d.tour.heroImage}
+                  durationDays={d.tour.durationDays}
+                  durationNights={d.tour.durationNights}
+                  cheapestPricePerPerson={d.basePricePerPerson}
+                  nextDates={[d.startDate]}
+                  seatsLeft={d.seatsLeft}
+                />
+              </div>
+            ))}
+          </ScrollRow>
+        </RevealOnScroll>
       )}
 
-      <section>
+      <RevealOnScroll as="section">
         <h2 className="font-heading mb-4 text-2xl font-bold">Browse by traveller type</h2>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-6">
           {TRAVELLER_TAGS.map((tag) => (
             <Link
               key={tag}
               href={`/tours?tag=${tag}`}
-              className="rounded-xl border border-border bg-surface p-4 text-center text-sm font-semibold hover:border-accent hover:text-accent"
+              className="flex min-h-11 items-center justify-center rounded-xl border border-border bg-surface p-4 text-center text-sm font-semibold press-feedback hover:border-accent hover:text-accent"
             >
               {tag.replace(/_/g, " ")}
             </Link>
           ))}
         </div>
-      </section>
+      </RevealOnScroll>
 
-      <section>
+      <RevealOnScroll as="section">
         <h2 className="font-heading mb-4 text-2xl font-bold">Browse by departure city</h2>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-8">
           {DEPARTURE_CITIES.filter((c) => c !== "JOIN_AT_DESTINATION").map((city) => (
             <Link
               key={city}
               href={`/tours?city=${city}`}
-              className="rounded-xl border border-border bg-surface p-4 text-center text-sm font-semibold hover:border-accent hover:text-accent"
+              className="flex min-h-11 items-center justify-center rounded-xl border border-border bg-surface p-4 text-center text-sm font-semibold press-feedback hover:border-accent hover:text-accent"
             >
               {DEPARTURE_CITY_LABELS[city]}
             </Link>
           ))}
         </div>
-      </section>
+      </RevealOnScroll>
 
-      <section className="rounded-2xl border border-border bg-surface p-8">
+      <RevealOnScroll as="section" className="rounded-2xl border border-border bg-surface p-8">
         <h2 className="font-heading text-2xl font-bold">Trip Expense Calculator</h2>
         <p className="mt-2 max-w-2xl text-foreground-muted">
           Most &ldquo;starts from&rdquo; prices grow once you call. Ours doesn&apos;t have to — add your travellers, your
           departure city and your add-ons, and see the real total, taxes and your own estimated spending, split out
           clearly, before you book.
         </p>
-        <Link href="/trip-cost-calculator" className="mt-4 inline-block rounded-md bg-accent px-4 py-2 font-semibold text-white hover:bg-accent-strong">
+        <Link href="/trip-cost-calculator" className="mt-4 inline-flex min-h-11 items-center rounded-md bg-accent px-4 font-semibold text-white press-feedback hover:bg-accent-strong">
           Try the calculator
         </Link>
-      </section>
+      </RevealOnScroll>
 
-      <section>
+      <RevealOnScroll as="section">
         <h2 className="font-heading mb-4 text-2xl font-bold">Why travel with us</h2>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
           {[
@@ -106,10 +112,10 @@ export default async function HomePage() {
             </div>
           ))}
         </div>
-      </section>
+      </RevealOnScroll>
 
       {reviews.length > 0 && (
-        <section>
+        <RevealOnScroll as="section">
           <h2 className="font-heading mb-4 text-2xl font-bold">What travellers say</h2>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
             {reviews.map((r) => (
@@ -122,7 +128,7 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
-        </section>
+        </RevealOnScroll>
       )}
 
       <section className="rounded-2xl border border-border bg-surface p-8 text-center">

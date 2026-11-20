@@ -1,32 +1,65 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "./auth/AuthContext";
+import { useWishlist } from "./WishlistContext";
+import { useToast } from "./ToastContext";
+import LoginModal from "./auth/LoginModal";
 
-export default function WishlistButton({ tourId }: { tourId: string }) {
+export default function WishlistButton({ tourId, initiallyAdded = false }: { tourId: string; initiallyAdded?: boolean }) {
   const { user } = useAuth();
-  const [added, setAdded] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
+  const { refresh } = useWishlist();
+  const { showToast } = useToast();
+  const [added, setAdded] = useState(initiallyAdded);
+  const [popping, setPopping] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [pendingSave, setPendingSave] = useState(false);
 
-  async function toggle() {
-    if (!user) {
-      setMsg("Please log in to save this to your wishlist.");
-      return;
-    }
+  async function save() {
     const res = await fetch("/api/wishlist", {
       method: added ? "DELETE" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ tourId }),
     });
-    if (res.ok) setAdded(!added);
+    if (res.ok) {
+      setAdded((v) => !v);
+      setPopping(true);
+      refresh();
+      showToast(added ? "Removed from wishlist" : "Added to wishlist");
+    }
   }
 
+  function toggle() {
+    if (!user) {
+      setPendingSave(true);
+      setShowLogin(true);
+      return;
+    }
+    save();
+  }
+
+  useEffect(() => {
+    if (user && pendingSave) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- completes a save the user started while logged out
+      setPendingSave(false);
+      save();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, pendingSave]);
+
   return (
-    <span>
-      <button type="button" onClick={toggle} className="rounded-full border border-border px-3 py-1 text-sm">
-        {added ? "♥ In wishlist" : "♡ Add to wishlist"}
+    <>
+      <button
+        type="button"
+        onClick={toggle}
+        onAnimationEnd={() => setPopping(false)}
+        className={`flex min-h-11 items-center gap-1.5 rounded-full border border-border px-3 text-sm press-feedback ${popping ? "heart-pop" : ""}`}
+        aria-pressed={added}
+      >
+        <span aria-hidden="true">{added ? "♥" : "♡"}</span>
+        {added ? "In wishlist" : "Add to wishlist"}
       </button>
-      {msg && <span className="ml-2 text-xs text-foreground-muted">{msg}</span>}
-    </span>
+      {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
+    </>
   );
 }

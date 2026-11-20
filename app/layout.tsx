@@ -1,18 +1,24 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Baloo_2 } from "next/font/google";
+import { Hind, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { BRAND } from "@/lib/brand";
 import { LocaleProvider } from "@/lib/i18n/LocaleContext";
 import { AuthProvider } from "./components/auth/AuthContext";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import ContactWidgets from "./components/ContactWidgets";
 import { CompareProvider } from "./components/CompareContext";
-import CompareBar from "./components/CompareBar";
+import { ToastProvider } from "./components/ToastContext";
+import { WishlistProvider } from "./components/WishlistContext";
+import Header from "./components/nav/Header";
+import Footer from "./components/Footer";
+import BottomTabBar from "./components/nav/BottomTabBar";
+import HelpButton from "./components/floating/HelpButton";
+import CompareTray from "./components/floating/CompareTray";
+import BackToTop from "./components/floating/BackToTop";
+import TopLoadingBar from "./components/nav/TopLoadingBar";
+import PageTransition from "./components/PageTransition";
+import { FloatingStackProvider } from "./components/floating/FloatingStackContext";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+const hind = Hind({ variable: "--font-hind", subsets: ["latin", "devanagari"], weight: ["400", "500", "600", "700"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
-const headingFont = Baloo_2({ variable: "--font-heading-rounded", subsets: ["latin"], weight: ["600", "700", "800"] });
 
 export const metadata: Metadata = {
   title: `${BRAND.name} — Tours, Treks & Pilgrimages`,
@@ -21,18 +27,27 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${headingFont.variable} h-full antialiased`}>
+    <html lang="en" className={`${hind.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-background text-foreground">
         <LocaleProvider>
           <AuthProvider>
             <CompareProvider>
-              <Header />
-              <main id="main-content" className="mx-auto w-full max-w-[1440px] flex-1 px-6 py-8">
-                {children}
-              </main>
-              <Footer />
-              <ContactWidgets />
-              <CompareBar />
+              <ToastProvider>
+                <WishlistProvider>
+                  <FloatingStackProvider>
+                    <TopLoadingBar />
+                    <Header />
+                    <main id="main-content" className="mx-auto w-full max-w-[1440px] flex-1 px-6 py-8 pb-24 md:pb-8">
+                      <PageTransition>{children}</PageTransition>
+                    </main>
+                    <Footer />
+                    <HelpButton />
+                    <CompareTray />
+                    <BackToTop />
+                    <BottomTabBar />
+                  </FloatingStackProvider>
+                </WishlistProvider>
+              </ToastProvider>
             </CompareProvider>
           </AuthProvider>
         </LocaleProvider>

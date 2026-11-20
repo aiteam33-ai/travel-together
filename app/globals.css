@@ -1,34 +1,68 @@
 @import "tailwindcss";
 
 /* ======================================================
-   THEME — warm, trustworthy Indian travel brand.
-   Edit these values to retheme. Contrast checked for WCAG 2.2 AA.
+   DESIGN TOKENS — the only source of colour, spacing,
+   radius, shadow, duration and easing values for the app.
+   Mirrors lib/design-tokens.ts (kept in sync by hand, since
+   Tailwind's @theme can't import TS). Use only these values,
+   via the Tailwind classes they generate — never a raw hex,
+   px margin or ad-hoc transition in a component.
    ====================================================== */
 :root {
   --background: #fdf6ec;
   --surface: #fffaf2;
+  --surface-raised: #ffffff;
   --foreground: #3b2415;
   --foreground-muted: #6b4f3b;
-  --accent: #c1440e;
-  --accent-strong: #9c360a;
+  --accent: #b23c0a; /* darkened from #c1440e to clear AA on white/cream */
+  --accent-strong: #8c2f07;
+  --accent-soft: #f6ddc9;
   --border: #e8d9c3;
   --success: #2f6b3a;
+  --success-soft: #e3f0e4;
   --danger: #a3291a;
+  --danger-soft: #f8e4e1;
+
+  /* Spacing scale: 8 / 16 / 24 / 40 / 64 (rule 2) */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 40px;
+  --space-5: 64px;
+
+  --radius-sm: 12px;
+  --radius-lg: 16px;
+
+  --shadow-soft: 0 2px 8px rgba(59, 36, 21, 0.08), 0 1px 2px rgba(59, 36, 21, 0.06);
+  --shadow-raised: 0 8px 24px rgba(59, 36, 21, 0.14), 0 2px 6px rgba(59, 36, 21, 0.08);
+
+  --duration-micro: 150ms;
+  --duration-small: 300ms;
+  --duration-panel: 350ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --content-max: 1440px;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
   --color-foreground: var(--foreground);
   --color-foreground-muted: var(--foreground-muted);
   --color-accent: var(--accent);
   --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
   --color-border: var(--border);
   --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
   --color-danger: var(--danger);
-  --font-sans: var(--font-geist-sans);
+  --color-danger-soft: var(--danger-soft);
+  --radius-token-sm: var(--radius-sm);
+  --radius-token-lg: var(--radius-lg);
+  --font-sans: var(--font-hind);
+  --font-heading: var(--font-hind);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-heading-rounded);
 }
 
 html {
@@ -38,12 +72,20 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-hind), "Noto Sans Devanagari", Arial, Helvetica, sans-serif;
 }
 
-/* Never disable zoom. */
-@viewport {
-  zoom: 1;
+/* Hindi needs more line-height than English; set generously everywhere so
+   Devanagari ascenders/descenders never clip in nav, buttons, cards, stepper. */
+:lang(hi) {
+  line-height: 1.6;
+}
+
+main, h1, h2, h3, p, button, a, input, select, textarea {
+  line-height: 1.5;
+}
+:lang(hi) main, :lang(hi) h1, :lang(hi) h2, :lang(hi) h3, :lang(hi) p, :lang(hi) button, :lang(hi) a {
+  line-height: 1.7;
 }
 
 :focus-visible {
@@ -69,8 +111,89 @@ body {
   background: var(--accent);
   color: #fff;
   padding: 0.75rem 1.25rem;
-  border-radius: 0 0 0.5rem 0;
+  border-radius: 0 0 var(--radius-sm) 0;
 }
 .skip-link:focus {
   left: 0;
+}
+
+/* ---------- Shared small-feedback utilities (Stage 5) ---------- */
+.press-feedback {
+  transition: transform var(--duration-micro) var(--ease-standard), box-shadow var(--duration-small) var(--ease-standard);
+}
+.press-feedback:hover {
+  transform: translateY(-2px);
+}
+.press-feedback:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.card-hover {
+  transition: transform var(--duration-small) var(--ease-standard), box-shadow var(--duration-small) var(--ease-standard);
+}
+@media (hover: hover) {
+  .card-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-raised);
+  }
+  .card-hover:hover .card-hover-image {
+    transform: scale(1.05);
+  }
+}
+.card-hover-image {
+  transition: transform var(--duration-small) var(--ease-standard);
+}
+
+@keyframes badge-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+.badge-pop {
+  animation: badge-pop var(--duration-small) var(--ease-standard);
+}
+
+@keyframes heart-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+.heart-pop {
+  animation: heart-pop var(--duration-small) var(--ease-standard);
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--border) 25%, var(--surface-raised) 50%, var(--border) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes loading-bar {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+@keyframes page-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.page-fade-in {
+  animation: page-fade-in var(--duration-small) var(--ease-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .press-feedback:hover,
+  .press-feedback:active,
+  .card-hover:hover,
+  .card-hover:hover .card-hover-image {
+    transform: none;
+  }
+  .badge-pop, .heart-pop, .skeleton, .page-fade-in {
+    animation: none;
+  }
 }
