@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import TripCostCalculator from "../pricing/TripCostCalculator";
 import EnquireButton from "../EnquireButton";
+import SlideOverPanel from "../SlideOverPanel";
 import { formatRupees, formatDateIST } from "@/lib/pricing/format";
 import { usePrefersReducedMotion } from "@/lib/motion/reduced-motion";
 import { useFloatingStack, COMPARE_TRAY_HEIGHT, FLOATING_GAP } from "../floating/FloatingStackContext";
@@ -31,6 +32,7 @@ export default function TourPricePanel({
   isInternational: boolean;
   departures: DepartureOption[];
 }) {
+  const [panelOpen, setPanelOpen] = useState(false);
   const [output, setOutput] = useState<PricingEngineOutput | null>(null);
   const [adults, setAdults] = useState(2);
   const [departureId, setDepartureId] = useState(departures[0]?.id ?? "");
@@ -76,8 +78,21 @@ export default function TourPricePanel({
             Book now
           </a>
           <EnquireButton tourId={tourId} tourTitle={tourTitle} />
+          <button
+            type="button"
+            onClick={() => setPanelOpen(true)}
+            className="min-h-11 text-sm font-medium text-accent underline press-feedback"
+          >
+            See full cost breakdown
+          </button>
         </div>
       </div>
+
+      <SlideOverPanel open={panelOpen} onClose={() => setPanelOpen(false)} title="Full trip cost breakdown">
+        {departures.length > 0 && (
+          <TripCostCalculator tourId={tourId} isInternational={isInternational} departures={departures} />
+        )}
+      </SlideOverPanel>
 
       <AnimatePresence>
         {!bookButtonVisible && output && departure && (
