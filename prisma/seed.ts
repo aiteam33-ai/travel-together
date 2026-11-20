@@ -673,8 +673,16 @@ const TOURS: TourSeed[] = [
 async function main() {
   console.log("Seeding database...");
 
+  await prisma.expenseParticipant.deleteMany();
+  await prisma.expense.deleteMany();
+  await prisma.settlement.deleteMany();
+  await prisma.groupFeedItem.deleteMany();
+  await prisma.groupShortlistItem.deleteMany();
+  await prisma.groupInviteLink.deleteMany();
+  await prisma.groupMember.deleteMany();
   await prisma.payment.deleteMany();
   await prisma.booking.deleteMany();
+  await prisma.group.deleteMany();
   await prisma.review.deleteMany();
   await prisma.departureCityPrice.deleteMany();
   await prisma.departure.deleteMany();
@@ -926,9 +934,110 @@ async function main() {
     });
   }
 
+  // Three demo accounts for showing My Socials with two people in two browser
+  // windows. OTP codes are printed to the console as usual when each signs in.
+  const demoUser2 = await prisma.user.upsert({
+    where: { phone: "+919999900001" },
+    update: {},
+    create: { phone: "+919999900001", name: "Demo Organiser" },
+  });
+  const demoUser3 = await prisma.user.upsert({
+    where: { phone: "+919999900002" },
+    update: {},
+    create: { phone: "+919999900002", name: "Demo Member" },
+  });
+
+  const goaTour = await prisma.tour.findFirst({ where: { slug: "goa-beaches-heritage" } });
+  if (goaTour) {
+    const demoGroup = await prisma.group.create({
+      data: {
+        name: "Demo Trip Group",
+        organiserUserId: demoUser2.id,
+        tourId: goaTour.id,
+        members: {
+          create: [
+            { userId: demoUser2.id, name: "Demo Organiser", phone: "+919999900001", role: "ORGANISER", status: "JOINED", consentAt: new Date() },
+            { userId: demoUser3.id, name: "Demo Member", phone: "+919999900002", role: "MEMBER", status: "JOINED", consentAt: new Date() },
+            { userId: demoUser.id, name: "Demo Traveller", phone: "+919999900000", role: "MEMBER", status: "JOINED", consentAt: new Date() },
+            { name: "Not Yet Joined", phone: "+919999900003", role: "MEMBER", status: "INVITED" },
+          ],
+        },
+      },
+      include: { members: true },
+    });
+
+    const organiserM = demoGroup.members.find((m) => m.phone === "+919999900001")!;
+    const memberM = demoGroup.members.find((m) => m.phone === "+919999900002")!;
+    const travellerM = demoGroup.members.find((m) => m.phone === "+919999900000")!;
+
+    await prisma.groupFeedItem.createMany({
+      data: [
+        { groupId: demoGroup.id, type: "SYSTEM", text: "Demo Organiser created the group." },
+        { groupId: demoGroup.id, type: "SYSTEM", text: "Demo Member joined." },
+        { groupId: demoGroup.id, type: "POST", authorMemberId: organiserM.id, text: "Excited for this trip! Let's finalise dates soon." },
+        { groupId: demoGroup.id, type: "POST", authorMemberId: memberM.id, text: "Works for me — I'm free that whole week." },
+      ],
+    });
+
+    const expense1 = await prisma.expense.create({
+      data: {
+        groupId: demoGroup.id,
+        description: "Airport cab",
+        amountPaise: 150000,
+        date: new Date(),
+        paidByMemberId: organiserM.id,
+        splitType: "EQUAL",
+        createdByMemberId: organiserM.id,
+        participants: {
+          create: [
+            { memberId: organiserM.id, shareAmountPaise: 50000 },
+            { memberId: memberM.id, shareAmountPaise: 50000 },
+            { memberId: travellerM.id, shareAmountPaise: 50000 },
+          ],
+        },
+      },
+    });
+    const expense2 = await prisma.expense.create({
+      data: {
+        groupId: demoGroup.id,
+        description: "Dinner on day 1",
+        amountPaise: 240000,
+        date: new Date(),
+        paidByMemberId: memberM.id,
+        splitType: "CUSTOM",
+        createdByMemberId: memberM.id,
+        participants: {
+          create: [
+            { memberId: organiserM.id, shareAmountPaise: 100000 },
+            { memberId: memberM.id, shareAmountPaise: 70000 },
+            { memberId: travellerM.id, shareAmountPaise: 70000 },
+          ],
+        },
+      },
+    });
+    await addSystemFeedEntrySeed(demoGroup.id, `${organiserM.name} added an expense: "${expense1.description}".`);
+    await addSystemFeedEntrySeed(demoGroup.id, `${memberM.name} added an expense: "${expense2.description}".`);
+
+    await prisma.settlement.create({
+      data: {
+        groupId: demoGroup.id,
+        fromMemberId: travellerM.id,
+        toMemberId: organiserM.id,
+        amountPaise: 50000,
+        note: "Cash handed over at the airport",
+      },
+    });
+    await addSystemFeedEntrySeed(demoGroup.id, `${travellerM.name} paid ${organiserM.name} ₹500.`);
+  }
+
   const tourCount = await prisma.tour.count();
   const departureCount = await prisma.departure.count();
   console.log(`Seeded ${tourCount} tours with ${departureCount} departures, and ${demoTours.length} demo bookings for +919999900000.`);
+  console.log("Demo accounts for My Socials: +919999900000, +919999900001, +919999900002 (OTP printed to console on login).");
+}
+
+async function addSystemFeedEntrySeed(groupId: string, text: string) {
+  await prisma.groupFeedItem.create({ data: { groupId, type: "SYSTEM", text } });
 }
 
 main()
