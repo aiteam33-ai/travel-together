@@ -154,6 +154,85 @@ can be swapped in without touching call sites:
   straight to the final state when it's true — see `RollingNumber.tsx` or `LandingIntro.tsx` for the
   pattern. Never gate a save, a page change or a payment on an animation finishing.
 
+## My Socials (collaborative layer)
+
+Tagline: "Travel, together." A trip is still bookable entirely solo — My Socials is additive, never required.
+
+- **Three separate relationships, modelled as such**: `GroupMember` (planning access), a booking traveller
+  (a name in `Booking.travellersJson`), and `ExpenseParticipant` (who shares one cost) are three distinct
+  tables/concepts. Joining a group never creates a traveller; a traveller need not be a member.
+- **Groups & invitations**: create a group any time (before or after choosing a tour), invite by a
+  7-day shareable link (`GroupInviteLink`, revocable) or by name + mobile number. A phone-invited person is
+  "invited" until they sign in with that number, which the OTP route (`app/api/auth/verify-otp/route.ts`)
+  auto-detects and flips to "joined". Roles are organiser/member; a member who appears in any expense is
+  marked "left" rather than deleted.
+- **Shared trip space**: `/socials/[id]` with Overview / Plan / Expenses / Members tabs. The feed
+  (`GroupFeed.tsx`) polls every 15s and refreshes on window focus, exactly as specified — not live chat.
+- **Group cost estimate**: the same `TripCostCalculator`, with a `groupId` prop that pre-fills the
+  traveller count from joined members and saves the result to the group via
+  `/api/groups/[id]/estimate`, which calls the identical `buildPricingInput` + `computePricing` pipeline
+  used everywhere else.
+- **Shared expenses & balances**: a pure, unit-tested module (`lib/expenses/engine.ts`, mirroring the
+  pricing engine's shape) handles equal/custom splits — leftover paise from an uneven equal split go to
+  the payer first, then participants in order — and balance/settlement-suggestion math. Balances are
+  always computed live from expenses + settlements, never stored.
+- **Booking from a group**: "Book for this group" on the group Overview carries `?groupId=` through the
+  tour page into checkout; only the group's organiser may create a booking linked to a group
+  (enforced server-side in `app/api/bookings/route.ts`). The checkout traveller step can prefill names from
+  joined members. Group members see only booking status and balance-due date — never the invoice, payment
+  method or traveller documents, which stay visible only to whoever booked. After payment, "Add this
+  booking to group expenses" creates a pre-split expense from the amount paid, editable afterwards like
+  any other expense.
+- **Privacy & access**: every group/feed/expense API route calls `requireMembership()`
+  (`lib/groups/access.ts`), which 404s for non-members rather than revealing the group exists — covered by
+  `lib/groups/access.test.ts`, an integration test against the real dev database. Display names are
+  visible to the group; mobile numbers are masked (`MembersList.tsx`); invitations are rate-limited
+  (20/hour) via a `ProductEvent` count.
+- **Admin additions**: an audit log (`/admin/audit-log`) records every GST/TCS and group-discount change
+  with who/when/old/new value; a basic analytics page (`/admin/analytics`) reports calculator use, invite
+  acceptance rate, share of groups with an expense, and checkout completion, derived from recorded
+  `ProductEvent` rows.
+- **Entry points**: "My Socials" in the top bar (unread badge) and in place of Wishlist on the mobile tab
+  bar (Wishlist moved into Account); "Plan this with your group" (tour page), "Share with a group"
+  (calculator), "Create a group for this trip" (booking confirmation); the landing page's hero and a new
+  three-step explainer section were repositioned around "Travel, together".
+- **Not built**: voting on the shortlist (brief marks this "only if everything above is finished" — it
+  wasn't reached, given the size of sections 1–8).
+
+### Demo: two people, two browser windows
+
+Three demo accounts exist after seeding, with a shared "Demo Trip Group" (not the "Goa Weekend" you'll
+create live) that has members at every status, two expenses (one equal split, one custom) and one
+settlement:
+
+| Phone | Role in Demo Trip Group |
+|---|---|
+| `+919999900000` | Member ("Demo Traveller") |
+| `+919999900001` | Organiser ("Demo Organiser") |
+| `+919999900002` | Member ("Demo Member") |
+
+Log in as `+919999900001` in one window and `+919999900000` (or any brand-new number) in another — the
+OTP for each prints to the server console as usual. To see a fresh join: as the organiser, open the
+group's Members tab → Invite people → Get invite link, then open that `/invite/<token>` link in the
+second window and sign in.
+
+### PDF export
+
+`/overview` is a real page in the app (two sections, each one print page) with a dedicated print
+stylesheet (`app/overview/overview.css`) that hides all site chrome (header, footer, floating buttons) via
+`print:hidden`. It's exported with **Puppeteer** — the simplest reliable option: a real headless Chrome
+renders the page exactly as a browser would (same fonts, colours, print CSS) and prints it, rather than
+hand-assembling a PDF with a layout engine that doesn't know the site's design tokens.
+
+```powershell
+npm run dev                 # in one terminal
+npm run export-overview-pdf # in another — writes docs/product-overview.pdf
+```
+
+Checked: exactly 2 pages, no clipped text or blank trailing page, three real screenshots (captured live
+from the running app) in the "product, as built" section, ₹ renders correctly (it's a screenshot, not
+drawn text, so the PDF-font ₹ limitation noted above doesn't apply here).
+
 ## What this polish pass skipped, and why
 
 - A literal pixel-for-pixel audit at 1440/1280/1024/390 wasn't run as an automated visual-regression
@@ -177,4 +256,8 @@ npx tsc --noEmit # type check
 npm run build     # production build
 ```
 
-All four pass as of this commit.
+All four pass as of this commit. The suite includes `lib/pricing/engine.test.ts` (pricing parity),
+`lib/expenses/engine.test.ts` (splits, balances, settlement suggestions), and
+`lib/groups/access.test.ts` (an integration test against the real dev SQLite database — it creates and
+cleans up its own rows, and needs `npm run db:seed` to have been run at least once so a tour exists to
+attach a test group to).
