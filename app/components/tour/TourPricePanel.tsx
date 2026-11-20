@@ -27,11 +27,13 @@ export default function TourPricePanel({
   tourTitle,
   isInternational,
   departures,
+  groupId,
 }: {
   tourId: string;
   tourTitle: string;
   isInternational: boolean;
   departures: DepartureOption[];
+  groupId?: string;
 }) {
   const [panelOpen, setPanelOpen] = useState(false);
   const [output, setOutput] = useState<PricingEngineOutput | null>(null);
@@ -51,6 +53,7 @@ export default function TourPricePanel({
   }, []);
 
   const departure = departures.find((d) => d.id === departureId);
+  const bookHref = `/checkout/new?departureId=${departureId}${groupId ? `&groupId=${groupId}` : ""}`;
 
   return (
     <>
@@ -73,7 +76,7 @@ export default function TourPricePanel({
         <div className="mt-4 flex flex-col gap-2">
           <a
             ref={bookButtonRef}
-            href={`/checkout/new?departureId=${departureId}`}
+            href={bookHref}
             className="flex min-h-11 items-center justify-center rounded-md bg-accent px-4 text-center font-semibold text-white press-feedback hover:bg-accent-strong"
           >
             Book now
@@ -110,7 +113,7 @@ export default function TourPricePanel({
                 {formatDateIST(departure.startDate)} · {adults} adult{adults > 1 ? "s" : ""} · <strong>{formatRupees(output.grandTotal)}</strong>
               </p>
               <a
-                href={`/checkout/new?departureId=${departureId}`}
+                href={bookHref}
                 className="flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white press-feedback"
               >
                 Book now

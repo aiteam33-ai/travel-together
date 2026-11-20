@@ -5,6 +5,8 @@ import { prisma } from "@/lib/db/client";
 import { formatDateIST, formatRupees } from "@/lib/pricing/format";
 import { BRAND } from "@/lib/brand";
 import BookingConfirmedAnimation from "@/app/components/checkout/BookingConfirmedAnimation";
+import AddBookingToExpensesButton from "@/app/components/socials/AddBookingToExpensesButton";
+import CreateGroupForThisTripButton from "@/app/components/socials/CreateGroupForThisTripButton";
 
 export default async function ConfirmationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -27,13 +29,20 @@ export default async function ConfirmationPage({ params }: { params: Promise<{ i
         <p>Amount paid: {formatRupees(booking.amountPaid)} of {formatRupees(booking.amountDue)}</p>
         <p>GSTIN: {BRAND.gstin}</p>
       </div>
-      <div className="mt-6 flex justify-center gap-3">
-        <Link href={`/account/bookings/${booking.id}`} className="rounded-md border border-border px-4 py-2 text-sm font-semibold">
+      <div className="mt-6 flex flex-wrap justify-center gap-3">
+        <Link href={`/account/bookings/${booking.id}`} className="min-h-11 rounded-md border border-border px-4 py-2 text-sm font-semibold">
           View GST invoice
         </Link>
-        <Link href="/account/bookings" className="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white">
+        <Link href="/account/bookings" className="min-h-11 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white">
           Go to my bookings
         </Link>
+      </div>
+      <div className="mt-4 flex flex-wrap justify-center gap-3">
+        {booking.groupId ? (
+          <AddBookingToExpensesButton groupId={booking.groupId} bookingId={booking.id} />
+        ) : (
+          <CreateGroupForThisTripButton bookingId={booking.id} tourTitle={booking.tour.title} />
+        )}
       </div>
     </div>
   );

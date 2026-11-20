@@ -40,11 +40,13 @@ export default function CheckoutForm({
   isInternational,
   defaultCity,
   defaultAdults,
+  groupId,
 }: {
   departureId: string;
   isInternational: boolean;
   defaultCity: string;
   defaultAdults: number;
+  groupId?: string;
 }) {
   const router = useRouter();
   const { user } = useAuth();
@@ -59,6 +61,7 @@ export default function CheckoutForm({
   const [travelInsurance, setTravelInsurance] = useState(false);
   const [visaFees, setVisaFees] = useState(false);
   const [savedTravellers, setSavedTravellers] = useState<SavedTraveller[]>([]);
+  const [groupMembers, setGroupMembers] = useState<{ id: string; name: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [restored, setRestored] = useState(false);
@@ -96,6 +99,19 @@ export default function CheckoutForm({
       .then((r) => r.json())
       .then((data) => setSavedTravellers(data.travellers ?? []));
   }, [user]);
+
+  useEffect(() => {
+    if (!user || !groupId) return;
+    fetch(`/api/groups/${groupId}`)
+      .then((r) => r.json())
+      .then((data) => setGroupMembers((data.group?.members ?? []).filter((m: { status: string }) => m.status === "JOINED")));
+  }, [user, groupId]);
+
+  function applyGroupMember(i: number, memberId: string) {
+    const m = groupMembers.find((gm) => gm.id === memberId);
+    if (!m) return;
+    setTravellers((prev) => prev.map((t, idx) => (idx === i ? { ...t, name: m.name } : t)));
+  }
 
   function updateTraveller(i: number, field: keyof TravellerForm, value: string | number | boolean) {
     setTravellers((prev) => prev.map((t, idx) => (idx === i ? { ...t, [field]: value } : t)));
@@ -149,6 +165,7 @@ export default function CheckoutForm({
         addOns: { travelInsurance, visaFees },
         spendPreset: "COMFORT",
         amountDuePercentNow: 25,
+        groupId,
       }),
     });
     const data = await res.json();
@@ -198,6 +215,17 @@ export default function CheckoutForm({
                 {travellers.map((t, i) => (
                   <fieldset key={i} className="grid grid-cols-1 gap-3 rounded-md border border-border p-3 sm:grid-cols-4">
                     <legend className="px-1 text-sm font-medium">Traveller {i + 1}</legend>
+                    {groupMembers.length > 0 && (
+                      <label className="text-sm sm:col-span-4">
+                        Fill from a group member
+                        <select defaultValue="" onChange={(e) => e.target.value && applyGroupMember(i, e.target.value)} className="mt-1 min-h-11 w-full max-w-xs rounded-md border border-border bg-background px-2">
+                          <option value="">— Choose —</option>
+                          {groupMembers.map((m) => (
+                            <option key={m.id} value={m.id}>{m.name}</option>
+                          ))}
+                        </select>
+                      </label>
+                    )}
                     {savedTravellers.length > 0 && (
                       <label className="text-sm sm:col-span-4">
                         Fill from a saved traveller

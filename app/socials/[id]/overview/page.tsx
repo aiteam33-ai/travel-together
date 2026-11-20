@@ -44,6 +44,14 @@ export default async function GroupOverviewPage({ params }: { params: Promise<{ 
               {estimate ? "Update the group estimate" : "Calculate group cost"}
             </Link>
           )}
+          {!booking && group.tour && ctx.membership.role === "ORGANISER" && (
+            <Link
+              href={`/tours/${group.tour.slug}?groupId=${id}`}
+              className="mt-2 inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white press-feedback"
+            >
+              Book for this group
+            </Link>
+          )}
           {booking ? (
             <p className="mt-2 text-sm">
               Booking status: <strong>{booking.status}</strong>

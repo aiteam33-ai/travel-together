@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
 import { simulatePayment } from "@/lib/mocks/payment-gateway";
 import { sendMessage } from "@/lib/mocks/outbox";
+import { logEvent } from "@/lib/groups/access";
 
 const schema = z.object({
   method: z.enum(["UPI", "CARD", "NETBANKING", "EMI"]),
@@ -46,6 +47,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (user.phone) {
       await sendMessage("WHATSAPP", user.phone, `Your booking ${booking.bookingRef} is confirmed!`);
     }
+    await logEvent("BOOKING_CONFIRMED", user.id, { bookingId: booking.id, groupId: booking.groupId });
   }
 
   return NextResponse.json({ ok: true, result });

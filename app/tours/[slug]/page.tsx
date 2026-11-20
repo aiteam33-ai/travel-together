@@ -13,8 +13,9 @@ interface Hotel { city: string; name: string; rating: number }
 interface Faq { q: string; a: string }
 interface CancellationRule { daysBefore: number; feePercent: number }
 
-export default async function TourDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function TourDetailPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ groupId?: string }> }) {
   const { slug } = await params;
+  const { groupId } = await searchParams;
   const tour = await getTourBySlug(slug);
   if (!tour) notFound();
 
@@ -170,7 +171,7 @@ export default async function TourDetailPage({ params }: { params: Promise<{ slu
       </div>
 
       <aside className="h-fit space-y-4 lg:sticky lg:top-[150px]">
-        <TourPricePanel tourId={tour.id} tourTitle={tour.title} isInternational={tour.isInternational} departures={futureDepartures} />
+        <TourPricePanel tourId={tour.id} tourTitle={tour.title} isInternational={tour.isInternational} departures={futureDepartures} groupId={groupId} />
       </aside>
       </div>
     </div>

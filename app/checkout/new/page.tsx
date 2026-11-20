@@ -26,6 +26,7 @@ async function NewCheckoutInner({ searchParamsPromise }: { searchParamsPromise: 
         isInternational={departure.tour.isInternational}
         defaultCity={sp.city ?? "MUMBAI"}
         defaultAdults={Number(sp.adults ?? 2)}
+        groupId={sp.groupId}
       />
     </div>
   );
