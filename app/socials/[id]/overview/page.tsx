@@ -64,7 +64,7 @@ export default async function GroupOverviewPage({ params }: { params: Promise<{ 
 
         <section className="rounded-xl border border-border bg-surface p-4">
           <h2 className="mb-2 font-semibold">Activity</h2>
-          <GroupFeed groupId={id} />
+          <GroupFeed groupId={id} currentMemberId={ctx.membership.id} />
         </section>
       </div>
 

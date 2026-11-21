@@ -283,6 +283,8 @@ model GroupMember {
   participations ExpenseParticipant[]
   settlementsFrom Settlement[] @relation("SettlementFrom")
   settlementsTo   Settlement[] @relation("SettlementTo")
+  preference      MemberPreference?
+  votes           Vote[]
 
   @@unique([groupId, phone])
 }
@@ -324,6 +326,7 @@ model GroupFeedItem {
   group          Group    @relation(fields: [groupId], references: [id])
   author         GroupMember? @relation(fields: [authorMemberId], references: [id])
   attachmentTour Tour?    @relation(fields: [attachmentTourId], references: [id])
+  votes          Vote[]
 }
 
 // ===================== My Socials v2: friends, DMs, budget =====================
@@ -368,6 +371,37 @@ model TripBudget {
   updatedByMemberId  String
   updatedAt          DateTime @updatedAt
   group              Group    @relation(fields: [groupId], references: [id])
+}
+
+// ===================== Vibe Check, AI Trip Match, Group Voting =====================
+
+// One row per GroupMember. secretBudgetPaise is PRIVATE: only ever returned
+// to its own owner (requireMembership + ownership check in the API route),
+// never included in any group-facing response or log. The group only ever
+// sees the aggregated comfort range computed from all members' values.
+model MemberPreference {
+  id                String   @id @default(cuid())
+  memberId          String   @unique
+  pace              Int      @default(3) // 1 (Relaxed) .. 5 (Packed)
+  interests         String   @default("") // comma-separated InterestChip
+  foodPreference    String?  // VEG, NON_VEG, JAIN, ANY
+  stayPreference    String?  // HOSTEL, BUDGET, PREMIUM
+  secretBudgetPaise Int?     // PRIVATE — see note above
+  updatedAt         DateTime @updatedAt
+  member            GroupMember @relation(fields: [memberId], references: [id])
+}
+
+model Vote {
+  id         String   @id @default(cuid())
+  feedItemId String
+  memberId   String
+  value      String   // YES, MAYBE, NO
+  isVeto     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  feedItem   GroupFeedItem @relation(fields: [feedItemId], references: [id])
+  member     GroupMember   @relation(fields: [memberId], references: [id])
+
+  @@unique([feedItemId, memberId])
 }
 
 model Expense {

@@ -14,6 +14,27 @@ export const TRAVELLER_TAGS = [
 ] as const;
 export type TravellerTag = (typeof TRAVELLER_TAGS)[number];
 
+// Vibe Check interest chips (My Socials) — a separate taxonomy from
+// TRAVELLER_TAGS above: these describe what a member likes doing, not who
+// a tour is packaged for.
+export const INTEREST_CHIPS = [
+  "TREKS",
+  "BEACHES",
+  "HERITAGE",
+  "SPIRITUAL",
+  "FOOD",
+  "ADVENTURE",
+  "NIGHTLIFE",
+  "NATURE",
+] as const;
+export type InterestChip = (typeof INTEREST_CHIPS)[number];
+
+export const FOOD_PREFERENCES = ["VEG", "NON_VEG", "JAIN", "ANY"] as const;
+export type FoodPreference = (typeof FOOD_PREFERENCES)[number];
+
+export const STAY_PREFERENCES = ["HOSTEL", "BUDGET", "PREMIUM"] as const;
+export type StayPreference = (typeof STAY_PREFERENCES)[number];
+
 export const DEPARTURE_CITIES = [
   "MUMBAI",
   "PUNE",
