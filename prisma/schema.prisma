@@ -285,6 +285,7 @@ model GroupMember {
   settlementsTo   Settlement[] @relation("SettlementTo")
   preference      MemberPreference?
   votes           Vote[]
+  pollVotes       PollVote[]
 
   @@unique([groupId, phone])
 }
@@ -315,7 +316,7 @@ model GroupFeedItem {
   id             String   @id @default(cuid())
   groupId        String
   type           String   // POST, COMMENT, SYSTEM
-  messageKind    String   @default("TEXT") // TEXT, IMAGE, LINK, PACKAGE
+  messageKind    String   @default("TEXT") // TEXT, IMAGE, LINK, PACKAGE, POLL
   attachmentUrl  String?  // image or link URL, for IMAGE/LINK kinds
   attachmentTourId String? // shared tour package, for PACKAGE kind
   authorMemberId String?
@@ -327,6 +328,40 @@ model GroupFeedItem {
   author         GroupMember? @relation(fields: [authorMemberId], references: [id])
   attachmentTour Tour?    @relation(fields: [attachmentTourId], references: [id])
   votes          Vote[]
+  poll           Poll?
+}
+
+// Quick polls in chat (dates, departure batch, or any custom question).
+// One vote per member per poll; changing your vote moves it, never doubles up.
+model Poll {
+  id         String   @id @default(cuid())
+  feedItemId String   @unique
+  question   String
+  createdAt  DateTime @default(now())
+  feedItem   GroupFeedItem @relation(fields: [feedItemId], references: [id])
+  options    PollOption[]
+  votes      PollVote[]
+}
+
+model PollOption {
+  id     String @id @default(cuid())
+  pollId String
+  label  String
+  poll   Poll   @relation(fields: [pollId], references: [id])
+  votes  PollVote[]
+}
+
+model PollVote {
+  id        String   @id @default(cuid())
+  pollId    String
+  optionId  String
+  memberId  String
+  createdAt DateTime @default(now())
+  poll      Poll       @relation(fields: [pollId], references: [id])
+  option    PollOption @relation(fields: [optionId], references: [id])
+  member    GroupMember @relation(fields: [memberId], references: [id])
+
+  @@unique([pollId, memberId])
 }
 
 // ===================== My Socials v2: friends, DMs, budget =====================

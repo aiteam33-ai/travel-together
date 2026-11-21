@@ -10,6 +10,18 @@ interface Vote {
   isVeto: boolean;
 }
 
+interface PollOption {
+  id: string;
+  label: string;
+  votes: { memberId: string }[];
+}
+
+interface Poll {
+  id: string;
+  question: string;
+  options: PollOption[];
+}
+
 interface FeedItem {
   id: string;
   type: string;
@@ -20,6 +32,7 @@ interface FeedItem {
   createdAt: string;
   author: { name: string } | null;
   votes: Vote[];
+  poll: Poll | null;
 }
 
 const POLL_MS = 8000;
@@ -29,6 +42,8 @@ export default function GroupFeed({ groupId, currentMemberId }: { groupId: strin
   const [text, setText] = useState("");
   const [kind, setKind] = useState<"TEXT" | "IMAGE" | "LINK">("TEXT");
   const [posting, setPosting] = useState(false);
+  const [pollDraft, setPollDraft] = useState<{ question: string; options: string[] } | null>(null);
+  const [pollPosting, setPollPosting] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const refresh = useCallback(() => {
@@ -77,6 +92,32 @@ export default function GroupFeed({ groupId, currentMemberId }: { groupId: strin
     if (res.ok) refresh();
   }
 
+  async function pollVote(pollId: string, optionId: string) {
+    const res = await fetch(`/api/groups/${groupId}/polls/${pollId}/vote`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ optionId }),
+    });
+    if (res.ok) refresh();
+  }
+
+  async function submitPoll(e: React.FormEvent) {
+    e.preventDefault();
+    if (!pollDraft) return;
+    const question = pollDraft.question.trim();
+    const options = pollDraft.options.map((o) => o.trim()).filter(Boolean);
+    if (!question || options.length < 2) return;
+    setPollPosting(true);
+    await fetch(`/api/groups/${groupId}/feed/polls`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question, options }),
+    });
+    setPollPosting(false);
+    setPollDraft(null);
+    refresh();
+  }
+
   return (
     <div>
       <ul className="max-h-[480px] space-y-2 overflow-y-auto rounded-xl border border-border bg-background p-3">
@@ -106,6 +147,8 @@ export default function GroupFeed({ groupId, currentMemberId }: { groupId: strin
                   </Link>
                   <VoteBar item={item} currentMemberId={currentMemberId} onVote={vote} />
                 </>
+              ) : item.messageKind === "POLL" && item.poll ? (
+                <PollBlock poll={item.poll} currentMemberId={currentMemberId} onVote={pollVote} />
               ) : (
                 <p className="mt-1">{item.text}</p>
               )}
@@ -136,6 +179,67 @@ export default function GroupFeed({ groupId, currentMemberId }: { groupId: strin
           Send
         </button>
       </form>
+
+      {!pollDraft ? (
+        <div className="mt-2 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setPollDraft({ question: "Which dates work?", options: ["", ""] })}
+            className="min-h-9 rounded-md border border-border px-3 text-xs font-semibold press-feedback"
+          >
+            Poll: dates
+          </button>
+          <button
+            type="button"
+            onClick={() => setPollDraft({ question: "Which departure batch?", options: ["", ""] })}
+            className="min-h-9 rounded-md border border-border px-3 text-xs font-semibold press-feedback"
+          >
+            Poll: departure batch
+          </button>
+          <button
+            type="button"
+            onClick={() => setPollDraft({ question: "", options: ["", ""] })}
+            className="min-h-9 rounded-md border border-border px-3 text-xs font-semibold press-feedback"
+          >
+            Custom poll
+          </button>
+        </div>
+      ) : (
+        <form onSubmit={submitPoll} className="mt-3 space-y-2 rounded-lg border border-border bg-background p-3">
+          <input
+            value={pollDraft.question}
+            onChange={(e) => setPollDraft((d) => (d ? { ...d, question: e.target.value } : d))}
+            placeholder="Poll question"
+            className="min-h-11 w-full rounded-md border border-border bg-surface px-3"
+          />
+          {pollDraft.options.map((opt, i) => (
+            <input
+              key={i}
+              value={opt}
+              onChange={(e) =>
+                setPollDraft((d) => (d ? { ...d, options: d.options.map((o, j) => (j === i ? e.target.value : o)) } : d))
+              }
+              placeholder={`Option ${i + 1}`}
+              className="min-h-11 w-full rounded-md border border-border bg-surface px-3"
+            />
+          ))}
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setPollDraft((d) => (d && d.options.length < 8 ? { ...d, options: [...d.options, ""] } : d))}
+              className="min-h-9 rounded-md border border-border px-3 text-xs font-semibold press-feedback"
+            >
+              + Add option
+            </button>
+            <button type="submit" disabled={pollPosting} className="min-h-9 rounded-md bg-accent px-3 text-xs font-semibold text-white press-feedback disabled:opacity-60">
+              {pollPosting ? "Posting…" : "Post poll"}
+            </button>
+            <button type="button" onClick={() => setPollDraft(null)} className="min-h-9 rounded-md px-3 text-xs font-semibold text-foreground-muted">
+              Cancel
+            </button>
+          </div>
+        </form>
+      )}
     </div>
   );
 }
@@ -179,6 +283,47 @@ function VoteBar({
         </button>
         {favourite && <span className="rounded-full bg-success/10 px-2 py-0.5 text-xs font-semibold text-success">Group&apos;s favourite</span>}
         {vetoed && <span className="rounded-full bg-danger/10 px-2 py-0.5 text-xs font-semibold text-danger">Vetoed</span>}
+      </div>
+    </div>
+  );
+}
+
+function PollBlock({
+  poll,
+  currentMemberId,
+  onVote,
+}: {
+  poll: Poll;
+  currentMemberId: string;
+  onVote: (pollId: string, optionId: string) => void;
+}) {
+  const totalVotes = poll.options.reduce((sum, o) => sum + o.votes.length, 0);
+  const myOptionId = poll.options.find((o) => o.votes.some((v) => v.memberId === currentMemberId))?.id;
+
+  return (
+    <div className="mt-2">
+      <p className="font-medium">{poll.question}</p>
+      <div className="mt-2 space-y-2">
+        {poll.options.map((option) => {
+          const count = option.votes.length;
+          const percent = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
+          const mine = option.id === myOptionId;
+          return (
+            <button
+              key={option.id}
+              onClick={() => onVote(poll.id, option.id)}
+              className={`block w-full rounded-lg border px-3 py-2 text-left text-sm press-feedback ${mine ? "border-accent" : "border-border"}`}
+            >
+              <div className="flex items-center justify-between">
+                <span className={mine ? "font-semibold text-accent" : ""}>{option.label}</span>
+                <span className="text-xs text-foreground-muted">{count} vote{count === 1 ? "" : "s"} · {percent}%</span>
+              </div>
+              <div className="mt-1 h-1.5 rounded-full bg-border">
+                <div className="h-1.5 rounded-full bg-accent" style={{ width: `${percent}%` }} />
+              </div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

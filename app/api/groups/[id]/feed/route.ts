@@ -13,7 +13,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   const items = await prisma.groupFeedItem.findMany({
     where: { groupId: id, deletedAt: null },
-    include: { author: true, attachmentTour: true, votes: true },
+    include: {
+      author: true,
+      attachmentTour: true,
+      votes: true,
+      poll: { include: { options: { include: { votes: true } } } },
+    },
     orderBy: { createdAt: "desc" },
     take: 100,
   });
