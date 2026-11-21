@@ -9,6 +9,7 @@ const TABS = [
   { key: "vibe-check", label: "Vibe Check" },
   { key: "budget", label: "Budget" },
   { key: "expenses", label: "Expenses" },
+  { key: "memories", label: "Memories" },
   { key: "members", label: "Members" },
 ];
 

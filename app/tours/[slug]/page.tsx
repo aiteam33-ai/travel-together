@@ -145,15 +145,27 @@ export default async function TourDetailPage({ params, searchParams }: { params:
           <section id="reviews" aria-labelledby="reviews-heading">
             <h2 id="reviews-heading" className="font-heading text-xl font-bold">Reviews</h2>
             <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {tour.reviews.map((r) => (
-                <div key={r.id} className="rounded-lg border border-border bg-surface p-4 text-sm">
-                  <p>{r.text}</p>
-                  <p className="mt-2 font-semibold">
-                    {r.name} {r.verifiedBooking && <span className="ml-1 rounded bg-success/10 px-1.5 py-0.5 text-xs font-medium text-success">Verified booking</span>}
-                  </p>
-                  <p className="text-xs text-foreground-muted">{formatDateIST(r.travelDate)}{r.isSampleData ? " · Sample review" : ""}</p>
-                </div>
-              ))}
+              {tour.reviews.map((r) => {
+                const photos: string[] = r.photos ? JSON.parse(r.photos) : [];
+                return (
+                  <div key={r.id} className="rounded-lg border border-border bg-surface p-4 text-sm">
+                    <p>{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}</p>
+                    <p className="mt-1">{r.text}</p>
+                    {photos.length > 0 && (
+                      <div className="mt-2 flex gap-2 overflow-x-auto">
+                        {photos.map((url, i) => (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img key={i} src={url} alt="Review photo" className="h-20 w-20 shrink-0 rounded-md object-cover" />
+                        ))}
+                      </div>
+                    )}
+                    <p className="mt-2 font-semibold">
+                      {r.name} {r.verifiedBooking && <span className="ml-1 rounded bg-success/10 px-1.5 py-0.5 text-xs font-medium text-success">Verified booking</span>}
+                    </p>
+                    <p className="text-xs text-foreground-muted">{formatDateIST(r.travelDate)}{r.isSampleData ? " · Sample review" : ""}</p>
+                  </div>
+                );
+              })}
             </div>
           </section>
         )}

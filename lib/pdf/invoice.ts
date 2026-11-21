@@ -118,3 +118,55 @@ export async function generateCalculationPdf(opts: { tourTitle: string; output: 
 
   return doc.save();
 }
+
+export async function generateGroupExpenseSummaryPdf(opts: {
+  groupName: string;
+  tourTitle: string | null;
+  totalExpensesPaise: number;
+  memberBalances: { name: string; netPaise: number }[];
+  settlements: { fromName: string; toName: string; amountPaise: number }[];
+}): Promise<Uint8Array> {
+  const doc = await PDFDocument.create();
+  const page = doc.addPage([595.28, 841.89]);
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const bold = await doc.embedFont(StandardFonts.HelveticaBold);
+
+  let y = 800;
+  const left = 50;
+  const lineHeight = 18;
+
+  function text(str: string, opts2: { size?: number; font?: typeof font; color?: ReturnType<typeof rgb> } = {}) {
+    page.drawText(str, { x: left, y, size: opts2.size ?? 11, font: opts2.font ?? font, color: opts2.color ?? rgb(0.15, 0.1, 0.05) });
+    y -= lineHeight;
+  }
+  function row(label: string, value: string) {
+    page.drawText(label, { x: left, y, size: 11, font });
+    page.drawText(value, { x: 380, y, size: 11, font });
+    y -= lineHeight;
+  }
+
+  text(BRAND.name, { size: 18, font: bold, color: rgb(0.76, 0.27, 0.05) });
+  text("Final Group Expense Summary", { size: 14, font: bold });
+  y -= 4;
+  row("Group:", opts.groupName);
+  if (opts.tourTitle) row("Trip:", opts.tourTitle);
+  row("Generated:", formatDateIST(new Date()));
+  y -= 6;
+
+  text("Total group spending", { font: bold });
+  row("  Total expenses", formatRupeesAscii(opts.totalExpensesPaise));
+  y -= 6;
+
+  text("Final balances", { font: bold });
+  for (const b of opts.memberBalances) {
+    row(`  ${b.name}`, b.netPaise === 0 ? "Settled" : b.netPaise > 0 ? `Owed ${formatRupeesAscii(b.netPaise)}` : `Owes ${formatRupeesAscii(-b.netPaise)}`);
+  }
+  y -= 6;
+
+  if (opts.settlements.length > 0) {
+    text("Settlements recorded", { font: bold });
+    for (const s of opts.settlements) row(`  ${s.fromName} -> ${s.toName}`, formatRupeesAscii(s.amountPaise));
+  }
+
+  return doc.save();
+}

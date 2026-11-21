@@ -606,6 +606,7 @@ model Review {
   travelDate  DateTime
   verifiedBooking Boolean @default(false)
   isSampleData Boolean @default(true)
+  photos      String?  // JSON string array of photo URLs (optional)
   createdAt   DateTime @default(now())
   tour        Tour     @relation(fields: [tourId], references: [id])
 }
