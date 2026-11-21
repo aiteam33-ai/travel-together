@@ -4,7 +4,10 @@ const nextConfig = {
   images: {
     dangerouslyAllowSVG: true,
     contentDispositionType: "inline",
-    remotePatterns: [{ protocol: "https", hostname: "picsum.photos" }],
+    remotePatterns: [
+      { protocol: "https", hostname: "picsum.photos" },
+      { protocol: "https", hostname: "images.unsplash.com" },
+    ],
   },
   turbopack: {
     rules: {
