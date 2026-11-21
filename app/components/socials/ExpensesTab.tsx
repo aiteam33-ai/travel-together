@@ -78,6 +78,30 @@ export default function ExpensesTab({
   );
   const suggestions = suggestSettlements(balances);
   const myBalance = balances.find((b) => b.memberId === currentMemberId)?.netPaise ?? 0;
+  const rawObligationCount = expenses.reduce(
+    (n, e) => n + e.participants.filter((p) => p.memberId !== e.paidByMemberId).length,
+    0
+  );
+
+  function upiLink(toMemberId: string, toName: string, amountPaise: number) {
+    const params = new URLSearchParams({
+      pa: `${toMemberId}@mock`,
+      pn: toName,
+      am: (amountPaise / 100).toFixed(2),
+      cu: "INR",
+    });
+    return `upi://pay?${params.toString()}`;
+  }
+
+  async function nudgeSettlement(fromMemberId: string, amountPaise: number) {
+    const fromName = nameOf(fromMemberId);
+    await fetch(`/api/groups/${groupId}/feed`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: `Reminder for ${fromName}: please settle ${formatRupees(amountPaise)}.`, messageKind: "TEXT" }),
+    });
+    showToast("Nudge sent in group chat");
+  }
 
   async function deleteExpense(expenseId: string) {
     await fetch(`/api/groups/${groupId}/expenses/${expenseId}`, { method: "DELETE" });
@@ -175,21 +199,45 @@ export default function ExpensesTab({
         {suggestions.length > 0 && (
           <section className="rounded-xl border border-border bg-surface p-4">
             <h2 className="mb-2 font-semibold">Suggested settlements</h2>
+            {rawObligationCount > suggestions.length && (
+              <p className="mb-2 text-xs text-foreground-muted">
+                Instead of {rawObligationCount} payments, just {suggestions.length}.
+              </p>
+            )}
             <ul className="space-y-2 text-sm">
               {suggestions.map((s, i) => (
-                <li key={i} className="flex items-center justify-between gap-2">
+                <li key={i} className="flex flex-col gap-1 border-b border-border pb-2 last:border-0 last:pb-0">
                   <span>
                     {nameOf(s.fromMemberId)} → {nameOf(s.toMemberId)}: {formatRupees(s.amountPaise)}
                   </span>
-                  {(s.fromMemberId === currentMemberId || s.toMemberId === currentMemberId) && (
-                    <button
-                      type="button"
-                      onClick={() => recordSettlement(s.fromMemberId, s.toMemberId, s.amountPaise)}
-                      className="min-h-11 shrink-0 rounded-md border border-border px-2 text-xs font-semibold press-feedback"
-                    >
-                      Mark paid
-                    </button>
-                  )}
+                  <div className="flex flex-wrap gap-2">
+                    {(s.fromMemberId === currentMemberId || s.toMemberId === currentMemberId) && (
+                      <button
+                        type="button"
+                        onClick={() => recordSettlement(s.fromMemberId, s.toMemberId, s.amountPaise)}
+                        className="min-h-9 shrink-0 rounded-md border border-border px-2 text-xs font-semibold press-feedback"
+                      >
+                        Mark paid
+                      </button>
+                    )}
+                    {s.fromMemberId === currentMemberId && (
+                      <a
+                        href={upiLink(s.toMemberId, nameOf(s.toMemberId), s.amountPaise)}
+                        className="min-h-9 shrink-0 rounded-md border border-border px-2 text-xs font-semibold press-feedback"
+                      >
+                        Pay via UPI (mock)
+                      </a>
+                    )}
+                    {s.toMemberId === currentMemberId && (
+                      <button
+                        type="button"
+                        onClick={() => nudgeSettlement(s.fromMemberId, s.amountPaise)}
+                        className="min-h-9 shrink-0 rounded-md border border-border px-2 text-xs font-semibold press-feedback"
+                      >
+                        Nudge
+                      </button>
+                    )}
+                  </div>
                 </li>
               ))}
             </ul>

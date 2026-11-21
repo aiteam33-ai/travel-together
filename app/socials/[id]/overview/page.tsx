@@ -1,9 +1,10 @@
 import { getCurrentUser } from "@/lib/auth/session";
 import { requireMembership } from "@/lib/groups/access";
 import { prisma } from "@/lib/db/client";
-import { formatDateIST, formatRupees } from "@/lib/pricing/format";
+import { formatRupees } from "@/lib/pricing/format";
 import GroupFeed from "@/app/components/socials/GroupFeed";
 import InviteWidget from "@/app/components/socials/InviteWidget";
+import GroupPaymentsPanel from "@/app/components/socials/GroupPaymentsPanel";
 import Link from "next/link";
 
 export default async function GroupOverviewPage({ params }: { params: Promise<{ id: string }> }) {
@@ -52,15 +53,10 @@ export default async function GroupOverviewPage({ params }: { params: Promise<{ 
               Book for this group
             </Link>
           )}
-          {booking ? (
-            <p className="mt-2 text-sm">
-              Booking status: <strong>{booking.status}</strong>
-              {booking.balanceDueDate && <> · Balance due {formatDateIST(booking.balanceDueDate)}</>}
-            </p>
-          ) : (
-            <p className="mt-2 text-sm text-foreground-muted">Not booked yet.</p>
-          )}
+          {!booking && <p className="mt-2 text-sm text-foreground-muted">Not booked yet.</p>}
         </section>
+
+        {booking && <GroupPaymentsPanel bookingId={booking.id} currentMemberId={ctx.membership.id} isOrganiser={ctx.membership.role === "ORGANISER"} />}
 
         <section className="rounded-xl border border-border bg-surface p-4">
           <h2 className="mb-2 font-semibold">Activity</h2>

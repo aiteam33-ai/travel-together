@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
 
   const booking = await prisma.$transaction(async (tx) => {
     await tx.departure.update({ where: { id: departure.id }, data: { seatsBooked: { increment: seatsNeeded } } });
-    return tx.booking.create({
+    const created = await tx.booking.create({
       data: {
         bookingRef,
         userId: user.id,
@@ -76,10 +76,37 @@ export async function POST(req: NextRequest) {
         groupId: body.groupId,
       },
     });
+
+    // Pay-your-share: split the total evenly across every JOINED member,
+    // same remainder rule as lib/expenses/engine.ts (organiser absorbs the
+    // odd paise first).
+    if (body.groupId) {
+      const joinedMembers = await tx.groupMember.findMany({ where: { groupId: body.groupId, status: "JOINED" } });
+      const organiser = joinedMembers.find((m) => m.role === "ORGANISER");
+      const n = joinedMembers.length;
+      if (n > 0) {
+        const base = Math.floor(output.grandTotal / n);
+        const remainder = output.grandTotal - base * n;
+        const order = [
+          ...(organiser ? [organiser] : []),
+          ...joinedMembers.filter((m) => m.id !== organiser?.id),
+        ];
+        const extra = new Set(order.slice(0, remainder).map((m) => m.id));
+        await tx.bookingShare.createMany({
+          data: joinedMembers.map((m) => ({
+            bookingId: created.id,
+            memberId: m.id,
+            amountPaise: base + (extra.has(m.id) ? 1 : 0),
+          })),
+        });
+      }
+    }
+
+    return created;
   });
 
   if (body.groupId) {
-    await addSystemFeedEntry(body.groupId, `A booking was started for this trip (ref ${bookingRef}).`);
+    await addSystemFeedEntry(body.groupId, `A booking was started for this trip (ref ${bookingRef}) — everyone's share is ready to pay.`);
   }
   await logEvent("CHECKOUT_STARTED", user.id, { bookingId: booking.id, groupId: body.groupId });
 

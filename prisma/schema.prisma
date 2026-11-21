@@ -236,6 +236,25 @@ model Booking {
   departure     Departure @relation(fields: [departureId], references: [id])
   payments      Payment[]
   group         Group?   @relation(fields: [groupId], references: [id])
+  shares        BookingShare[]
+}
+
+// Pay-your-share for a group booking: one row per JOINED member at the
+// moment the organiser books for the group, splitting Booking.amountDue
+// the same way lib/expenses/engine.ts splits an expense (equal, remainder
+// to the organiser first). COVERED means the organiser paid it on the
+// member's behalf rather than the member paying it themselves.
+model BookingShare {
+  id          String   @id @default(cuid())
+  bookingId   String
+  memberId    String
+  amountPaise Int
+  status      String   @default("PENDING") // PENDING, PAID, COVERED
+  paidAt      DateTime?
+  booking     Booking     @relation(fields: [bookingId], references: [id])
+  member      GroupMember @relation(fields: [memberId], references: [id])
+
+  @@unique([bookingId, memberId])
 }
 
 // ===================== My Socials =====================
@@ -286,6 +305,7 @@ model GroupMember {
   preference      MemberPreference?
   votes           Vote[]
   pollVotes       PollVote[]
+  bookingShares   BookingShare[]
 
   @@unique([groupId, phone])
 }
