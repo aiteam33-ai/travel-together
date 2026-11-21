@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { DEPARTURE_CITIES, DepartureCityCode } from "../lib/pricing/constants";
+import { tourPhoto, tourGallery } from "../lib/images";
 
 const prisma = new PrismaClient();
 
@@ -723,8 +724,8 @@ async function main() {
         altitudeMeters: t.altitudeMeters,
         fitnessNote: t.fitnessNote,
         gearList: t.gearList ? JSON.stringify(t.gearList) : null,
-        heroImage: `/placeholders/tour-${(idx % 6) + 1}.svg`,
-        gallery: [1, 2, 3].map((n) => `/placeholders/tour-${((idx + n) % 6) + 1}.svg`).join(","),
+        heroImage: tourPhoto(slug),
+        gallery: tourGallery(slug).join(","),
         itinerary: JSON.stringify(itinerary),
         inclusions: JSON.stringify(t.inclusions),
         exclusions: JSON.stringify(t.exclusions),
