@@ -7,6 +7,7 @@ import InviteWidget from "@/app/components/socials/InviteWidget";
 import GroupPaymentsPanel from "@/app/components/socials/GroupPaymentsPanel";
 import ReadinessPanel from "@/app/components/socials/ReadinessPanel";
 import TrekEssentialsPanel from "@/app/components/socials/TrekEssentialsPanel";
+import SafetyCenterPanel from "@/app/components/socials/SafetyCenterPanel";
 import { deriveBestSeason } from "@/lib/trek/essentials";
 import Link from "next/link";
 
@@ -83,6 +84,7 @@ export default async function GroupOverviewPage({ params }: { params: Promise<{ 
           </ul>
         </section>
         {ctx.membership.role === "ORGANISER" && <InviteWidget groupId={id} />}
+        <SafetyCenterPanel groupId={id} isOrganiser={ctx.membership.role === "ORGANISER"} />
       </aside>
     </div>
   );

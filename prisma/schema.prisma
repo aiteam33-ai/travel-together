@@ -270,6 +270,37 @@ model MemberReadiness {
   member             GroupMember @relation(fields: [memberId], references: [id])
 }
 
+// Safety Center. Emergency contacts are visible to the whole group (useful
+// in an emergency); medical notes are PRIVATE and only ever returned to
+// their own owner or to the trip leader (organiser) — and only once the
+// member has explicitly consented (medicalNotesConsent).
+model MemberSafetyInfo {
+  id                    String   @id @default(cuid())
+  memberId              String   @unique
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  medicalNotes          String?  // PRIVATE — see note above
+  medicalNotesConsent   Boolean  @default(false)
+  updatedAt             DateTime @updatedAt
+  member                GroupMember @relation(fields: [memberId], references: [id])
+}
+
+// SOS: shares a one-off location snapshot with the whole group. No live
+// tracking — this is a mocked "I need help, here's where I am right now"
+// alert, consistent with the project's other mocked external services.
+model SosAlert {
+  id          String   @id @default(cuid())
+  groupId     String
+  memberId    String
+  message     String?
+  latitude    Float?
+  longitude   Float?
+  createdAt   DateTime @default(now())
+  resolvedAt  DateTime?
+  group       Group    @relation(fields: [groupId], references: [id])
+  member      GroupMember @relation(fields: [memberId], references: [id])
+}
+
 // Trek & Pilgrimage essentials: one shared list per group covering gear
 // (rentable vs carry-your-own, claimable), a packing list (claimable —
 // "who's bringing the first-aid kit"), and pilgrimage permit/registration
@@ -312,6 +343,7 @@ model Group {
   tour            Tour?    @relation(fields: [tourId], references: [id])
   tripBudget      TripBudget?
   checklistItems  TripChecklistItem[]
+  sosAlerts       SosAlert[]
 }
 
 model GroupMember {
@@ -339,6 +371,8 @@ model GroupMember {
   bookingShares   BookingShare[]
   readiness       MemberReadiness?
   claimedChecklistItems TripChecklistItem[]
+  safetyInfo      MemberSafetyInfo?
+  sosAlerts       SosAlert[]
 
   @@unique([groupId, phone])
 }
