@@ -22,7 +22,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     prisma.memberPreference.findMany({ where: { member: { groupId: id, status: "JOINED" } } }),
   ]);
 
-  const mine = preferences.find((p) => p.memberId === ctx.membership.id) ?? null;
+  const mine = preferences.find((p) => p.memberId === ctx.membership.id) ?? null; // includes fitnessSelfRating — private, own-only below too
 
   const others = preferences
     .filter((p) => p.memberId !== ctx.membership.id)
@@ -50,13 +50,17 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 const schema = z.object({
-  pace: z.number().int().min(1).max(5),
-  interests: z.array(z.enum(INTEREST_CHIPS)).max(INTEREST_CHIPS.length),
+  pace: z.number().int().min(1).max(5).optional(),
+  interests: z.array(z.enum(INTEREST_CHIPS)).max(INTEREST_CHIPS.length).optional(),
   foodPreference: z.enum(FOOD_PREFERENCES).optional(),
   stayPreference: z.enum(STAY_PREFERENCES).optional(),
   secretBudgetPaise: z.number().int().min(0).optional(),
+  fitnessSelfRating: z.number().int().min(1).max(5).optional(),
 });
 
+// Partial update — only the fields actually sent are changed (e.g. the
+// fitness self-assessment slider on Trek Essentials saves on its own
+// without touching the rest of this member's Vibe Check answers).
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Login required" }, { status: 401 });
@@ -68,10 +72,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   if (!parsed.success) return NextResponse.json({ error: "Invalid preferences" }, { status: 400 });
 
   const { interests, ...rest } = parsed.data;
+  const updateData: Record<string, unknown> = { ...rest };
+  if (interests) updateData.interests = interests.join(",");
+
   await prisma.memberPreference.upsert({
     where: { memberId: ctx.membership.id },
-    create: { memberId: ctx.membership.id, interests: interests.join(","), ...rest },
-    update: { interests: interests.join(","), ...rest },
+    create: { memberId: ctx.membership.id, pace: parsed.data.pace ?? 3, interests: interests?.join(",") ?? "", ...rest },
+    update: updateData,
   });
 
   return NextResponse.json({ ok: true });

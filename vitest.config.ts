@@ -5,5 +5,6 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     environment: "node",
+    testTimeout: 20000, // lib/groups/access.test.ts hits Supabase over the network — 5s default is too tight
   },
 });

@@ -5,6 +5,9 @@ import { formatRupees } from "@/lib/pricing/format";
 import GroupFeed from "@/app/components/socials/GroupFeed";
 import InviteWidget from "@/app/components/socials/InviteWidget";
 import GroupPaymentsPanel from "@/app/components/socials/GroupPaymentsPanel";
+import ReadinessPanel from "@/app/components/socials/ReadinessPanel";
+import TrekEssentialsPanel from "@/app/components/socials/TrekEssentialsPanel";
+import { deriveBestSeason } from "@/lib/trek/essentials";
 import Link from "next/link";
 
 export default async function GroupOverviewPage({ params }: { params: Promise<{ id: string }> }) {
@@ -57,6 +60,12 @@ export default async function GroupOverviewPage({ params }: { params: Promise<{ 
         </section>
 
         {booking && <GroupPaymentsPanel bookingId={booking.id} currentMemberId={ctx.membership.id} isOrganiser={ctx.membership.role === "ORGANISER"} />}
+
+        {group.tour && <ReadinessPanel groupId={id} />}
+
+        {group.tour && (group.tour.category === "TREK" || group.tour.category === "PILGRIMAGE") && (
+          <TrekEssentialsPanel groupId={id} bestSeason={deriveBestSeason(group.tour)} difficulty={group.tour.difficulty} />
+        )}
 
         <section className="rounded-xl border border-border bg-surface p-4">
           <h2 className="mb-2 font-semibold">Activity</h2>

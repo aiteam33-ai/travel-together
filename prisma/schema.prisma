@@ -257,6 +257,36 @@ model BookingShare {
   @@unique([bookingId, memberId])
 }
 
+// Trip Countdown & Readiness: the two checklist items with no dedicated
+// model of their own (payments and preferences are already derivable from
+// BookingShare / MemberPreference). idDocumentUploaded is a mock toggle —
+// no real file upload in this project.
+model MemberReadiness {
+  id                 String   @id @default(cuid())
+  memberId           String   @unique
+  idDocumentUploaded Boolean  @default(false)
+  packingDone        Boolean  @default(false)
+  updatedAt          DateTime @updatedAt
+  member             GroupMember @relation(fields: [memberId], references: [id])
+}
+
+// Trek & Pilgrimage essentials: one shared list per group covering gear
+// (rentable vs carry-your-own, claimable), a packing list (claimable —
+// "who's bringing the first-aid kit"), and pilgrimage permit/registration
+// requirements (checked off, not claimed).
+model TripChecklistItem {
+  id                String   @id @default(cuid())
+  groupId           String
+  category          String   // GEAR, PACKING, PERMIT
+  label             String
+  mode              String?  // RENT, OWN — meaningful for GEAR only
+  done              Boolean  @default(false)
+  claimedByMemberId String?
+  createdAt         DateTime @default(now())
+  group             Group    @relation(fields: [groupId], references: [id])
+  claimedBy         GroupMember? @relation(fields: [claimedByMemberId], references: [id])
+}
+
 // ===================== My Socials =====================
 // GroupMember is the one and only "who's in this group" relationship.
 // A Booking traveller (named in Booking.travellersJson) and an
@@ -281,6 +311,7 @@ model Group {
   bookings        Booking[]
   tour            Tour?    @relation(fields: [tourId], references: [id])
   tripBudget      TripBudget?
+  checklistItems  TripChecklistItem[]
 }
 
 model GroupMember {
@@ -306,6 +337,8 @@ model GroupMember {
   votes           Vote[]
   pollVotes       PollVote[]
   bookingShares   BookingShare[]
+  readiness       MemberReadiness?
+  claimedChecklistItems TripChecklistItem[]
 
   @@unique([groupId, phone])
 }
@@ -442,6 +475,7 @@ model MemberPreference {
   foodPreference    String?  // VEG, NON_VEG, JAIN, ANY
   stayPreference    String?  // HOSTEL, BUDGET, PREMIUM
   secretBudgetPaise Int?     // PRIVATE — see note above
+  fitnessSelfRating Int?     // 1 (needs prep) .. 5 (very fit) — self-assessed, for trek/pilgrimage readiness
   updatedAt         DateTime @updatedAt
   member            GroupMember @relation(fields: [memberId], references: [id])
 }
