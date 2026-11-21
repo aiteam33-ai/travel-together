@@ -5,6 +5,7 @@ import Image from "next/image";
 import { formatRupees, formatDateIST } from "@/lib/pricing/format";
 import CompareCheckbox from "./CompareCheckbox";
 import { useLocale } from "@/lib/i18n/LocaleContext";
+import TiltImage from "./motion/TiltImage";
 
 interface TourCardProps {
   tourId: string;
@@ -24,9 +25,9 @@ export default function TourCard({ tourId, slug, title, heroImage, durationDays,
   return (
     <article className="card-hover flex flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-[var(--shadow-soft)]">
       <Link href={`/tours/${slug}`} className="block overflow-hidden">
-        <div className="relative h-44 w-full overflow-hidden">
+        <TiltImage className="relative h-44 w-full overflow-hidden">
           <Image src={heroImage} alt={`${title} — illustrative placeholder photo`} fill className="card-hover-image object-cover" />
-        </div>
+        </TiltImage>
       </Link>
       <div className="flex flex-1 flex-col gap-2 p-4">
         <Link href={`/tours/${slug}`} className="font-heading text-base font-bold leading-snug hover:text-accent">

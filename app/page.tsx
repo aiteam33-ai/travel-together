@@ -6,6 +6,8 @@ import SearchBar from "./components/SearchBar";
 import ScrollRow from "./components/landing/ScrollRow";
 import LandingIntro from "./components/landing/LandingIntro";
 import RevealOnScroll from "./components/motion/RevealOnScroll";
+import StaggerReveal from "./components/motion/StaggerReveal";
+import CountUp from "./components/motion/CountUp";
 import { formatRupees, formatDateIST } from "@/lib/pricing/format";
 import { TRAVELLER_TAGS, DEPARTURE_CITIES, DEPARTURE_CITY_LABELS } from "@/lib/pricing/constants";
 
@@ -82,9 +84,9 @@ export default async function HomePage() {
         </RevealOnScroll>
       )}
 
-      <RevealOnScroll as="section">
+      <section>
         <h2 className="font-heading mb-4 text-2xl font-bold">Browse by traveller type</h2>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-6">
+        <StaggerReveal as="div" className="grid grid-cols-2 gap-4 md:grid-cols-6">
           {TRAVELLER_TAGS.map((tag) => (
             <Link
               key={tag}
@@ -94,12 +96,12 @@ export default async function HomePage() {
               {tag.replace(/_/g, " ")}
             </Link>
           ))}
-        </div>
-      </RevealOnScroll>
+        </StaggerReveal>
+      </section>
 
-      <RevealOnScroll as="section">
+      <section>
         <h2 className="font-heading mb-4 text-2xl font-bold">Browse by departure city</h2>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-8">
+        <StaggerReveal as="div" className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-8">
           {DEPARTURE_CITIES.filter((c) => c !== "JOIN_AT_DESTINATION").map((city) => (
             <Link
               key={city}
@@ -109,8 +111,8 @@ export default async function HomePage() {
               {DEPARTURE_CITY_LABELS[city]}
             </Link>
           ))}
-        </div>
-      </RevealOnScroll>
+        </StaggerReveal>
+      </section>
 
       <RevealOnScroll as="section" className="rounded-2xl border border-border bg-surface p-8">
         <h2 className="font-heading text-2xl font-bold">Trip Expense Calculator</h2>
@@ -124,28 +126,28 @@ export default async function HomePage() {
         </Link>
       </RevealOnScroll>
 
-      <RevealOnScroll as="section">
+      <section>
         <h2 className="font-heading mb-4 text-2xl font-bold">Why travel with us</h2>
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+        <StaggerReveal as="div" className="grid grid-cols-1 gap-5 md:grid-cols-3">
           {[
             { q: "Is it safe for solo women travellers?", a: "Our women-only departures carry a woman tour manager and all-women local support staff, start to finish." },
             { q: "What if my parents can't walk long distances?", a: "Senior-citizen departures use fewer hotel changes, shorter drive segments, and a slower daily pace." },
             { q: "Why does the price look higher than an ad I saw?", a: "Our price panel and calculator show the full door-to-door cost up front, including taxes — not just a joining fare." },
           ].map((item) => (
-            <div key={item.q} className="rounded-xl border border-border bg-surface p-5">
+            <div key={item.q} className="rounded-xl border border-border bg-surface p-5 card-hover">
               <h3 className="font-semibold">{item.q}</h3>
               <p className="mt-2 text-sm text-foreground-muted">{item.a}</p>
             </div>
           ))}
-        </div>
-      </RevealOnScroll>
+        </StaggerReveal>
+      </section>
 
       {reviews.length > 0 && (
-        <RevealOnScroll as="section">
+        <section>
           <h2 className="font-heading mb-4 text-2xl font-bold">What travellers say</h2>
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+          <StaggerReveal as="div" className="grid grid-cols-1 gap-5 md:grid-cols-3">
             {reviews.map((r) => (
-              <div key={r.id} className="rounded-xl border border-border bg-surface p-5">
+              <div key={r.id} className="rounded-xl border border-border bg-surface p-5 card-hover">
                 <p className="text-sm">{r.text}</p>
                 <p className="mt-3 text-sm font-semibold">
                   {r.name} {r.verifiedBooking && <span className="ml-1 rounded bg-success/10 px-1.5 py-0.5 text-xs font-medium text-success">Verified booking</span>}
@@ -153,15 +155,19 @@ export default async function HomePage() {
                 <p className="text-xs text-foreground-muted">{r.tour.title} · {formatDateIST(r.travelDate)}{r.isSampleData ? " · Sample review" : ""}</p>
               </div>
             ))}
-          </div>
-        </RevealOnScroll>
+          </StaggerReveal>
+        </section>
       )}
 
-      <section className="rounded-2xl border border-border bg-surface p-8 text-center">
-        <p className="text-foreground-muted">
-          {tourCount} tours · {departureCount} upcoming departures · {travellersServed}+ seats booked by travellers so far
+      <RevealOnScroll as="section" className="rounded-2xl border border-border bg-surface p-8 text-center">
+        <p className="flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1 text-foreground-muted">
+          <span><CountUp value={tourCount} className="font-heading text-2xl font-extrabold text-accent" /> tours</span>
+          <span aria-hidden="true">·</span>
+          <span><CountUp value={departureCount} className="font-heading text-2xl font-extrabold text-accent" /> upcoming departures</span>
+          <span aria-hidden="true">·</span>
+          <span><CountUp value={travellersServed} suffix="+" className="font-heading text-2xl font-extrabold text-accent" /> seats booked by travellers so far</span>
         </p>
-      </section>
+      </RevealOnScroll>
     </div>
   );
 }
