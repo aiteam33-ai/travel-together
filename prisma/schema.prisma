@@ -3,14 +3,16 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
-// SQLite has no native enum support; these string unions are enforced by
-// the Zod schemas in lib/validation instead. See lib/pricing/constants.ts
-// for the canonical value lists (TourCategory, MealPlanType, TravellerTag,
-// DepartureCity).
+// Schema originally targeted SQLite and avoided native enums in favor of
+// string unions enforced by the Zod schemas in lib/validation instead (see
+// lib/pricing/constants.ts for the canonical value lists: TourCategory,
+// MealPlanType, TravellerTag, DepartureCity). Kept as-is after moving to
+// Postgres (Supabase) for consistency — these are still validated in code.
 
 model User {
   id            String    @id @default(cuid())
