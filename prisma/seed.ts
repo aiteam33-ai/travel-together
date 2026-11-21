@@ -678,13 +678,21 @@ async function main() {
   await prisma.expenseParticipant.deleteMany();
   await prisma.expense.deleteMany();
   await prisma.settlement.deleteMany();
+  await prisma.pollVote.deleteMany();
+  await prisma.pollOption.deleteMany();
+  await prisma.poll.deleteMany();
+  await prisma.vote.deleteMany();
   await prisma.groupFeedItem.deleteMany();
   await prisma.groupShortlistItem.deleteMany();
   await prisma.groupInviteLink.deleteMany();
+  await prisma.bookingShare.deleteMany();
+  await prisma.memberPreference.deleteMany();
   await prisma.groupMember.deleteMany();
   await prisma.payment.deleteMany();
   await prisma.booking.deleteMany();
   await prisma.group.deleteMany();
+  await prisma.directMessage.deleteMany();
+  await prisma.friendRequest.deleteMany();
   await prisma.review.deleteMany();
   await prisma.departureCityPrice.deleteMany();
   await prisma.departure.deleteMany();
@@ -1032,12 +1040,127 @@ async function main() {
       },
     });
     await addSystemFeedEntrySeed(demoGroup.id, `${travellerM.name} paid ${organiserM.name} ₹500.`);
+
+    // ---- A 4th demo friend + accepted friend requests, so "My Friends"
+    // and Messages aren't empty for a first-time demo of either feature.
+    const demoUser4 = await prisma.user.upsert({
+      where: { phone: "+919999900004" },
+      update: {},
+      create: { phone: "+919999900004", name: "Demo Friend" },
+    });
+    await prisma.friendRequest.createMany({
+      data: [
+        { fromUserId: demoUser.id, toUserId: demoUser2.id, status: "ACCEPTED", respondedAt: new Date() },
+        { fromUserId: demoUser.id, toUserId: demoUser3.id, status: "ACCEPTED", respondedAt: new Date() },
+        { fromUserId: demoUser.id, toUserId: demoUser4.id, status: "ACCEPTED", respondedAt: new Date() },
+        { fromUserId: demoUser4.id, toUserId: demoUser2.id, status: "PENDING" },
+      ],
+      skipDuplicates: true,
+    });
+    await prisma.directMessage.createMany({
+      data: [
+        { fromUserId: demoUser2.id, toUserId: demoUser.id, text: "Hey! Did you check the Goa dates?" },
+        { fromUserId: demoUser.id, toUserId: demoUser2.id, text: "Yes, 15 Dec works for me." },
+      ],
+    });
+
+    // ---- Vibe Check + Secret Budget: enough members share preferences
+    // that the comfort-range and AI Trip Match have something to show.
+    await prisma.memberPreference.createMany({
+      data: [
+        { memberId: organiserM.id, pace: 3, interests: "BEACHES,HERITAGE,FOOD", foodPreference: "NON_VEG", stayPreference: "BUDGET", secretBudgetPaise: 3000000 },
+        { memberId: memberM.id, pace: 4, interests: "BEACHES,NIGHTLIFE,ADVENTURE", foodPreference: "ANY", stayPreference: "PREMIUM", secretBudgetPaise: 4500000 },
+        { memberId: travellerM.id, pace: 2, interests: "HERITAGE,FOOD", foodPreference: "VEG", stayPreference: "BUDGET", secretBudgetPaise: 2200000 },
+      ],
+      skipDuplicates: true,
+    });
+
+    // ---- A shared tour package in chat with sample votes, and a sample
+    // quick poll — so Group Voting and Quick Polls show live data too.
+    const sharedPackage = await prisma.groupFeedItem.create({
+      data: {
+        groupId: demoGroup.id,
+        type: "POST",
+        authorMemberId: organiserM.id,
+        text: "Goa Beaches & Heritage",
+        messageKind: "PACKAGE",
+        attachmentTourId: goaTour.id,
+      },
+    });
+    await prisma.vote.createMany({
+      data: [
+        { feedItemId: sharedPackage.id, memberId: organiserM.id, value: "YES" },
+        { feedItemId: sharedPackage.id, memberId: memberM.id, value: "YES" },
+        { feedItemId: sharedPackage.id, memberId: travellerM.id, value: "MAYBE" },
+      ],
+      skipDuplicates: true,
+    });
+
+    const pollItem = await prisma.groupFeedItem.create({
+      data: {
+        groupId: demoGroup.id,
+        type: "POST",
+        authorMemberId: organiserM.id,
+        text: "Which dates work?",
+        messageKind: "POLL",
+        poll: {
+          create: {
+            question: "Which dates work?",
+            options: { create: [{ label: "15 Dec" }, { label: "22 Dec" }] },
+          },
+        },
+      },
+      include: { poll: { include: { options: true } } },
+    });
+    if (pollItem.poll) {
+      const [opt1, opt2] = pollItem.poll.options;
+      await prisma.pollVote.createMany({
+        data: [
+          { pollId: pollItem.poll.id, optionId: opt1.id, memberId: organiserM.id },
+          { pollId: pollItem.poll.id, optionId: opt1.id, memberId: travellerM.id },
+          { pollId: pollItem.poll.id, optionId: opt2.id, memberId: memberM.id },
+        ],
+        skipDuplicates: true,
+      });
+    }
+
+    // ---- A held group booking with pay-your-share statuses already mixed
+    // (one paid, one covered, one pending), so Group Payments has live data
+    // without needing a fresh checkout.
+    const goaDeparture = await prisma.departure.findFirst({ where: { tourId: goaTour.id }, orderBy: { startDate: "asc" } });
+    if (goaDeparture) {
+      const demoBooking = await prisma.booking.create({
+        data: {
+          bookingRef: "PHDEMOGROUP1",
+          userId: demoUser2.id,
+          tourId: goaTour.id,
+          departureId: goaDeparture.id,
+          status: "PARTIALLY_PAID",
+          travellersJson: JSON.stringify({
+            counts: { adults: 3, childrenWithBed: 0, childrenWithoutBed: 0, infants: 0, rooms: 2, singleOccupancyRooms: 0 },
+            details: [],
+          }),
+          addOnsJson: "{}",
+          pricingSnapshotJson: "{}",
+          amountDue: 1680000 * 3,
+          amountPaid: 1680000 * 2,
+          groupId: demoGroup.id,
+        },
+      });
+      await prisma.bookingShare.createMany({
+        data: [
+          { bookingId: demoBooking.id, memberId: organiserM.id, amountPaise: 1680000, status: "PAID", paidAt: new Date() },
+          { bookingId: demoBooking.id, memberId: memberM.id, amountPaise: 1680000, status: "COVERED", paidAt: new Date() },
+          { bookingId: demoBooking.id, memberId: travellerM.id, amountPaise: 1680000, status: "PENDING" },
+        ],
+      });
+    }
   }
 
   const tourCount = await prisma.tour.count();
   const departureCount = await prisma.departure.count();
   console.log(`Seeded ${tourCount} tours with ${departureCount} departures, and ${demoTours.length} demo bookings for +919999900000.`);
-  console.log("Demo accounts for My Socials: +919999900000, +919999900001, +919999900002 (OTP printed to console on login).");
+  console.log("Demo accounts for My Socials: +919999900000, +919999900001, +919999900002, +919999900004 (OTP printed to console on login).");
 }
 
 async function addSystemFeedEntrySeed(groupId: string, text: string) {
