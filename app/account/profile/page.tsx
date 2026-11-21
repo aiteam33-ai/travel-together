@@ -1,5 +1,6 @@
 import { getCurrentUser } from "@/lib/auth/session";
 import LogoutButtons from "@/app/components/account/LogoutButtons";
+import BadgesPanel from "@/app/components/account/BadgesPanel";
 
 export default async function ProfilePage() {
   const user = await getCurrentUser();
@@ -12,6 +13,7 @@ export default async function ProfilePage() {
         {user!.phone && <p><strong>Mobile:</strong> {user!.phone}</p>}
         {user!.email && <p><strong>Email:</strong> {user!.email}</p>}
       </div>
+      <BadgesPanel />
       <LogoutButtons />
     </div>
   );
