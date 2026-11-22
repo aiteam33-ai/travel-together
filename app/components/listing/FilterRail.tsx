@@ -4,12 +4,17 @@ import Link from "next/link";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, SlidersHorizontal } from "lucide-react";
-import { TOUR_CATEGORIES, TRAVELLER_TAGS, MEAL_PLAN_TYPES } from "@/lib/pricing/constants";
+import { TOUR_CATEGORIES, INDIA_REGIONS, INDIA_REGION_LABELS, TRAVELLER_TAGS, MEAL_PLAN_TYPES } from "@/lib/pricing/constants";
 import { usePrefersReducedMotion } from "@/lib/motion/reduced-motion";
+
+// The catalogue is India-only (see lib/data/tours.ts) — INTERNATIONAL isn't a
+// browsable category here even though the field still exists in the schema.
+const BROWSABLE_CATEGORIES = TOUR_CATEGORIES.filter((c) => c !== "INTERNATIONAL");
 
 interface SearchParams {
   destination?: string;
   category?: string;
+  region?: string;
   tag?: string;
   minBudget?: string;
   maxBudget?: string;
@@ -35,10 +40,23 @@ function FilterContent({ sp, onNavigate }: { sp: SearchParams; onNavigate?: () =
         <h2 className="mb-2 font-semibold">Category</h2>
         <ul className="space-y-1 text-sm">
           <li><Link onClick={onNavigate} className={`block min-h-11 py-1.5 ${!sp.category ? "font-bold text-accent" : ""}`} href={buildHref(sp, { category: undefined })}>All</Link></li>
-          {TOUR_CATEGORIES.map((c) => (
+          {BROWSABLE_CATEGORIES.map((c) => (
             <li key={c}>
               <Link onClick={onNavigate} className={`block min-h-11 py-1.5 ${sp.category === c ? "font-bold text-accent" : ""}`} href={buildHref(sp, { category: c })}>
                 {c.charAt(0) + c.slice(1).toLowerCase()}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <h2 className="mb-2 font-semibold">Region</h2>
+        <ul className="space-y-1 text-sm">
+          <li><Link onClick={onNavigate} className={`block min-h-11 py-1.5 ${!sp.region ? "font-bold text-accent" : ""}`} href={buildHref(sp, { region: undefined })}>All India</Link></li>
+          {INDIA_REGIONS.map((r) => (
+            <li key={r}>
+              <Link onClick={onNavigate} className={`block min-h-11 py-1.5 ${sp.region === r ? "font-bold text-accent" : ""}`} href={buildHref(sp, { region: r })}>
+                {INDIA_REGION_LABELS[r]}
               </Link>
             </li>
           ))}

@@ -1,6 +1,20 @@
 export const TOUR_CATEGORIES = ["DOMESTIC", "INTERNATIONAL", "PILGRIMAGE", "TREK"] as const;
 export type TourCategory = (typeof TOUR_CATEGORIES)[number];
 
+// India regions for browsing domestic tours — international tours are hidden
+// from catalogue browsing entirely (see lib/data/tours.ts), not region-tagged.
+export const INDIA_REGIONS = ["NORTH", "SOUTH", "EAST", "WEST", "NORTHEAST", "CENTRAL", "ISLANDS"] as const;
+export type IndiaRegion = (typeof INDIA_REGIONS)[number];
+export const INDIA_REGION_LABELS: Record<IndiaRegion, string> = {
+  NORTH: "North India",
+  SOUTH: "South India",
+  EAST: "East India",
+  WEST: "West India",
+  NORTHEAST: "Northeast India",
+  CENTRAL: "Central India",
+  ISLANDS: "Islands",
+};
+
 export const MEAL_PLAN_TYPES = ["VEG", "JAIN", "NON_VEG"] as const;
 export type MealPlanType = (typeof MEAL_PLAN_TYPES)[number];
 

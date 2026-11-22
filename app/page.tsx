@@ -10,7 +10,7 @@ import RevealOnScroll from "./components/motion/RevealOnScroll";
 import StaggerReveal from "./components/motion/StaggerReveal";
 import CountUp from "./components/motion/CountUp";
 import { formatRupees, formatDateIST } from "@/lib/pricing/format";
-import { TRAVELLER_TAGS, DEPARTURE_CITIES, DEPARTURE_CITY_LABELS } from "@/lib/pricing/constants";
+import { TRAVELLER_TAGS, DEPARTURE_CITIES, DEPARTURE_CITY_LABELS, INDIA_REGIONS, INDIA_REGION_LABELS } from "@/lib/pricing/constants";
 
 export default async function HomePage() {
   const [{ tourCount, departureCount, travellersServed }, fastFilling, reviews] = await Promise.all([
@@ -60,6 +60,21 @@ export default async function HomePage() {
               className="flex min-h-11 items-center justify-center rounded-xl border border-border bg-surface p-4 text-center text-sm font-semibold press-feedback hover:border-accent hover:text-accent"
             >
               {tag.replace(/_/g, " ")}
+            </Link>
+          ))}
+        </StaggerReveal>
+      </section>
+
+      <section>
+        <h2 className="font-heading mb-4 text-2xl font-bold">Browse India by region</h2>
+        <StaggerReveal as="div" className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-7">
+          {INDIA_REGIONS.map((region) => (
+            <Link
+              key={region}
+              href={`/tours?region=${region}`}
+              className="flex min-h-11 items-center justify-center rounded-xl border border-border bg-surface p-4 text-center text-sm font-semibold press-feedback hover:border-accent hover:text-accent"
+            >
+              {INDIA_REGION_LABELS[region]}
             </Link>
           ))}
         </StaggerReveal>

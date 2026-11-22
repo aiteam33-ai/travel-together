@@ -9,6 +9,32 @@ function slugify(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
+// India region for domestic/pilgrimage/trek tours — left unset (null) for the
+// international tours below, which are hidden from browse/search entirely
+// rather than region-tagged. Keyed by title so a new TOURS entry fails loud
+// (ends up null, caught by the seed's own backfill-sanity check) rather than
+// silently mismatching on a slug tweak.
+const REGION_BY_TITLE: Record<string, string> = {
+  "Kerala Backwaters & Hills Family Escape": "SOUTH",
+  "Char Dham Yatra by Road": "NORTH",
+  "Rajasthan Royal Circuit": "WEST",
+  "Goa Beaches & Heritage": "WEST",
+  "Kashmir Paradise": "NORTH",
+  "Himachal Shimla-Manali Family Trip": "NORTH",
+  "Andaman Island Getaway": "ISLANDS",
+  "Golden Triangle Express": "NORTH",
+  "Northeast Explorer — Meghalaya & Assam": "NORTHEAST",
+  "Ladakh Bike & Landscape Tour": "NORTH",
+  "Varanasi & Bodh Gaya Spiritual Trail": "EAST",
+  "Jyotirlinga Yatra — Maharashtra Circuit": "WEST",
+  "Amarnath Yatra — Guided Group Departure": "NORTH",
+  "Kedarkantha Winter Trek": "NORTH",
+  "Valley of Flowers & Hemkund Trek": "NORTH",
+  "Women-Only Himachal Wellness Retreat": "NORTH",
+  "South India Temple Trail — Tamil Nadu": "SOUTH",
+  "Spiti Valley Offbeat Expedition": "NORTH",
+};
+
 interface TourSeed {
   title: string;
   category: "DOMESTIC" | "INTERNATIONAL" | "PILGRIMAGE" | "TREK";
@@ -722,6 +748,7 @@ async function main() {
         slug,
         title: t.title,
         category: t.category,
+        region: REGION_BY_TITLE[t.title] ?? null,
         tags: t.tags.join(","),
         summary: t.summary,
         description: t.description,

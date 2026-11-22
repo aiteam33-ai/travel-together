@@ -15,8 +15,8 @@ const SLIDES = [
   { url: "https://images.unsplash.com/photo-1621232082074-1a7750ecc557", label: "Kashmir" }, // Kashmir Paradise
   { url: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2", label: "Goa" }, // Goa Beaches
   { url: "https://images.unsplash.com/photo-1581793745862-99fde7fa73d2", label: "Ladakh" }, // Ladakh
-  { url: "https://images.unsplash.com/photo-1577717903315-1691ae25ab3f", label: "Bali" }, // Bali
-  { url: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0", label: "Everest" }, // Everest Base Camp
+  { url: "https://images.unsplash.com/photo-1661924326425-c14a6426d989", label: "Rajasthan" }, // Rajasthan Royal Circuit
+  { url: "https://images.unsplash.com/photo-1586053226626-febc8817962f", label: "Andaman" }, // Andaman Islands
   { url: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944", label: "Kerala" }, // Kerala Backwaters
 ];
 
@@ -74,7 +74,7 @@ export default function WelcomeHero() {
               Plan, book and share the trip with your people.
             </h1>
             <p className="mt-4 max-w-xl text-base text-white/90 md:text-lg">
-              Fixed-departure tours, treks and pilgrimages across India and the world — with My Socials, plan it
+              Fixed-departure tours, treks and pilgrimages across every region of India — with My Socials, plan it
               together with the friends or family you&apos;re travelling with.
             </p>
           </div>

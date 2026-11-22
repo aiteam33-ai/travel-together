@@ -10,8 +10,8 @@ export function parseJsonField<T>(value: string, fallback: T): T {
 
 export async function getTourCounts() {
   const [tourCount, departureCount, travellerAgg] = await Promise.all([
-    prisma.tour.count(),
-    prisma.departure.count(),
+    prisma.tour.count({ where: { isInternational: false } }),
+    prisma.departure.count({ where: { tour: { isInternational: false } } }),
     prisma.departure.aggregate({ _sum: { seatsBooked: true } }),
   ]);
   return {
@@ -23,7 +23,7 @@ export async function getTourCounts() {
 
 export async function getFastFillingDepartures(limit = 8) {
   const departures = await prisma.departure.findMany({
-    where: { startDate: { gte: new Date() } },
+    where: { startDate: { gte: new Date() }, tour: { isInternational: false } },
     include: { tour: true },
     orderBy: { startDate: "asc" },
     take: 60,
@@ -37,6 +37,7 @@ export async function getFastFillingDepartures(limit = 8) {
 export async function listToursForListing(filters: {
   destination?: string;
   category?: string;
+  region?: string;
   tag?: string;
   minBudget?: number;
   maxBudget?: number;
@@ -48,7 +49,12 @@ export async function listToursForListing(filters: {
 }) {
   const tours = await prisma.tour.findMany({
     where: {
+      // International tours are hidden from browsing/search entirely — the
+      // catalogue is India-only. Their rows stay in the database (bookings,
+      // reviews, etc. keep working), they're just never listed here.
+      isInternational: false,
       ...(filters.category ? { category: filters.category } : {}),
+      ...(filters.region ? { region: filters.region } : {}),
       ...(filters.destination ? { title: { contains: filters.destination } } : {}),
       ...(filters.mealPlan ? { mealPlan: { contains: filters.mealPlan } } : {}),
       ...(filters.difficulty ? { difficulty: filters.difficulty } : {}),

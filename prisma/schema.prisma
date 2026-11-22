@@ -61,6 +61,7 @@ model Tour {
   slug          String       @unique
   title         String
   category      String
+  region        String?      // NORTH, SOUTH, EAST, WEST, NORTHEAST, CENTRAL, ISLANDS — domestic (India) tours only
   tags          String       // comma-separated TravellerTag
   summary       String
   description   String
