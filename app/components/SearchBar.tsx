@@ -24,27 +24,27 @@ export default function SearchBar() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-wrap items-end gap-3 rounded-xl bg-surface p-4 shadow-md" aria-label="Search tours">
-      <label className="flex flex-col text-sm font-medium">
+    <form onSubmit={onSubmit} className="flex flex-wrap items-end gap-3 rounded-xl bg-surface p-4 text-foreground shadow-md" aria-label="Search tours">
+      <label className="flex flex-col text-sm font-medium text-foreground">
         {t("search.destination")}
         <input
           value={destination}
           onChange={(e) => setDestination(e.target.value)}
           placeholder="e.g. Kerala, Bali"
-          className="mt-1 w-44 rounded-md border border-border bg-background px-3 py-2"
+          className="mt-1 w-44 rounded-md border border-border bg-background px-3 py-2 text-foreground placeholder:text-foreground-muted"
         />
       </label>
-      <label className="flex flex-col text-sm font-medium">
+      <label className="flex flex-col text-sm font-medium text-foreground">
         {t("search.durationUpTo")}
         <input
           type="number"
           min={1}
           value={duration}
           onChange={(e) => setDuration(e.target.value)}
-          className="mt-1 w-32 rounded-md border border-border bg-background px-3 py-2"
+          className="mt-1 w-32 rounded-md border border-border bg-background px-3 py-2 text-foreground"
         />
       </label>
-      <label className="flex flex-col text-sm font-medium">
+      <label className="flex flex-col text-sm font-medium text-foreground">
         {t("search.budgetUpTo")}
         <input
           type="number"
@@ -52,12 +52,12 @@ export default function SearchBar() {
           value={budget}
           onChange={(e) => setBudget(e.target.value)}
           placeholder="50000"
-          className="mt-1 w-32 rounded-md border border-border bg-background px-3 py-2"
+          className="mt-1 w-32 rounded-md border border-border bg-background px-3 py-2 text-foreground placeholder:text-foreground-muted"
         />
       </label>
-      <label className="flex flex-col text-sm font-medium">
+      <label className="flex flex-col text-sm font-medium text-foreground">
         {t("search.city")}
-        <select value={city} onChange={(e) => setCity(e.target.value)} className="mt-1 w-40 rounded-md border border-border bg-background px-3 py-2">
+        <select value={city} onChange={(e) => setCity(e.target.value)} className="mt-1 w-40 rounded-md border border-border bg-background px-3 py-2 text-foreground">
           {DEPARTURE_CITIES.map((c) => (
             <option key={c} value={c}>{DEPARTURE_CITY_LABELS[c]}</option>
           ))}
