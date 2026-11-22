@@ -532,6 +532,7 @@ model Expense {
   id              String   @id @default(cuid())
   groupId         String
   description     String
+  category        String   @default("OTHER") // HOTEL, FOOD, TRANSPORT, TICKETS, SHOPPING, OTHER
   amountPaise     Int
   date            DateTime
   paidByMemberId  String

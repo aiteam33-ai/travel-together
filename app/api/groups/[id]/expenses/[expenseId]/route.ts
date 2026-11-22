@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db/client";
 import { requireMembership } from "@/lib/groups/access";
 import { addSystemFeedEntry } from "@/lib/groups/feed";
 import { splitExpense } from "@/lib/expenses/engine";
+import { EXPENSE_CATEGORIES } from "@/lib/pricing/constants";
 
 async function canEdit(groupId: string, expenseId: string, memberId: string, role: string) {
   const expense = await prisma.expense.findFirst({ where: { id: expenseId, groupId } });
@@ -15,6 +16,7 @@ async function canEdit(groupId: string, expenseId: string, memberId: string, rol
 
 const patchSchema = z.object({
   description: z.string().min(1).max(120).optional(),
+  category: z.enum(EXPENSE_CATEGORIES).optional(),
   amountPaise: z.number().int().positive().optional(),
   date: z.string().optional(),
   paidByMemberId: z.string().optional(),
@@ -59,6 +61,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       where: { id: expenseId },
       data: {
         description: data.description ?? existing.description,
+        category: data.category ?? existing.category,
         amountPaise,
         date: data.date ? new Date(data.date) : existing.date,
         paidByMemberId,

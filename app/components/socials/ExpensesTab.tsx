@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { computeBalances, suggestSettlements } from "@/lib/expenses/engine";
 import { formatRupees, formatDateIST } from "@/lib/pricing/format";
+import { EXPENSE_CATEGORIES, EXPENSE_CATEGORY_LABELS, ExpenseCategory } from "@/lib/pricing/constants";
 import { useToast } from "../ToastContext";
 
 interface Member {
@@ -13,6 +14,7 @@ interface Member {
 interface ApiExpense {
   id: string;
   description: string;
+  category: ExpenseCategory;
   amountPaise: number;
   date: string;
   paidByMemberId: string;
@@ -49,6 +51,7 @@ export default function ExpensesTab({
   const [expenses, setExpenses] = useState<ApiExpense[]>([]);
   const [settlements, setSettlements] = useState<ApiSettlement[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<ApiExpense | null>(null);
 
   const refresh = useCallback(() => {
     fetch(`/api/groups/${groupId}/expenses`)
@@ -78,6 +81,11 @@ export default function ExpensesTab({
   );
   const suggestions = suggestSettlements(balances);
   const myBalance = balances.find((b) => b.memberId === currentMemberId)?.netPaise ?? 0;
+  const totalPaise = expenses.reduce((sum, e) => sum + e.amountPaise, 0);
+  const categoryTotals = EXPENSE_CATEGORIES.map((cat) => ({
+    category: cat,
+    amountPaise: expenses.filter((e) => e.category === cat).reduce((sum, e) => sum + e.amountPaise, 0),
+  })).filter((c) => c.amountPaise > 0);
   const rawObligationCount = expenses.reduce(
     (n, e) => n + e.participants.filter((p) => p.memberId !== e.paidByMemberId).length,
     0
@@ -123,20 +131,36 @@ export default function ExpensesTab({
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-semibold">Expenses</h2>
-          <button type="button" onClick={() => setShowAddForm((v) => !v)} className="min-h-11 rounded-md bg-accent px-4 text-sm font-semibold text-white press-feedback">
-            {showAddForm ? "Close" : "Add expense"}
+          <div>
+            <h2 className="font-semibold">Expenses</h2>
+            {expenses.length > 0 && <p className="text-xs text-foreground-muted">{formatRupees(totalPaise)} logged across {expenses.length} expense{expenses.length === 1 ? "" : "s"}</p>}
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setEditingExpense(null);
+              setShowAddForm((v) => !v);
+            }}
+            className="min-h-11 rounded-md bg-accent px-4 text-sm font-semibold text-white press-feedback"
+          >
+            {showAddForm && !editingExpense ? "Close" : "Add expense"}
           </button>
         </div>
 
-        {showAddForm && (
+        {(showAddForm || editingExpense) && (
           <AddExpenseForm
             groupId={groupId}
             members={members}
             defaultPayerId={currentMemberId}
+            editing={editingExpense}
             onSaved={() => {
               setShowAddForm(false);
+              setEditingExpense(null);
               refresh();
+            }}
+            onCancel={() => {
+              setShowAddForm(false);
+              setEditingExpense(null);
             }}
           />
         )}
@@ -144,24 +168,51 @@ export default function ExpensesTab({
         <ul className="mt-4 space-y-2">
           {expenses.map((e) => (
             <li key={e.id} className="rounded-md border border-border bg-surface p-3 text-sm">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <p className="font-semibold">{e.description}</p>
                 <p className="font-semibold">{formatRupees(e.amountPaise)}</p>
               </div>
               <p className="text-xs text-foreground-muted">
-                Paid by {e.paidBy.name} · {formatDateIST(e.date)} · split {e.splitType.toLowerCase()} among{" "}
+                <span className="rounded bg-accent-soft px-1.5 py-0.5 font-medium text-accent">{EXPENSE_CATEGORY_LABELS[e.category]}</span>{" "}
+                · Paid by {e.paidBy.name} · {formatDateIST(e.date)} · split {e.splitType.toLowerCase()} among{" "}
                 {e.participants.map((p) => nameOf(p.memberId)).join(", ")}
                 {e.fromBooking && " · from booking"}
               </p>
               {(e.createdByMemberId === currentMemberId || isOrganiser) && (
-                <button type="button" onClick={() => deleteExpense(e.id)} className="mt-1 text-xs text-danger underline">
-                  Delete
-                </button>
+                <div className="mt-1 flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAddForm(false);
+                      setEditingExpense(e);
+                    }}
+                    className="text-xs text-accent underline"
+                  >
+                    Edit
+                  </button>
+                  <button type="button" onClick={() => deleteExpense(e.id)} className="text-xs text-danger underline">
+                    Delete
+                  </button>
+                </div>
               )}
             </li>
           ))}
           {expenses.length === 0 && <p className="text-sm text-foreground-muted">No expenses recorded yet.</p>}
         </ul>
+
+        {categoryTotals.length > 0 && (
+          <div className="mt-6">
+            <h3 className="font-semibold">By category</h3>
+            <ul className="mt-2 space-y-1 text-sm">
+              {categoryTotals.map((c) => (
+                <li key={c.category} className="flex items-center justify-between">
+                  <span className="text-foreground-muted">{EXPENSE_CATEGORY_LABELS[c.category]}</span>
+                  <span className="font-medium">{formatRupees(c.amountPaise)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {settlements.length > 0 && (
           <div className="mt-6">
@@ -252,20 +303,29 @@ function AddExpenseForm({
   groupId,
   members,
   defaultPayerId,
+  editing,
   onSaved,
+  onCancel,
 }: {
   groupId: string;
   members: Member[];
   defaultPayerId: string;
+  editing: ApiExpense | null;
   onSaved: () => void;
+  onCancel: () => void;
 }) {
-  const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState("");
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
-  const [paidByMemberId, setPaidByMemberId] = useState(defaultPayerId);
-  const [participantIds, setParticipantIds] = useState<string[]>(members.map((m) => m.id));
-  const [splitType, setSplitType] = useState<"EQUAL" | "CUSTOM">("EQUAL");
-  const [customShares, setCustomShares] = useState<Record<string, string>>({});
+  const [description, setDescription] = useState(editing?.description ?? "");
+  const [category, setCategory] = useState<ExpenseCategory>(editing?.category ?? "OTHER");
+  const [amount, setAmount] = useState(editing ? String(editing.amountPaise / 100) : "");
+  const [date, setDate] = useState(() => (editing ? editing.date.slice(0, 10) : new Date().toISOString().slice(0, 10)));
+  const [paidByMemberId, setPaidByMemberId] = useState(editing?.paidByMemberId ?? defaultPayerId);
+  const [participantIds, setParticipantIds] = useState<string[]>(editing ? editing.participants.map((p) => p.memberId) : members.map((m) => m.id));
+  const [splitType, setSplitType] = useState<"EQUAL" | "CUSTOM">(editing?.splitType ?? "EQUAL");
+  const [customShares, setCustomShares] = useState<Record<string, string>>(
+    editing && editing.splitType === "CUSTOM"
+      ? Object.fromEntries(editing.participants.map((p) => [p.memberId, String(p.shareAmountPaise / 100)]))
+      : {}
+  );
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -283,6 +343,7 @@ function AddExpenseForm({
     }
     const body: Record<string, unknown> = {
       description,
+      category,
       amountPaise,
       date,
       paidByMemberId,
@@ -295,15 +356,15 @@ function AddExpenseForm({
       body.customShares = shares;
     }
     setSaving(true);
-    const res = await fetch(`/api/groups/${groupId}/expenses`, {
-      method: "POST",
+    const res = await fetch(`/api/groups/${groupId}/expenses${editing ? `/${editing.id}` : ""}`, {
+      method: editing ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
     const data = await res.json();
     setSaving(false);
     if (!res.ok) {
-      setError(typeof data.error === "string" ? data.error : "Could not add expense — check the split adds up.");
+      setError(typeof data.error === "string" ? data.error : "Could not save expense — check the split adds up.");
       return;
     }
     onSaved();
@@ -315,6 +376,14 @@ function AddExpenseForm({
       <label className="block text-sm">
         Description
         <input required value={description} onChange={(e) => setDescription(e.target.value)} className="mt-1 min-h-11 w-full rounded-md border border-border bg-background px-2" />
+      </label>
+      <label className="block text-sm">
+        Category
+        <select value={category} onChange={(e) => setCategory(e.target.value as ExpenseCategory)} className="mt-1 min-h-11 w-full rounded-md border border-border bg-background px-2">
+          {EXPENSE_CATEGORIES.map((c) => (
+            <option key={c} value={c}>{EXPENSE_CATEGORY_LABELS[c]}</option>
+          ))}
+        </select>
       </label>
       <div className="grid grid-cols-2 gap-2">
         <label className="block text-sm">
@@ -369,9 +438,14 @@ function AddExpenseForm({
           ))}
         </div>
       )}
-      <button type="submit" disabled={saving} className="min-h-11 w-full rounded-md bg-accent text-sm font-semibold text-white press-feedback disabled:opacity-60">
-        {saving ? "Saving…" : "Add expense"}
-      </button>
+      <div className="flex gap-2">
+        <button type="submit" disabled={saving} className="min-h-11 flex-1 rounded-md bg-accent text-sm font-semibold text-white press-feedback disabled:opacity-60">
+          {saving ? "Saving…" : editing ? "Save changes" : "Add expense"}
+        </button>
+        <button type="button" onClick={onCancel} className="min-h-11 rounded-md border border-border px-4 text-sm font-semibold press-feedback">
+          Cancel
+        </button>
+      </div>
     </form>
   );
 }

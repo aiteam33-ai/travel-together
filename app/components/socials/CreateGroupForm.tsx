@@ -18,7 +18,7 @@ export default function CreateGroupForm() {
     });
     const data = await res.json();
     setCreating(false);
-    if (res.ok) router.push(`/socials/${data.groupId}`);
+    if (res.ok) router.push(`/socials/${data.groupId}/members`);
   }
 
   return (

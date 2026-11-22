@@ -86,6 +86,20 @@ export const TRAVEL_MODES = [
 
 export const SPEND_PRESETS = ["BUDGET", "COMFORT", "PREMIUM"] as const;
 
+// Categories for individually-logged shared expenses (My Socials' expense
+// splitter) — distinct from BUDGET_CATEGORY_LABELS in lib/budget/engine.ts,
+// which groups a single pre-trip group-level estimate, not per-expense entries.
+export const EXPENSE_CATEGORIES = ["HOTEL", "FOOD", "TRANSPORT", "TICKETS", "SHOPPING", "OTHER"] as const;
+export type ExpenseCategory = (typeof EXPENSE_CATEGORIES)[number];
+export const EXPENSE_CATEGORY_LABELS: Record<ExpenseCategory, string> = {
+  HOTEL: "Hotel",
+  FOOD: "Food",
+  TRANSPORT: "Transport / fuel",
+  TICKETS: "Tickets & entry",
+  SHOPPING: "Shopping",
+  OTHER: "Other",
+};
+
 export const DEFAULT_GST_RATE = 5;
 export const DEFAULT_TCS_RATE_INTL = 2;
 export const DEFAULT_TCS_RATE_DOMESTIC = 0;

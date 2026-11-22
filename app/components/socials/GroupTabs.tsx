@@ -5,12 +5,11 @@ import { usePathname } from "next/navigation";
 
 const TABS = [
   { key: "overview", label: "Overview" },
-  { key: "plan", label: "Plan" },
+  { key: "plan", label: "Plan & Expenses" },
   { key: "vibe-check", label: "Vibe Check" },
   { key: "budget", label: "Budget" },
-  { key: "expenses", label: "Expenses" },
   { key: "memories", label: "Memories" },
-  { key: "members", label: "Members" },
+  { key: "members", label: "Invite & Members" },
 ];
 
 export default function GroupTabs({ groupId }: { groupId: string }) {

@@ -87,11 +87,31 @@ export default async function SocialsPage() {
 
         <div className="mt-4 rounded-xl border border-border bg-background p-4">
           <h3 className="font-semibold">Start a new trip group</h3>
-          <p className="mt-1 text-sm text-foreground-muted">Give it a name — you can invite members and pick a destination next.</p>
+          <p className="mt-1 text-sm text-foreground-muted">Give it a name — you&apos;ll land straight on its invite link next.</p>
           <div className="mt-3">
             <CreateGroupForm />
           </div>
         </div>
+
+        {groups.length > 0 && (
+          <div className="mt-4 space-y-3">
+            <h3 className="font-semibold">Invite people to an existing group</h3>
+            {groups.map((group) => (
+              <div key={group.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-background p-4">
+                <div>
+                  <p className="font-semibold">{group.name}</p>
+                  <p className="text-sm text-foreground-muted">{group.members.filter((m) => m.status === "JOINED").length} joined</p>
+                </div>
+                <Link
+                  href={`/socials/${group.id}/members`}
+                  className="min-h-11 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white press-feedback hover:bg-accent-strong"
+                >
+                  Get invite link
+                </Link>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Step 2 — matches "Plan and calculate together" (href="/socials#plan") */}
@@ -165,7 +185,7 @@ export default async function SocialsPage() {
                     </p>
                   </div>
                   <Link
-                    href={`/socials/${group.id}/expenses`}
+                    href={`/socials/${group.id}/plan#settle-up`}
                     className="min-h-11 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white press-feedback hover:bg-accent-strong"
                   >
                     Open expenses

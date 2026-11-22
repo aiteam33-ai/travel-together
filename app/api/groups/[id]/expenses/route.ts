@@ -5,9 +5,11 @@ import { prisma } from "@/lib/db/client";
 import { requireMembership, logEvent } from "@/lib/groups/access";
 import { addSystemFeedEntry } from "@/lib/groups/feed";
 import { splitExpense } from "@/lib/expenses/engine";
+import { EXPENSE_CATEGORIES } from "@/lib/pricing/constants";
 
 const schema = z.object({
   description: z.string().min(1).max(120),
+  category: z.enum(EXPENSE_CATEGORIES).default("OTHER"),
   amountPaise: z.number().int().positive(),
   date: z.string(),
   paidByMemberId: z.string(),
@@ -61,6 +63,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     data: {
       groupId: id,
       description: data.description,
+      category: data.category,
       amountPaise: data.amountPaise,
       date: new Date(data.date),
       paidByMemberId: data.paidByMemberId,
