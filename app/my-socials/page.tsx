@@ -18,31 +18,47 @@ export default function MySocialsExplainerPage() {
 
       <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
         {[
-          { step: "1", title: "Invite your group", body: "Create a group and invite friends by link or mobile number." },
-          { step: "2", title: "Plan and calculate together", body: "Shortlist tours, chat, vote, and see the group's cost estimate from the same pricing engine used at checkout." },
-          { step: "3", title: "Book and split expenses", body: "One person books for the group; everyone pays their own share and can record shared expenses." },
+          { step: "1", title: "Invite your group", body: "Create a group and invite friends by link or mobile number.", href: "/socials" },
+          { step: "2", title: "Plan and calculate together", body: "Shortlist tours, chat, vote, and see the group's cost estimate from the same pricing engine used at checkout.", href: "/socials" },
+          { step: "3", title: "Book and split expenses", body: "One person books for the group; everyone pays their own share and can record shared expenses.", href: "/socials" },
         ].map((item) => (
-          <div key={item.step} className="rounded-xl border border-border bg-surface p-5 card-hover">
+          <Link
+            key={item.step}
+            href={item.href}
+            className="group block rounded-xl border border-border bg-surface p-5 card-hover press-feedback"
+          >
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-sm font-bold text-white">{item.step}</span>
             <h3 className="mt-3 font-semibold">{item.title}</h3>
             <p className="mt-1 text-sm text-foreground-muted">{item.body}</p>
-          </div>
+            <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-accent">
+              Open in My Socials <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span>
+            </span>
+          </Link>
         ))}
       </div>
 
       <div className="mt-10 rounded-2xl border border-border bg-surface p-8">
         <h2 className="font-heading text-xl font-bold">What&apos;s inside</h2>
-        <ul className="mt-4 grid grid-cols-1 gap-x-8 gap-y-2 text-sm text-foreground-muted sm:grid-cols-2">
-          <li>Friends, 1:1 messages &amp; group chat</li>
-          <li>Vibe Check + a private secret budget</li>
-          <li>AI Trip Match &amp; side-by-side compare</li>
-          <li>Group voting &amp; quick polls</li>
-          <li>Pay-your-share group booking</li>
-          <li>Trip countdown &amp; readiness checklist</li>
-          <li>Trek &amp; pilgrimage essentials</li>
-          <li>A Safety Center with SOS</li>
-          <li>Post-trip memories, reviews &amp; a final expense PDF</li>
-          <li>Badges &amp; a traveller profile</li>
+        <p className="mt-1 text-sm text-foreground-muted">Every item below is live inside My Socials — tap one to jump straight in.</p>
+        <ul className="mt-4 grid grid-cols-1 gap-x-8 gap-y-1 text-sm sm:grid-cols-2">
+          {[
+            { label: "Friends, 1:1 messages & group chat", href: "/socials/friends" },
+            { label: "Vibe Check + a private secret budget", href: "/socials" },
+            { label: "AI Trip Match & side-by-side compare", href: "/compare" },
+            { label: "Group voting & quick polls", href: "/socials" },
+            { label: "Pay-your-share group booking", href: "/socials" },
+            { label: "Trip countdown & readiness checklist", href: "/socials" },
+            { label: "Trek & pilgrimage essentials", href: "/socials" },
+            { label: "A Safety Center with SOS", href: "/socials" },
+            { label: "Post-trip memories, reviews & a final expense PDF", href: "/socials" },
+            { label: "Badges & a traveller profile", href: "/account/profile" },
+          ].map((item) => (
+            <li key={item.label}>
+              <Link href={item.href} className="inline-block py-1 text-foreground-muted underline-offset-2 hover:text-accent hover:underline">
+                {item.label}
+              </Link>
+            </li>
+          ))}
         </ul>
       </div>
 

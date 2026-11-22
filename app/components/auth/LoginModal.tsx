@@ -90,6 +90,18 @@ export default function LoginModal({ onClose, onSuccess }: { onClose: () => void
     }
   }
 
+  async function continueWithMockGoogle() {
+    setError(null);
+    const res = await fetch("/api/auth/mock-google", { method: "POST" });
+    if (!res.ok) {
+      setError("Could not sign in. Please try again.");
+      return;
+    }
+    await refresh();
+    onClose();
+    onSuccess?.();
+  }
+
   async function saveName() {
     const res = await fetch("/api/auth/update-name", {
       method: "POST",
@@ -168,7 +180,11 @@ export default function LoginModal({ onClose, onSuccess }: { onClose: () => void
             <button type="button" onClick={sendOtp} className="w-full rounded-md bg-accent py-2 font-semibold text-white hover:bg-accent-strong">
               Send OTP
             </button>
-            <button type="button" className="w-full rounded-md border border-border py-2 text-sm" disabled>
+            <button
+              type="button"
+              onClick={continueWithMockGoogle}
+              className="w-full rounded-md border border-border py-2 text-sm press-feedback hover:border-accent"
+            >
               Continue with Google (mock)
             </button>
           </div>
