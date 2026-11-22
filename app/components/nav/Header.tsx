@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BRAND } from "@/lib/brand";
 import { useLocale } from "@/lib/i18n/LocaleContext";
@@ -19,7 +20,13 @@ export default function Header() {
   const { count: wishlistCount } = useWishlist();
   const { ids: compareIds } = useCompare();
   const { unreadCount } = useSocials();
-  const [loginOpen, setLoginOpen] = useState(false);
+  const searchParams = useSearchParams();
+  const nextPath = searchParams.get("next");
+  // A page that requires login redirects here with ?login=1&next=<path> instead
+  // of silently bouncing the visitor to "/" — this opens the login dialog
+  // automatically (derived directly from the URL, not an effect) and sends
+  // them on to where they were trying to go once they sign in.
+  const [loginOpen, setLoginOpen] = useState(() => searchParams.get("login") === "1");
   const [city, setCity] = useState<DepartureCityCode>("MUMBAI");
   const [condensed, setCondensed] = useState(false);
 
@@ -117,7 +124,12 @@ export default function Header() {
         </div>
       </div>
       <Breadcrumbs />
-      {loginOpen && <LoginModal onClose={() => setLoginOpen(false)} />}
+      {loginOpen && (
+        <LoginModal
+          onClose={() => setLoginOpen(false)}
+          onSuccess={nextPath ? () => window.location.assign(nextPath) : undefined}
+        />
+      )}
     </header>
   );
 }

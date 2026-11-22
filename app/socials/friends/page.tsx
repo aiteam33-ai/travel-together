@@ -4,7 +4,7 @@ import FriendsClient from "@/app/components/socials/FriendsClient";
 
 export default async function FriendsPage() {
   const user = await getCurrentUser();
-  if (!user) redirect("/");
+  if (!user) redirect("/?login=1&next=/socials/friends");
 
   return (
     <div className="max-w-2xl">

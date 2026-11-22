@@ -7,7 +7,7 @@ import MarkSocialsSeen from "@/app/components/socials/MarkSocialsSeen";
 export default async function GroupLayout({ children, params }: { children: React.ReactNode; params: Promise<{ id: string }> }) {
   const { id } = await params;
   const user = await getCurrentUser();
-  if (!user) redirect("/");
+  if (!user) redirect(`/?login=1&next=${encodeURIComponent(`/socials/${id}`)}`);
 
   const ctx = await requireMembership(id, user.id);
   if (!ctx) notFound();

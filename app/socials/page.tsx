@@ -8,7 +8,7 @@ import MarkSocialsSeen from "@/app/components/socials/MarkSocialsSeen";
 
 export default async function SocialsPage() {
   const user = await getCurrentUser();
-  if (!user) redirect("/");
+  if (!user) redirect("/?login=1&next=/socials");
 
   const [memberships, friendIds, incomingRequests, unreadDMs] = await Promise.all([
     prisma.groupMember.findMany({

@@ -9,7 +9,7 @@ type Step = "identifier" | "otp" | "name";
 
 const RESEND_SECONDS = 30;
 
-export default function LoginModal({ onClose }: { onClose: () => void }) {
+export default function LoginModal({ onClose, onSuccess }: { onClose: () => void; onSuccess?: () => void }) {
   const { refresh } = useAuth();
   const [step, setStep] = useState<Step>("identifier");
   const [mode, setMode] = useState<"phone" | "email">("phone");
@@ -86,6 +86,7 @@ export default function LoginModal({ onClose }: { onClose: () => void }) {
     } else {
       await refresh();
       onClose();
+      onSuccess?.();
     }
   }
 
@@ -98,6 +99,7 @@ export default function LoginModal({ onClose }: { onClose: () => void }) {
     if (res.ok) {
       await refresh();
       onClose();
+      onSuccess?.();
     }
   }
 

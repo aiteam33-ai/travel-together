@@ -4,7 +4,7 @@ import MessagesClient from "@/app/components/socials/MessagesClient";
 
 export default async function MessagesPage({ searchParams }: { searchParams: Promise<{ with?: string }> }) {
   const user = await getCurrentUser();
-  if (!user) redirect("/");
+  if (!user) redirect("/?login=1&next=/socials/messages");
   const { with: withId } = await searchParams;
 
   return (

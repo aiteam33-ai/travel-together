@@ -10,6 +10,7 @@ export function FooterCompanyLinks() {
       <h3 className="font-semibold">{t("footer.company")}</h3>
       <ul className="mt-2 space-y-1 text-sm">
         <li><Link href="/about">{t("footer.about")}</Link></li>
+        <li><Link href="/my-socials">My Socials</Link></li>
         <li><Link href="/branches">{t("footer.branches")}</Link></li>
         <li><Link href="/blog">{t("footer.blog")}</Link></li>
         <li><Link href="/contact">{t("footer.contact")}</Link></li>

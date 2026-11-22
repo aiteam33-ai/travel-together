@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Hind, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { BRAND } from "@/lib/brand";
@@ -38,7 +39,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <SocialsProvider>
                     <FloatingStackProvider>
                       <TopLoadingBar />
-                      <Header />
+                      <Suspense fallback={null}>
+                        <Header />
+                      </Suspense>
                       <main id="main-content" className="mx-auto w-full max-w-[1440px] flex-1 px-6 py-8 pb-24 md:pb-8">
                         <PageTransition>{children}</PageTransition>
                       </main>

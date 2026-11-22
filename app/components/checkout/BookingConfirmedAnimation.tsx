@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePrefersReducedMotion } from "@/lib/motion/reduced-motion";
 
-const CONFETTI_COLORS = ["#b23c0a", "#2f6b3a", "#f6ddc9", "#8c2f07"];
+const CONFETTI_COLORS = ["#0e6e5c", "#2f7a4f", "#dcefe8", "#0a5447"];
 
 /**
  * Booking-confirmed moment (Stage 6, GSAP): a self-drawing tick and a ~2s
