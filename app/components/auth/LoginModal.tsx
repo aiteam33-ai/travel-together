@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useAuth } from "./AuthContext";
 import { usePrefersReducedMotion } from "@/lib/motion/reduced-motion";
@@ -11,6 +12,18 @@ const RESEND_SECONDS = 30;
 
 export default function LoginModal({ onClose, onSuccess }: { onClose: () => void; onSuccess?: () => void }) {
   const { refresh } = useAuth();
+  const router = useRouter();
+
+  // Pages gated behind login (e.g. /socials) redirect logged-out visitors away
+  // server-side. If one of those pages was visited or prefetched before this
+  // login, Next.js's client-side router cache can still hold that "redirect,
+  // not logged in" response. router.refresh() busts that cache so the very
+  // next navigation re-renders from the server with the new session instead
+  // of replaying the stale redirect and silently bouncing back to the
+  // homepage right after a successful login.
+  function syncAfterLogin() {
+    router.refresh();
+  }
   const [step, setStep] = useState<Step>("identifier");
   const [mode, setMode] = useState<"phone" | "email">("phone");
   const [identifier, setIdentifier] = useState("");
@@ -85,6 +98,7 @@ export default function LoginModal({ onClose, onSuccess }: { onClose: () => void
       setStep("name");
     } else {
       await refresh();
+      syncAfterLogin();
       onClose();
       onSuccess?.();
     }
@@ -98,6 +112,7 @@ export default function LoginModal({ onClose, onSuccess }: { onClose: () => void
       return;
     }
     await refresh();
+    syncAfterLogin();
     onClose();
     onSuccess?.();
   }
@@ -110,6 +125,7 @@ export default function LoginModal({ onClose, onSuccess }: { onClose: () => void
     });
     if (res.ok) {
       await refresh();
+      syncAfterLogin();
       onClose();
       onSuccess?.();
     }
