@@ -2,9 +2,9 @@ import Link from "next/link";
 import { prisma } from "@/lib/db/client";
 import { getTourCounts, getFastFillingDepartures } from "@/lib/data/tours";
 import TourCard from "./components/TourCard";
-import SearchBar from "./components/SearchBar";
 import ScrollRow from "./components/landing/ScrollRow";
 import LandingIntro from "./components/landing/LandingIntro";
+import WelcomeHero from "./components/landing/WelcomeHero";
 import RevealOnScroll from "./components/motion/RevealOnScroll";
 import StaggerReveal from "./components/motion/StaggerReveal";
 import CountUp from "./components/motion/CountUp";
@@ -21,20 +21,7 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col gap-16">
       <LandingIntro>
-        <section className="rounded-2xl bg-gradient-to-br from-accent/10 to-transparent p-8 md:p-14">
-          <p className="font-heading text-sm font-bold uppercase tracking-wide text-accent" data-intro="headline">Travel, together</p>
-          <h1 className="font-heading mt-2 max-w-2xl text-3xl font-extrabold leading-tight md:text-5xl" data-intro="headline">
-            Plan, book and share the trip with your people.
-          </h1>
-          <p className="mt-4 max-w-xl text-lg text-foreground-muted" data-intro="headline">
-            Search fixed-departure tours, treks and pilgrimages across India and the world, see the full door-to-door
-            cost with our Trip Expense Calculator — and with My Socials, plan it together with the friends or family
-            you&apos;re travelling with.
-          </p>
-          <div className="mt-8" data-intro="search">
-            <SearchBar />
-          </div>
-        </section>
+        <WelcomeHero />
       </LandingIntro>
 
       {fastFilling.length > 0 && (

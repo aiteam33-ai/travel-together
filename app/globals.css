@@ -191,6 +191,23 @@ main, h1, h2, h3, p, button, a, input, select, textarea {
   animation: page-fade-in var(--duration-small) var(--ease-standard);
 }
 
+@keyframes kenburns {
+  0% { transform: scale(1) translate(0, 0); }
+  100% { transform: scale(1.12) translate(-1%, -1%); }
+}
+.hero-slide {
+  animation: kenburns 9s ease-in-out infinite alternate;
+}
+
+@keyframes drift {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(3%, -4%); }
+  100% { transform: translate(0, 0); }
+}
+.hero-orb {
+  animation: drift 14s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .press-feedback:hover,
   .press-feedback:active,
@@ -198,7 +215,7 @@ main, h1, h2, h3, p, button, a, input, select, textarea {
   .card-hover:hover .card-hover-image {
     transform: none;
   }
-  .badge-pop, .heart-pop, .skeleton, .page-fade-in {
+  .badge-pop, .heart-pop, .skeleton, .page-fade-in, .hero-slide, .hero-orb {
     animation: none;
   }
 }
