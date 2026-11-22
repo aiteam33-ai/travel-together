@@ -5,6 +5,7 @@ import TourCard from "./components/TourCard";
 import ScrollRow from "./components/landing/ScrollRow";
 import LandingIntro from "./components/landing/LandingIntro";
 import WelcomeHero from "./components/landing/WelcomeHero";
+import MySocialsTeaser from "./components/landing/MySocialsTeaser";
 import RevealOnScroll from "./components/motion/RevealOnScroll";
 import StaggerReveal from "./components/motion/StaggerReveal";
 import CountUp from "./components/motion/CountUp";
@@ -46,6 +47,8 @@ export default async function HomePage() {
           </ScrollRow>
         </RevealOnScroll>
       )}
+
+      <MySocialsTeaser />
 
       <section>
         <h2 className="font-heading mb-4 text-2xl font-bold">Browse by traveller type</h2>
