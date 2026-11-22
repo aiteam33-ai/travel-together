@@ -18,9 +18,9 @@ export default function MySocialsExplainerPage() {
 
       <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
         {[
-          { step: "1", title: "Invite your group", body: "Create a group and invite friends by link or mobile number.", href: "/socials" },
-          { step: "2", title: "Plan and calculate together", body: "Shortlist tours, chat, vote, and see the group's cost estimate from the same pricing engine used at checkout.", href: "/socials" },
-          { step: "3", title: "Book and split expenses", body: "One person books for the group; everyone pays their own share and can record shared expenses.", href: "/socials" },
+          { step: "1", title: "Invite your group", body: "Create a group and invite friends by link or mobile number.", href: "/socials#invite" },
+          { step: "2", title: "Plan and calculate together", body: "Shortlist tours, chat, vote, and see the group's cost estimate from the same pricing engine used at checkout.", href: "/socials#plan" },
+          { step: "3", title: "Book and split expenses", body: "One person books for the group; everyone pays their own share and can record shared expenses.", href: "/socials#book-split" },
         ].map((item) => (
           <Link
             key={item.step}
@@ -43,14 +43,14 @@ export default function MySocialsExplainerPage() {
         <ul className="mt-4 grid grid-cols-1 gap-x-8 gap-y-1 text-sm sm:grid-cols-2">
           {[
             { label: "Friends, 1:1 messages & group chat", href: "/socials/friends" },
-            { label: "Vibe Check + a private secret budget", href: "/socials" },
+            { label: "Vibe Check + a private secret budget", href: "/socials#plan" },
             { label: "AI Trip Match & side-by-side compare", href: "/compare" },
-            { label: "Group voting & quick polls", href: "/socials" },
-            { label: "Pay-your-share group booking", href: "/socials" },
-            { label: "Trip countdown & readiness checklist", href: "/socials" },
-            { label: "Trek & pilgrimage essentials", href: "/socials" },
-            { label: "A Safety Center with SOS", href: "/socials" },
-            { label: "Post-trip memories, reviews & a final expense PDF", href: "/socials" },
+            { label: "Group voting & quick polls", href: "/socials#plan" },
+            { label: "Pay-your-share group booking", href: "/socials#book-split" },
+            { label: "Trip countdown & readiness checklist", href: "/socials#plan" },
+            { label: "Trek & pilgrimage essentials", href: "/socials#plan" },
+            { label: "A Safety Center with SOS", href: "/socials#book-split" },
+            { label: "Post-trip memories, reviews & a final expense PDF", href: "/socials#book-split" },
             { label: "Badges & a traveller profile", href: "/account/profile" },
           ].map((item) => (
             <li key={item.label}>
