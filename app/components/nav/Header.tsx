@@ -24,9 +24,19 @@ export default function Header() {
   const nextPath = searchParams.get("next");
   // A page that requires login redirects here with ?login=1&next=<path> instead
   // of silently bouncing the visitor to "/" — this opens the login dialog
-  // automatically (derived directly from the URL, not an effect) and sends
-  // them on to where they were trying to go once they sign in.
+  // automatically and sends them on to where they were trying to go once they
+  // sign in. The lazy initializer covers a fresh page load; the effect below
+  // covers navigating here via an already-mounted Header (Header lives in the
+  // root layout and never remounts on client-side navigation, so a *later*
+  // redirect to ?login=1 would otherwise never be noticed).
   const [loginOpen, setLoginOpen] = useState(() => searchParams.get("login") === "1");
+
+  useEffect(() => {
+    if (searchParams.get("login") === "1") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing to an external URL change, not derived render state
+      setLoginOpen(true);
+    }
+  }, [searchParams]);
   const [city, setCity] = useState<DepartureCityCode>("MUMBAI");
   const [condensed, setCondensed] = useState(false);
 
