@@ -40,7 +40,9 @@ export default function CompareClient() {
   const [city, setCity] = useState("MUMBAI");
   const [adults, setAdults] = useState(2);
   const [outputs, setOutputs] = useState<Record<string, PricingEngineOutput | null>>({});
-  const [loading, setLoading] = useState(true);
+  // Lazily derived from the initial URL: a bare /compare with no ?ids= has
+  // nothing to load, so it should never show "Loading…" at all.
+  const [loading, setLoading] = useState(() => !!ids);
   const [groups, setGroups] = useState<Group[]>([]);
   const [sharing, setSharing] = useState<string | null>(null);
   const [shared, setShared] = useState<Record<string, boolean>>({});

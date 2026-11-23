@@ -109,7 +109,11 @@ export default function Header() {
             </Link>
           )}
 
-          <Link href="/compare" className="relative hidden min-h-11 min-w-11 items-center justify-center rounded-md lg:flex" aria-label="Compare">
+          <Link
+            href={compareIds.length > 0 ? `/compare?ids=${compareIds.join(",")}` : "/compare"}
+            className="relative hidden min-h-11 min-w-11 items-center justify-center rounded-md lg:flex"
+            aria-label="Compare"
+          >
             <span aria-hidden="true">⇄</span>
             {compareIds.length > 0 && (
               <span className="badge-pop absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-xs font-semibold text-white">

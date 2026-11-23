@@ -45,11 +45,22 @@ export default function GroupFeed({ groupId, currentMemberId }: { groupId: strin
   const [pollDraft, setPollDraft] = useState<{ question: string; options: string[] } | null>(null);
   const [pollPosting, setPollPosting] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  // Several things can call refresh() close together (the poll interval, the
+  // window "focus" listener, and every action below) and their fetches can
+  // resolve out of order. Without this guard, a slower, older response can
+  // land after a newer one and overwrite the just-posted message/vote with
+  // stale data — so only the response to the most recently *started* request
+  // is ever applied.
+  const refreshSeq = useRef(0);
 
   const refresh = useCallback(() => {
+    const seq = ++refreshSeq.current;
     fetch(`/api/groups/${groupId}/feed`)
       .then((r) => r.json())
-      .then((data) => setItems([...(data.items ?? [])].reverse()));
+      .then((data) => {
+        if (seq !== refreshSeq.current) return;
+        setItems([...(data.items ?? [])].reverse());
+      });
   }, [groupId]);
 
   useEffect(() => {

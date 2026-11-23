@@ -1,3 +1,5 @@
+"use client";
+
 import { Check } from "lucide-react";
 
 export const CHECKOUT_STEPS = ["Travellers", "Rooms", "Add-ons", "Review", "Pay"] as const;
