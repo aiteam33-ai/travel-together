@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AuthAwareLink from "../components/socials/AuthAwareLink";
 
 export const metadata = {
   title: "My Socials — plan trips together | Parikrama",
@@ -22,7 +23,7 @@ export default function MySocialsExplainerPage() {
           { step: "2", title: "Plan and calculate together", body: "Shortlist tours, chat, vote, and see the group's cost estimate from the same pricing engine used at checkout.", href: "/socials#plan" },
           { step: "3", title: "Book and split expenses", body: "One person books for the group; everyone pays their own share and can record shared expenses.", href: "/socials#book-split" },
         ].map((item) => (
-          <Link
+          <AuthAwareLink
             key={item.step}
             href={item.href}
             className="group block rounded-xl border border-border bg-surface p-5 card-hover press-feedback"
@@ -33,7 +34,7 @@ export default function MySocialsExplainerPage() {
             <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-accent">
               Open in My Socials <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span>
             </span>
-          </Link>
+          </AuthAwareLink>
         ))}
       </div>
 
@@ -52,13 +53,21 @@ export default function MySocialsExplainerPage() {
             { label: "A Safety Center with SOS", href: "/socials#book-split" },
             { label: "Post-trip memories, reviews & a final expense PDF", href: "/socials#book-split" },
             { label: "Badges & a traveller profile", href: "/account/profile" },
-          ].map((item) => (
-            <li key={item.label}>
-              <Link href={item.href} className="inline-block py-1 text-foreground-muted underline-offset-2 hover:text-accent hover:underline">
-                {item.label}
-              </Link>
-            </li>
-          ))}
+          ].map((item) =>
+            item.href.includes("#") ? (
+              <li key={item.label}>
+                <AuthAwareLink href={item.href} className="inline-block py-1 text-foreground-muted underline-offset-2 hover:text-accent hover:underline">
+                  {item.label}
+                </AuthAwareLink>
+              </li>
+            ) : (
+              <li key={item.label}>
+                <Link href={item.href} className="inline-block py-1 text-foreground-muted underline-offset-2 hover:text-accent hover:underline">
+                  {item.label}
+                </Link>
+              </li>
+            )
+          )}
         </ul>
       </div>
 
