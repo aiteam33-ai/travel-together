@@ -2,42 +2,14 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
-import { getFriendIds } from "@/lib/friends/access";
-import CreateGroupForm from "@/app/components/socials/CreateGroupForm";
+import { getSocialsDashboardData } from "@/lib/socials/dashboard-data";
 import MarkSocialsSeen from "@/app/components/socials/MarkSocialsSeen";
-import { formatRupees } from "@/lib/pricing/format";
 
 export default async function SocialsPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/?login=1&next=/socials");
 
-  const [memberships, friendIds, incomingRequests, unreadDMs] = await Promise.all([
-    prisma.groupMember.findMany({
-      where: { userId: user.id, status: "JOINED" },
-      include: {
-        group: {
-          include: {
-            tour: true,
-            members: true,
-            bookings: { orderBy: { createdAt: "desc" }, take: 1 },
-            shortlist: true,
-            expenses: { where: { deletedAt: null } },
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    }),
-    getFriendIds(user.id),
-    prisma.friendRequest.count({ where: { toUserId: user.id, status: "PENDING" } }),
-    prisma.directMessage.count({ where: { toUserId: user.id, readAt: null } }),
-  ]);
-
-  const friends = friendIds.length
-    ? await prisma.user.findMany({ where: { id: { in: friendIds } }, select: { id: true, name: true } })
-    : [];
-
-  const groups = memberships.map((m) => m.group);
-  const upcomingTrips = groups.filter((g) => g.bookings[0] && g.bookings[0].status !== "CANCELLED");
+  const { groups } = await getSocialsDashboardData(user.id);
 
   const recentFeed = groups.length
     ? await prisma.groupFeedItem.findMany({
@@ -56,160 +28,31 @@ export default async function SocialsPage() {
         Connect with friends, plan together, and keep expenses straight — all in one place.
       </p>
 
-      {/* Step 1 — matches the "Invite your group" card on /my-socials (href="/socials#invite") */}
-      <section id="invite" className="mt-8 scroll-mt-20 rounded-2xl border border-border bg-surface p-6">
-        <div className="flex items-center gap-3">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-bold text-white">1</span>
-          <h2 className="font-heading text-lg font-bold">Invite your group</h2>
-        </div>
-        <p className="mt-2 text-sm text-foreground-muted">Create a trip group and bring your people in by link or mobile number.</p>
-
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Link href="/socials/friends" className="rounded-xl border border-border bg-background p-4 card-hover">
-            <h3 className="font-semibold">My Friends</h3>
-            <p className="mt-1 text-sm text-foreground-muted">{friends.length} friend{friends.length === 1 ? "" : "s"} · add more here</p>
-            {incomingRequests > 0 && (
-              <span className="mt-2 inline-block rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-white">
-                {incomingRequests} pending request{incomingRequests === 1 ? "" : "s"}
-              </span>
-            )}
+      <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+        {[
+          { step: "1", title: "Invite your group", body: "Create a group and invite friends by link or mobile number.", href: "/socials/invite" },
+          { step: "2", title: "Plan and calculate together", body: "Shortlist tours, chat, vote, and see each group's live cost estimate.", href: "/socials/plan" },
+          { step: "3", title: "Book and split expenses", body: "One person books for the group; everyone pays their own share.", href: "/socials/book-split" },
+        ].map((item) => (
+          <Link key={item.step} href={item.href} className="group block rounded-xl border border-border bg-surface p-5 card-hover press-feedback">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-sm font-bold text-white">{item.step}</span>
+            <h2 className="font-heading mt-3 font-semibold">{item.title}</h2>
+            <p className="mt-1 text-sm text-foreground-muted">{item.body}</p>
+            <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-accent">
+              Open <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span>
+            </span>
           </Link>
-          <Link href="/socials/messages" className="rounded-xl border border-border bg-background p-4 card-hover">
-            <h3 className="font-semibold">Messages</h3>
-            <p className="mt-1 text-sm text-foreground-muted">1:1 chats with friends</p>
-            {unreadDMs > 0 && (
-              <span className="mt-2 inline-block rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-white">
-                {unreadDMs} unread
-              </span>
-            )}
-          </Link>
-        </div>
+        ))}
+      </div>
 
-        <div className="mt-4 rounded-xl border border-border bg-background p-4">
-          <h3 className="font-semibold">Start a new trip group</h3>
-          <p className="mt-1 text-sm text-foreground-muted">Give it a name — you&apos;ll land straight on its invite link next.</p>
-          <div className="mt-3">
-            <CreateGroupForm />
-          </div>
-        </div>
-
-        {groups.length > 0 && (
-          <div className="mt-4 space-y-3">
-            <h3 className="font-semibold">Invite people to an existing group</h3>
-            {groups.map((group) => (
-              <div key={group.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-background p-4">
-                <div>
-                  <p className="font-semibold">{group.name}</p>
-                  <p className="text-sm text-foreground-muted">{group.members.filter((m) => m.status === "JOINED").length} joined</p>
-                </div>
-                <Link
-                  href={`/socials/${group.id}/members`}
-                  className="min-h-11 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white press-feedback hover:bg-accent-strong"
-                >
-                  Get invite link
-                </Link>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Step 2 — matches "Plan and calculate together" (href="/socials#plan") */}
-      <section id="plan" className="mt-6 scroll-mt-20 rounded-2xl border border-border bg-surface p-6">
-        <div className="flex items-center gap-3">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-bold text-white">2</span>
-          <h2 className="font-heading text-lg font-bold">Plan and calculate together</h2>
-        </div>
-        <p className="mt-2 text-sm text-foreground-muted">
-          Shortlist tours, chat, vote, and see each group&apos;s live cost estimate.
-        </p>
-
-        {groups.length === 0 ? (
-          <div className="mt-4 rounded-xl border border-dashed border-border p-6 text-center">
-            <p className="font-semibold">No groups yet</p>
-            <p className="mt-1 text-sm text-foreground-muted">
-              <Link href="#invite" className="text-accent underline underline-offset-2">Create a group above</Link> to start planning.
-            </p>
-          </div>
-        ) : (
-          <div className="mt-4 space-y-3">
-            {groups.map((group) => (
-              <div key={group.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-background p-4">
-                <div>
-                  <p className="font-semibold">{group.name}</p>
-                  <p className="text-sm text-foreground-muted">
-                    {group.tour ? group.tour.title : "No tour shortlisted yet"} · {group.shortlist.length} shortlisted · {group.members.filter((m) => m.status === "JOINED").length} joined
-                  </p>
-                </div>
-                <Link
-                  href={`/socials/${group.id}/plan`}
-                  className="min-h-11 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white press-feedback hover:bg-accent-strong"
-                >
-                  Open planning
-                </Link>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Step 3 — matches "Book and split expenses" (href="/socials#book-split") */}
-      <section id="book-split" className="mt-6 scroll-mt-20 rounded-2xl border border-border bg-surface p-6">
-        <div className="flex items-center gap-3">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-bold text-white">3</span>
-          <h2 className="font-heading text-lg font-bold">Book and split expenses</h2>
-        </div>
-        <p className="mt-2 text-sm text-foreground-muted">
-          One person books for the group; everyone pays their own share and can record shared expenses.
-        </p>
-
-        {groups.length === 0 ? (
-          <div className="mt-4 rounded-xl border border-dashed border-border p-6 text-center">
-            <p className="font-semibold">No groups yet</p>
-            <p className="mt-1 text-sm text-foreground-muted">
-              <Link href="#invite" className="text-accent underline underline-offset-2">Create a group above</Link> to start booking and splitting costs.
-            </p>
-          </div>
-        ) : (
-          <div className="mt-4 space-y-3">
-            {groups.map((group) => {
-              const totalExpense = group.expenses.reduce((sum, e) => sum + e.amountPaise, 0);
-              const booking = group.bookings[0];
-              return (
-                <div key={group.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-background p-4">
-                  <div>
-                    <p className="font-semibold">{group.name}</p>
-                    <p className="text-sm text-foreground-muted">
-                      {booking ? `Booking ${booking.status}` : "Not booked yet"}
-                      {group.expenses.length > 0 && <> · {formatRupees(totalExpense)} in shared expenses</>}
-                    </p>
-                  </div>
-                  <Link
-                    href={`/socials/${group.id}/plan#settle-up`}
-                    className="min-h-11 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white press-feedback hover:bg-accent-strong"
-                  >
-                    Open expenses
-                  </Link>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {upcomingTrips.length > 0 && (
-          <div className="mt-4 rounded-xl border border-border bg-background p-4">
-            <h3 className="font-semibold">Upcoming group trips</h3>
-            <ul className="mt-2 space-y-1 text-sm">
-              {upcomingTrips.map((g) => (
-                <li key={g.id}>
-                  <Link href={`/socials/${g.id}`} className="font-medium hover:text-accent">{g.name}</Link>
-                  <span className="text-foreground-muted"> · {g.bookings[0].status}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </section>
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Link href="/socials/friends" className="rounded-xl border border-border bg-surface p-4 card-hover">
+          <h2 className="font-semibold">My Friends</h2>
+        </Link>
+        <Link href="/socials/messages" className="rounded-xl border border-border bg-surface p-4 card-hover">
+          <h2 className="font-semibold">Messages</h2>
+        </Link>
+      </div>
 
       <div className="mt-6 rounded-xl border border-border bg-surface p-4">
         <h2 className="font-heading text-lg font-semibold">Group Discussions</h2>
@@ -232,7 +75,7 @@ export default async function SocialsPage() {
           <div className="mt-3 rounded-xl border border-dashed border-border p-8 text-center">
             <p className="font-semibold">No groups yet</p>
             <p className="mt-1 text-sm text-foreground-muted">
-              Create a group above, or ask a friend to send you an invite link.
+              <Link href="/socials/invite" className="text-accent underline underline-offset-2">Create a group</Link>, or ask a friend to send you an invite link.
             </p>
           </div>
         ) : (
