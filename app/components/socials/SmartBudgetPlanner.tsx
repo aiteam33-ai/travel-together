@@ -62,23 +62,34 @@ export default function SmartBudgetPlanner({
       travellers: String(travellerCount),
       days: String(Math.max(1, parseInt(days, 10) || 5)),
     });
-    const res = await fetch(`/api/groups/${groupId}/budget-match?${params.toString()}`);
-    const data = await res.json();
-    setLoading(false);
-    if (!res.ok) {
-      setError(data.error ?? "Could not generate a plan.");
-      return;
+    try {
+      const res = await fetch(`/api/groups/${groupId}/budget-match?${params.toString()}`);
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Could not generate a plan.");
+        return;
+      }
+      setResult(data);
+    } catch {
+      // A network hiccup (not a server error) shouldn't leave the button
+      // stuck on "Generating…" forever with no way to retry.
+      setError("Couldn't reach the server — check your connection and try again.");
+    } finally {
+      setLoading(false);
     }
-    setResult(data);
   }
 
   async function shortlist(tourId: string) {
-    await fetch(`/api/groups/${groupId}/shortlist`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tourId }),
-    });
-    showToast("Added to the group's shortlist");
+    try {
+      await fetch(`/api/groups/${groupId}/shortlist`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tourId }),
+      });
+      showToast("Added to the group's shortlist");
+    } catch {
+      showToast("Couldn't reach the server — try again");
+    }
   }
 
   async function shareToChat() {
@@ -92,13 +103,18 @@ export default function SmartBudgetPlanner({
         ? `Closest matching tours: ${result.matches.slice(0, 3).map((m) => m.title).join(", ")}.`
         : "No tours currently match this budget — try raising it or shortening the trip.",
     ];
-    await fetch(`/api/groups/${groupId}/feed`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: lines.join("\n"), messageKind: "TEXT" }),
-    });
-    setSharing(false);
-    showToast("Shared to the group chat");
+    try {
+      await fetch(`/api/groups/${groupId}/feed`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: lines.join("\n"), messageKind: "TEXT" }),
+      });
+      showToast("Shared to the group chat");
+    } catch {
+      showToast("Couldn't reach the server — try again");
+    } finally {
+      setSharing(false);
+    }
   }
 
   async function saveAsGroupBudget() {
@@ -106,19 +122,24 @@ export default function SmartBudgetPlanner({
     setSaving(true);
     const totalPaise = Math.round(Number(budget) * 100);
     const destination = result.matches[0]?.title ?? "Trip";
-    await fetch(`/api/groups/${groupId}/budget`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        destination,
-        travellers: Math.max(1, parseInt(travellers, 10) || 1),
-        days: Math.max(1, parseInt(days, 10) || 5),
-        budgetLimitPaise: totalPaise,
-        ...result.allocation,
-      }),
-    });
-    setSaving(false);
-    showToast("Saved as the group's trip budget");
+    try {
+      await fetch(`/api/groups/${groupId}/budget`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          destination,
+          travellers: Math.max(1, parseInt(travellers, 10) || 1),
+          days: Math.max(1, parseInt(days, 10) || 5),
+          budgetLimitPaise: totalPaise,
+          ...result.allocation,
+        }),
+      });
+      showToast("Saved as the group's trip budget");
+    } catch {
+      showToast("Couldn't reach the server — try again");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
