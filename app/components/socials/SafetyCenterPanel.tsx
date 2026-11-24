@@ -86,9 +86,31 @@ export default function SafetyCenterPanel({ groupId, isOrganiser }: { groupId: s
       });
 
     if (typeof navigator !== "undefined" && navigator.geolocation) {
+      // Browsers don't reliably start the `timeout` clock until the
+      // permission prompt is answered, so a slow/ignored prompt can leave
+      // this button stuck well past 5s — this is a safety feature, so a
+      // hard client-side fallback guarantees the SOS still sends (without
+      // location) no later than ~5s even if geolocation never calls back.
+      let settled = false;
+      const fallback = setTimeout(() => {
+        if (!settled) {
+          settled = true;
+          post();
+        }
+      }, 5000);
       navigator.geolocation.getCurrentPosition(
-        (pos) => post(pos.coords.latitude, pos.coords.longitude),
-        () => post(),
+        (pos) => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(fallback);
+          post(pos.coords.latitude, pos.coords.longitude);
+        },
+        () => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(fallback);
+          post();
+        },
         { timeout: 5000 }
       );
     } else {

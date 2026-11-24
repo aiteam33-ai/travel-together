@@ -42,7 +42,7 @@ export default function WelcomeHero() {
 
   return (
     <section className="relative -mx-6 -mt-8 overflow-hidden rounded-b-3xl md:rounded-b-[2.5rem]">
-      <div className="relative h-[560px] w-full md:h-[640px]">
+      <div className="relative min-h-[560px] w-full md:h-[640px]">
         {/* Crossfading background video slides, each with a real-photo poster fallback */}
         {SLIDES.map((slide, i) => (
           <div
@@ -84,7 +84,7 @@ export default function WelcomeHero() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/10" aria-hidden="true" />
 
         {/* Foreground content */}
-        <div className="relative flex h-full flex-col justify-end gap-6 p-6 pb-10 text-white md:justify-center md:p-14">
+        <div className="relative flex min-h-full flex-col justify-end gap-6 p-6 pb-10 text-white md:h-full md:justify-center md:p-14">
           <div data-intro="headline">
             <p className="font-heading text-sm font-bold uppercase tracking-[0.2em] text-white/90">Travel, together</p>
             <h1 className="font-heading mt-3 max-w-2xl text-4xl font-extrabold leading-tight drop-shadow-sm md:text-6xl">
