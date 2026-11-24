@@ -73,7 +73,8 @@ export default function LoginModal({ onClose, onSuccess }: { onClose: () => void
       body: JSON.stringify({ identifier: idf, channel: mode === "phone" ? "SMS" : "EMAIL" }),
     });
     if (!res.ok) {
-      setError("Could not send OTP. Please try again.");
+      const data = await res.json().catch(() => null);
+      setError(data?.error ?? "Could not send OTP. Please try again.");
       return;
     }
     setIdentifier(idf);

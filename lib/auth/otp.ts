@@ -3,9 +3,19 @@ import { sendMessage } from "../mocks/outbox";
 
 const OTP_TTL_MINUTES = 5;
 const MAX_ATTEMPTS = 5;
+const REQUEST_RATE_LIMIT_PER_HOUR = 5;
 
 function generateCode() {
   return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// Unauthenticated endpoint (no userId yet to key off), so this limits by the
+// identifier itself — stops someone from flooding a phone/email with OTP
+// requests (SMS bombing) or bloating the OtpCode table.
+async function checkRequestRateLimit(identifier: string): Promise<boolean> {
+  const since = new Date(Date.now() - 60 * 60 * 1000);
+  const count = await prisma.otpCode.count({ where: { identifier, createdAt: { gte: since } } });
+  return count < REQUEST_RATE_LIMIT_PER_HOUR;
 }
 
 /**
@@ -13,7 +23,13 @@ function generateCode() {
  * instead of sending a real SMS/email. Swap sendMessage's body for a real
  * provider later without changing any call site.
  */
-export async function requestOtp(identifier: string, channel: "SMS" | "EMAIL" = "SMS") {
+export async function requestOtp(
+  identifier: string,
+  channel: "SMS" | "EMAIL" = "SMS"
+): Promise<{ sent: boolean; reason?: string }> {
+  if (!(await checkRequestRateLimit(identifier))) {
+    return { sent: false, reason: "Too many OTP requests. Please try again in an hour." };
+  }
   const code = generateCode();
   const expiresAt = new Date(Date.now() + OTP_TTL_MINUTES * 60 * 1000);
   await prisma.otpCode.create({ data: { identifier, code, expiresAt } });

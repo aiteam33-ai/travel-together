@@ -10,6 +10,7 @@ const schema = z.object({
 export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) return NextResponse.json({ error: "Invalid phone or email." }, { status: 400 });
-  await requestOtp(parsed.data.identifier, parsed.data.channel);
+  const result = await requestOtp(parsed.data.identifier, parsed.data.channel);
+  if (!result.sent) return NextResponse.json({ error: result.reason }, { status: 429 });
   return NextResponse.json({ sent: true });
 }
