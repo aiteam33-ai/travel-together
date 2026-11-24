@@ -43,7 +43,7 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
 
       <section>
         <div className="mb-4 flex items-center justify-between">
-          <h1 className="font-heading text-2xl font-bold">{results.length} tours found</h1>
+          <h1 className="font-heading text-2xl font-bold">{results.length} {results.length === 1 ? "tour" : "tours"} found</h1>
           <SortSelect />
         </div>
 
