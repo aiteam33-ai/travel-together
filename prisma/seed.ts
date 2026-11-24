@@ -45,6 +45,7 @@ interface TourSeed {
   durationNights: number;
   mealPlan: string[];
   isInternational?: boolean;
+  country?: string; // comma-separated for multi-country itineraries — international tours only
   difficulty?: string;
   altitudeMeters?: number;
   fitnessNote?: string;
@@ -419,6 +420,7 @@ const TOURS: TourSeed[] = [
     cityUplift: 15000,
     departureCount: 4,
     isInternational: true,
+    country: "Nepal",
     difficulty: "Difficult",
     altitudeMeters: 5364,
     fitnessNote: "Requires the ability to walk 6-8 hours a day on uneven terrain for multiple consecutive days. We recommend 2-3 months of cardio and stair-climbing training beforehand.",
@@ -504,6 +506,7 @@ const TOURS: TourSeed[] = [
     durationNights: 5,
     mealPlan: ["VEG", "NON_VEG", "JAIN"],
     isInternational: true,
+    country: "Singapore, Malaysia",
     basePricePerPerson: 68500,
     cityUplift: 14000,
     departureCount: 6,
@@ -524,6 +527,7 @@ const TOURS: TourSeed[] = [
     durationNights: 6,
     mealPlan: ["VEG", "NON_VEG", "JAIN"],
     isInternational: true,
+    country: "Thailand",
     basePricePerPerson: 59500,
     cityUplift: 13000,
     departureCount: 6,
@@ -544,6 +548,7 @@ const TOURS: TourSeed[] = [
     durationNights: 4,
     mealPlan: ["VEG", "NON_VEG", "JAIN"],
     isInternational: true,
+    country: "UAE",
     basePricePerPerson: 54500,
     cityUplift: 11000,
     departureCount: 7,
@@ -564,6 +569,7 @@ const TOURS: TourSeed[] = [
     durationNights: 5,
     mealPlan: ["VEG", "NON_VEG"],
     isInternational: true,
+    country: "Indonesia",
     basePricePerPerson: 72500,
     cityUplift: 14500,
     departureCount: 4,
@@ -584,6 +590,7 @@ const TOURS: TourSeed[] = [
     durationNights: 8,
     mealPlan: ["VEG", "NON_VEG", "JAIN"],
     isInternational: true,
+    country: "Switzerland, France",
     basePricePerPerson: 165000,
     cityUplift: 22000,
     departureCount: 3,
@@ -633,6 +640,7 @@ const TOURS: TourSeed[] = [
     durationNights: 6,
     mealPlan: ["VEG", "NON_VEG", "JAIN"],
     isInternational: true,
+    country: "Vietnam",
     basePricePerPerson: 62500,
     cityUplift: 13500,
     departureCount: 3,
@@ -749,6 +757,7 @@ async function main() {
         title: t.title,
         category: t.category,
         region: REGION_BY_TITLE[t.title] ?? null,
+        country: t.country ?? null,
         tags: t.tags.join(","),
         summary: t.summary,
         description: t.description,

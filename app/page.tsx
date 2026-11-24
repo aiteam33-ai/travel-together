@@ -5,7 +5,7 @@ import {
   ShieldCheck, Accessibility, Calculator, Star, MapPin, CalendarCheck,
 } from "lucide-react";
 import { prisma } from "@/lib/db/client";
-import { getTourCounts, getFastFillingDepartures } from "@/lib/data/tours";
+import { getTourCounts, getFastFillingDepartures, getFeaturedInternationalTours } from "@/lib/data/tours";
 import TourCard from "./components/TourCard";
 import ScrollRow from "./components/landing/ScrollRow";
 import LandingIntro from "./components/landing/LandingIntro";
@@ -37,9 +37,10 @@ const REGION_ICONS: Record<IndiaRegion, React.ElementType> = {
 };
 
 export default async function HomePage() {
-  const [{ tourCount, departureCount, travellersServed }, fastFilling, reviews] = await Promise.all([
+  const [{ tourCount, departureCount, travellersServed }, fastFilling, worldTours, reviews] = await Promise.all([
     getTourCounts(),
-    getFastFillingDepartures(6),
+    getFastFillingDepartures(6, false),
+    getFeaturedInternationalTours(6),
     prisma.review.findMany({ orderBy: { createdAt: "desc" }, take: 6, include: { tour: true } }),
   ]);
 
@@ -65,6 +66,31 @@ export default async function HomePage() {
                   cheapestPricePerPerson={d.basePricePerPerson}
                   nextDates={[d.startDate]}
                   seatsLeft={d.seatsLeft}
+                />
+              </div>
+            ))}
+          </ScrollRow>
+        </RevealOnScroll>
+      )}
+
+      {worldTours.length > 0 && (
+        <RevealOnScroll as="section">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="font-heading text-2xl font-bold">Explore the world</h2>
+            <Link href="/destinations" className="text-sm font-semibold text-accent hover:underline">See all destinations</Link>
+          </div>
+          <ScrollRow>
+            {worldTours.map(({ tour, futureDepartures, cheapestPricePerPerson }) => (
+              <div key={tour.id} className="w-72 shrink-0 snap-start">
+                <TourCard
+                  tourId={tour.id}
+                  slug={tour.slug}
+                  title={tour.title}
+                  heroImage={tour.heroImage}
+                  durationDays={tour.durationDays}
+                  durationNights={tour.durationNights}
+                  cheapestPricePerPerson={cheapestPricePerPerson}
+                  nextDates={futureDepartures.slice(0, 3).map((d) => d.startDate)}
                 />
               </div>
             ))}

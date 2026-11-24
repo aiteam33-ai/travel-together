@@ -3,6 +3,7 @@ export type Locale = "en" | "hi";
 // Keep this flat so Marathi/Gujarati can be added as new top-level keys later.
 export const DICTIONARY: Record<string, Record<Locale, string>> = {
   "nav.india": { en: "India", hi: "भारत" },
+  "nav.global": { en: "Global", hi: "विश्व" },
   "nav.regions": { en: "Regions", hi: "क्षेत्र" },
   "nav.treks": { en: "Treks", hi: "ट्रेक" },
   "nav.speciality": { en: "Speciality", hi: "विशेष" },

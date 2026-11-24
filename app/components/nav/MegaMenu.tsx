@@ -10,6 +10,7 @@ import { INDIA_REGIONS, INDIA_REGION_LABELS } from "@/lib/pricing/constants";
 
 const MENU_ITEMS: { key: string; href: string; subItems?: { label: string; href: string }[] }[] = [
   { key: "nav.india", href: "/tours?category=DOMESTIC" },
+  { key: "nav.global", href: "/destinations" },
   {
     key: "nav.regions",
     href: "/tours",

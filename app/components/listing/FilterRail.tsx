@@ -7,14 +7,18 @@ import { X, SlidersHorizontal } from "lucide-react";
 import { TOUR_CATEGORIES, INDIA_REGIONS, INDIA_REGION_LABELS, TRAVELLER_TAGS, MEAL_PLAN_TYPES } from "@/lib/pricing/constants";
 import { usePrefersReducedMotion } from "@/lib/motion/reduced-motion";
 
-// The catalogue is India-only (see lib/data/tours.ts) — INTERNATIONAL isn't a
-// browsable category here even though the field still exists in the schema.
-const BROWSABLE_CATEGORIES = TOUR_CATEGORIES.filter((c) => c !== "INTERNATIONAL");
+const BROWSABLE_CATEGORIES = TOUR_CATEGORIES;
+
+// Finite, hand-maintained list matching the countries actually seeded today
+// (see lib/destinations.ts) — a dropdown of distinct DB values would also
+// work, but this needs no extra query and stays in sync with the seed data.
+const INTERNATIONAL_COUNTRIES = ["Singapore", "Malaysia", "Thailand", "UAE", "Indonesia", "Switzerland", "France", "Vietnam", "Nepal"];
 
 interface SearchParams {
   destination?: string;
   category?: string;
   region?: string;
+  country?: string;
   tag?: string;
   minBudget?: string;
   maxBudget?: string;
@@ -62,6 +66,21 @@ function FilterContent({ sp, onNavigate }: { sp: SearchParams; onNavigate?: () =
           ))}
         </ul>
       </div>
+      {sp.category === "INTERNATIONAL" && (
+        <div>
+          <h2 className="mb-2 font-semibold">Country</h2>
+          <ul className="space-y-1 text-sm">
+            <li><Link onClick={onNavigate} className={`block min-h-11 py-1.5 ${!sp.country ? "font-bold text-accent" : ""}`} href={buildHref(sp, { country: undefined })}>All countries</Link></li>
+            {INTERNATIONAL_COUNTRIES.map((c) => (
+              <li key={c}>
+                <Link onClick={onNavigate} className={`block min-h-11 py-1.5 ${sp.country === c ? "font-bold text-accent" : ""}`} href={buildHref(sp, { country: c })}>
+                  {c}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <div>
         <h2 className="mb-2 font-semibold">Traveller type</h2>
         <ul className="space-y-1 text-sm">

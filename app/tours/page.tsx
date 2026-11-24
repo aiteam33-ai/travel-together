@@ -9,6 +9,7 @@ interface SearchParams {
   destination?: string;
   category?: string;
   region?: string;
+  country?: string;
   tag?: string;
   minBudget?: string;
   maxBudget?: string;
@@ -27,6 +28,7 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
     destination: sp.destination,
     category: sp.category,
     region: sp.region,
+    country: sp.country,
     tag: sp.tag,
     minBudget: sp.minBudget ? Number(sp.minBudget) : undefined,
     maxBudget: sp.maxBudget ? Number(sp.maxBudget) : undefined,

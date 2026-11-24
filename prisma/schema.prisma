@@ -62,6 +62,7 @@ model Tour {
   title         String
   category      String
   region        String?      // NORTH, SOUTH, EAST, WEST, NORTHEAST, CENTRAL, ISLANDS — domestic (India) tours only
+  country       String?      // display country/countries name — international tours only, see lib/destinations.ts for continent grouping
   tags          String       // comma-separated TravellerTag
   summary       String
   description   String
