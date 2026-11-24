@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { computeBudgetSummary, compareEstimateVsActual } from "./engine";
+import { computeBudgetSummary, compareEstimateVsActual, allocateBudget } from "./engine";
 
 describe("computeBudgetSummary", () => {
   it("matches the Goa worked example", () => {
@@ -36,6 +36,27 @@ describe("computeBudgetSummary", () => {
       0
     );
     expect(summary.perPersonPaise).toBe(1000);
+  });
+});
+
+describe("allocateBudget", () => {
+  it("splits by BUDGET_SPLIT_PERCENTS and sums back to the exact total", () => {
+    const result = allocateBudget(10000000); // Rs. 1,00,000
+    const sum = Object.values(result).reduce((s, v) => s + v, 0);
+    expect(sum).toBe(10000000);
+    expect(result.accommodationPaise).toBe(3500000); // 35%
+    expect(result.transportPaise).toBe(2500000); // 25%
+  });
+
+  it("never loses or invents paise on an amount that doesn't divide evenly", () => {
+    const result = allocateBudget(999997);
+    const sum = Object.values(result).reduce((s, v) => s + v, 0);
+    expect(sum).toBe(999997);
+  });
+
+  it("handles a zero budget", () => {
+    const result = allocateBudget(0);
+    expect(Object.values(result).every((v) => v === 0)).toBe(true);
   });
 });
 

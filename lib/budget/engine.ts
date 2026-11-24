@@ -60,6 +60,41 @@ export function computeBudgetSummary(
   };
 }
 
+// Default category split for the Smart Budget Planner (My Socials) — given
+// one total budget, this is how it's divided before any tours are matched.
+// Accommodation and transport dominate a typical fixed-departure trip; the
+// remainder covers food, activities, shopping and a small buffer. These are
+// starting percentages, not a hard rule — a user can always switch to the
+// manual calculator above to set exact numbers instead.
+export const BUDGET_SPLIT_PERCENTS: Record<keyof BudgetCategories, number> = {
+  accommodationPaise: 35,
+  transportPaise: 25,
+  foodPaise: 20,
+  activitiesPaise: 12,
+  shoppingPaise: 5,
+  otherPaise: 3,
+};
+
+/** Splits one total trip budget into the standard categories by BUDGET_SPLIT_PERCENTS. */
+export function allocateBudget(totalPaise: number): BudgetCategories {
+  const keys = Object.keys(BUDGET_SPLIT_PERCENTS) as (keyof BudgetCategories)[];
+  const result = {} as BudgetCategories;
+  let allocated = 0;
+  // Whole-paise rounding: every category but the last gets its exact share;
+  // the last absorbs the rounding remainder so the categories always sum to
+  // exactly totalPaise (no stray paise lost or invented).
+  keys.forEach((key, i) => {
+    if (i === keys.length - 1) {
+      result[key] = totalPaise - allocated;
+    } else {
+      const amount = Math.round((totalPaise * BUDGET_SPLIT_PERCENTS[key]) / 100);
+      result[key] = amount;
+      allocated += amount;
+    }
+  });
+  return result;
+}
+
 /** Compares the planned (estimated) budget against the group's actual logged expenses. */
 export function compareEstimateVsActual(estimatedTotalPaise: number, actualTotalPaise: number) {
   const differencePaise = actualTotalPaise - estimatedTotalPaise;

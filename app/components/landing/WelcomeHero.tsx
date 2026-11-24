@@ -1,61 +1,78 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import SearchBar from "../SearchBar";
 import Link from "next/link";
 import { usePrefersReducedMotion } from "@/lib/motion/reduced-motion";
 import { tourPhotoUrl } from "@/lib/tour-photos";
 
-// A handful of real destination photos already used elsewhere in the
-// catalogue (lib/tour-photos.ts) — reused here as a slow-crossfading,
-// Ken-Burns-animated background so the welcome hero feels alive without
-// shipping an actual video file.
+// Real, free-to-use (Mixkit Free License, no attribution required) travel
+// scenery clips — muted/looped/playsInline below, with a photo poster as the
+// fallback frame while the video loads or if it fails, and reduced-motion
+// visitors get the poster only (no autoplay). Kept short (360p, each well
+// under 4MB) so this never becomes a performance problem on mobile data.
 const SLIDES = [
-  { url: "https://images.unsplash.com/photo-1621232082074-1a7750ecc557", label: "Kashmir" }, // Kashmir Paradise
-  { url: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2", label: "Goa" }, // Goa Beaches
-  { url: "https://images.unsplash.com/photo-1581793745862-99fde7fa73d2", label: "Ladakh" }, // Ladakh
-  { url: "https://images.unsplash.com/photo-1661924326425-c14a6426d989", label: "Rajasthan" }, // Rajasthan Royal Circuit
-  { url: "https://images.unsplash.com/photo-1586053226626-febc8817962f", label: "Andaman" }, // Andaman Islands
-  { url: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944", label: "Kerala" }, // Kerala Backwaters
+  {
+    video: "https://assets.mixkit.co/videos/2168/2168-360.mp4",
+    poster: tourPhotoUrl("https://images.unsplash.com/photo-1512343879784-a960bf40e7f2", 1600, 900),
+    label: "Beach",
+  },
+  {
+    video: "https://assets.mixkit.co/videos/4132/4132-360.mp4",
+    poster: tourPhotoUrl("https://images.unsplash.com/photo-1581793745862-99fde7fa73d2", 1600, 900),
+    label: "Mountains",
+  },
+  {
+    video: "https://assets.mixkit.co/videos/41576/41576-360.mp4",
+    poster: tourPhotoUrl("https://images.unsplash.com/photo-1661924326425-c14a6426d989", 1600, 900),
+    label: "Road trip",
+  },
 ];
-
-const SLIDE_MS = 6000;
 
 export default function WelcomeHero() {
   const reduced = usePrefersReducedMotion();
   const [active, setActive] = useState(0);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   useEffect(() => {
     if (reduced) return;
-    const interval = setInterval(() => setActive((i) => (i + 1) % SLIDES.length), SLIDE_MS);
-    return () => clearInterval(interval);
-  }, [reduced]);
+    const video = videoRefs.current[active];
+    video?.play().catch(() => {}); // autoplay can be blocked until the first user gesture on some mobile browsers — fails silently, poster stays visible
+  }, [active, reduced]);
 
   return (
     <section className="relative -mx-6 -mt-8 overflow-hidden rounded-b-3xl md:rounded-b-[2.5rem]">
       <div className="relative h-[560px] w-full md:h-[640px]">
-        {/* Crossfading, slowly-zooming destination photos — the "background video" */}
+        {/* Crossfading background video slides, each with a real-photo poster fallback */}
         {SLIDES.map((slide, i) => (
           <div
-            key={slide.url}
+            key={slide.video}
             className={`absolute inset-0 transition-opacity duration-[1500ms] ease-in-out ${i === active ? "opacity-100" : "opacity-0"}`}
             aria-hidden={i !== active}
           >
-            <div className={`h-full w-full ${reduced ? "" : "hero-slide"}`}>
-              <Image
-                src={tourPhotoUrl(slide.url, 1600, 900)}
-                alt=""
-                fill
-                priority={i === 0}
-                sizes="100vw"
-                className="object-cover"
+            {reduced ? (
+              // eslint-disable-next-line @next/next/no-img-element -- static poster only, no motion, intentional plain <img>
+              <img src={slide.poster} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <video
+                ref={(el) => {
+                  videoRefs.current[i] = el;
+                }}
+                className="h-full w-full object-cover"
+                poster={slide.poster}
+                src={slide.video}
+                muted
+                loop
+                playsInline
+                autoPlay={i === 0}
+                preload={i === 0 ? "auto" : "none"}
+                aria-hidden="true"
               />
-            </div>
+            )}
           </div>
         ))}
 
-        {/* Drifting colour orbs for extra depth/creativity over the photo */}
+        {/* Drifting colour orbs for extra depth/creativity over the video */}
         <div className={`absolute -left-20 -top-20 h-72 w-72 rounded-full bg-accent/30 blur-3xl ${reduced ? "" : "hero-orb"}`} aria-hidden="true" />
         <div
           className={`absolute -right-24 bottom-0 h-80 w-80 rounded-full bg-white/20 blur-3xl ${reduced ? "" : "hero-orb"}`}
@@ -103,7 +120,7 @@ export default function WelcomeHero() {
         <div className="absolute bottom-3 right-4 z-10 flex gap-1.5 md:bottom-5 md:right-6">
           {SLIDES.map((slide, i) => (
             <button
-              key={slide.url}
+              key={slide.video}
               type="button"
               onClick={() => setActive(i)}
               aria-label={`Show ${slide.label} background`}

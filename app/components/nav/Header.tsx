@@ -39,17 +39,31 @@ export default function Header() {
   }, [searchParams]);
   const [city, setCity] = useState<DepartureCityCode>("MUMBAI");
   const [condensed, setCondensed] = useState(false);
+  const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
+    let lastY = window.scrollY;
     function onScroll() {
-      setCondensed(window.scrollY > 80);
+      const y = window.scrollY;
+      setCondensed(y > 80);
+      // Hide while scrolling down past the header's own height (so it
+      // doesn't flicker right at the top), show again on any upward scroll —
+      // the standard "give the page room, but never make nav hard to find"
+      // pattern.
+      if (y > lastY && y > 120) setHidden(true);
+      else if (y < lastY) setHidden(false);
+      lastY = y;
     }
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur print:hidden">
+    <header
+      className={`sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur print:hidden transition-transform duration-300 ${
+        hidden ? "-translate-y-full" : "translate-y-0"
+      }`}
+    >
       <a href="#main-content" className="skip-link">Skip to content</a>
       <div
         className={`mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-6 transition-[padding] duration-200 ${
