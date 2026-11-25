@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { prisma } from "../db/client";
 import { randomBytes } from "crypto";
@@ -20,14 +21,17 @@ export async function createSession(userId: string) {
   return token;
 }
 
-export async function getCurrentUser() {
+// Called from ~90 places across the app, often more than once per request
+// (a group's layout and its page both call it, for example) — cache() dedupes
+// those into a single DB round trip per request instead of one each.
+export const getCurrentUser = cache(async () => {
   const jar = await cookies();
   const token = jar.get(SESSION_COOKIE)?.value;
   if (!token) return null;
   const session = await prisma.session.findUnique({ where: { token }, include: { user: true } });
   if (!session || session.expiresAt < new Date()) return null;
   return session.user;
-}
+});
 
 export async function destroySession() {
   const jar = await cookies();

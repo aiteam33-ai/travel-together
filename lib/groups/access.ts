@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { prisma } from "../db/client";
 
 /**
@@ -11,13 +12,16 @@ export async function getMembership(groupId: string, userId: string) {
   });
 }
 
-export async function requireMembership(groupId: string, userId: string) {
+// A group's layout and its page both call this for the same (groupId, userId)
+// within one request — cache() dedupes that into one membership + one group
+// query instead of two of each.
+export const requireMembership = cache(async (groupId: string, userId: string) => {
   const membership = await getMembership(groupId, userId);
   if (!membership) return null;
   const group = await prisma.group.findUnique({ where: { id: groupId } });
   if (!group) return null;
   return { group, membership };
-}
+});
 
 export async function logEvent(type: string, userId?: string, metadata?: Record<string, unknown>) {
   await prisma.productEvent.create({

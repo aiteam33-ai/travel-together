@@ -10,13 +10,15 @@ export default async function TripCostCalculatorPage({
   searchParams: Promise<{ tourSlug?: string }>;
 }) {
   const sp = await searchParams;
-  const tours = await prisma.tour.findMany({
-    where: sp.tourSlug ? { slug: sp.tourSlug } : undefined,
-    include: { departures: true },
-    orderBy: { title: "asc" },
-  });
-  const selectedSlug = sp.tourSlug ?? tours[0]?.slug;
-  const selectedTour = tours.find((t) => t.slug === selectedSlug) ?? tours[0];
+  // The picker's own list only ever needs slug+title; fetching every tour's
+  // full departures just to find one was wasted work, done twice over (once
+  // here, once more for this same list) — one lightweight query decides the
+  // slug, then a single findUnique loads the one tour actually needed.
+  const allTours = await prisma.tour.findMany({ select: { slug: true, title: true }, orderBy: { title: "asc" } });
+  const selectedSlug = sp.tourSlug ?? allTours[0]?.slug;
+  const selectedTour = selectedSlug
+    ? await prisma.tour.findUnique({ where: { slug: selectedSlug }, include: { departures: true } })
+    : null;
 
   if (!selectedTour) {
     return <p>No tours available yet.</p>;
@@ -25,8 +27,6 @@ export default async function TripCostCalculatorPage({
   const futureDepartures = selectedTour.departures
     .filter((d) => d.startDate >= new Date())
     .map((d) => ({ id: d.id, startDate: d.startDate.toISOString(), seatsLeft: d.totalSeats - d.seatsBooked }));
-
-  const allTours = await prisma.tour.findMany({ select: { slug: true, title: true }, orderBy: { title: "asc" } });
 
   return (
     <div>
