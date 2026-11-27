@@ -9,7 +9,25 @@ import ReadinessPanel from "@/app/components/socials/ReadinessPanel";
 import TrekEssentialsPanel from "@/app/components/socials/TrekEssentialsPanel";
 import SafetyCenterPanel from "@/app/components/socials/SafetyCenterPanel";
 import { deriveBestSeason } from "@/lib/trek/essentials";
+import {
+  getReadinessData,
+  getFeedData,
+  getChecklistData,
+  getFitnessRating,
+  getSafetyData,
+  getSosData,
+  getSharesData,
+} from "@/lib/groups/panel-data";
 import Link from "next/link";
+
+// These panels' props mirror exactly what their own API routes return over
+// JSON (same shape, same union-typed enum fields) — so normalizing the
+// server-fetched data through a JSON round-trip here (Dates -> ISO strings)
+// makes it identical to what the client fetch would have produced, and the
+// component prop types below can stay unchanged.
+function asJson<T>(data: unknown): T {
+  return JSON.parse(JSON.stringify(data)) as T;
+}
 
 export default async function GroupOverviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -26,6 +44,21 @@ export default async function GroupOverviewPage({ params }: { params: Promise<{ 
   const joinedMembers = group.members.filter((m) => m.status === "JOINED");
   const estimate = group.estimateSnapshotJson ? JSON.parse(group.estimateSnapshotJson) : null;
   const booking = group.bookings[0];
+  const isTrekOrPilgrimage = group.tour?.category === "TREK" || group.tour?.category === "PILGRIMAGE";
+
+  // Every panel below used to fetch its own data client-side after mount —
+  // up to 8 separate round trips firing only once the shell had already
+  // painted. Fetching them all here, in parallel, means each panel renders
+  // with real data on first paint instead of a skeleton.
+  const [readiness, feed, checklist, fitness, safety, sos, shares] = await Promise.all([
+    group.tour ? getReadinessData(id, ctx) : null,
+    getFeedData(id),
+    isTrekOrPilgrimage ? getChecklistData(id, ctx) : null,
+    isTrekOrPilgrimage ? getFitnessRating(ctx) : null,
+    getSafetyData(id, ctx),
+    getSosData(id),
+    booking ? getSharesData(booking.id, ctx) : null,
+  ]);
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
@@ -60,17 +93,25 @@ export default async function GroupOverviewPage({ params }: { params: Promise<{ 
           {!booking && <p className="mt-2 text-sm text-foreground-muted">Not booked yet.</p>}
         </section>
 
-        {booking && <GroupPaymentsPanel bookingId={booking.id} currentMemberId={ctx.membership.id} isOrganiser={ctx.membership.role === "ORGANISER"} />}
+        {booking && shares && (
+          <GroupPaymentsPanel bookingId={booking.id} currentMemberId={ctx.membership.id} isOrganiser={ctx.membership.role === "ORGANISER"} initialData={asJson(shares)} />
+        )}
 
-        {group.tour && <ReadinessPanel groupId={id} />}
+        {group.tour && readiness && <ReadinessPanel groupId={id} initialData={asJson(readiness)} />}
 
-        {group.tour && (group.tour.category === "TREK" || group.tour.category === "PILGRIMAGE") && (
-          <TrekEssentialsPanel groupId={id} bestSeason={deriveBestSeason(group.tour)} difficulty={group.tour.difficulty} />
+        {isTrekOrPilgrimage && checklist && (
+          <TrekEssentialsPanel
+            groupId={id}
+            bestSeason={deriveBestSeason(group.tour!)}
+            difficulty={group.tour!.difficulty}
+            initialChecklist={asJson(checklist)}
+            initialFitness={fitness}
+          />
         )}
 
         <section className="rounded-xl border border-border bg-surface p-4">
           <h2 className="mb-2 font-semibold">Activity</h2>
-          <GroupFeed groupId={id} currentMemberId={ctx.membership.id} />
+          <GroupFeed groupId={id} currentMemberId={ctx.membership.id} initialData={asJson(feed)} />
         </section>
       </div>
 
@@ -84,7 +125,7 @@ export default async function GroupOverviewPage({ params }: { params: Promise<{ 
           </ul>
         </section>
         {ctx.membership.role === "ORGANISER" && <InviteWidget groupId={id} />}
-        <SafetyCenterPanel groupId={id} isOrganiser={ctx.membership.role === "ORGANISER"} />
+        <SafetyCenterPanel groupId={id} isOrganiser={ctx.membership.role === "ORGANISER"} initialSafety={asJson(safety)} initialSos={asJson(sos)} />
       </aside>
     </div>
   );

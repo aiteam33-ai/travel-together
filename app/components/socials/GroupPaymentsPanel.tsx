@@ -40,14 +40,16 @@ export default function GroupPaymentsPanel({
   bookingId,
   currentMemberId,
   isOrganiser,
+  initialData,
 }: {
   bookingId: string;
   currentMemberId: string;
   isOrganiser: boolean;
+  initialData?: { booking: BookingData; shares: Share[] };
 }) {
-  const [booking, setBooking] = useState<BookingData | null>(null);
-  const [shares, setShares] = useState<Share[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [booking, setBooking] = useState<BookingData | null>(initialData?.booking ?? null);
+  const [shares, setShares] = useState<Share[]>(initialData?.shares ?? []);
+  const [loading, setLoading] = useState(!initialData);
   const [busyId, setBusyId] = useState<string | null>(null);
 
   const refresh = useCallback(() => {
@@ -61,8 +63,9 @@ export default function GroupPaymentsPanel({
   }, [bookingId]);
 
   useEffect(() => {
-    refresh();
-  }, [refresh]);
+    if (!initialData) refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const holdCountdown = useCountdown(booking?.status === "HELD" ? booking.holdExpiresAt : null);
 

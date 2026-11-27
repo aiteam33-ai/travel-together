@@ -23,16 +23,33 @@ interface SosAlert {
   member: { name: string };
 }
 
-export default function SafetyCenterPanel({ groupId, isOrganiser }: { groupId: string; isOrganiser: boolean }) {
-  const [contacts, setContacts] = useState<Contact[]>([]);
-  const [myMemberId, setMyMemberId] = useState<string | null>(null);
-  const [tripLeader, setTripLeader] = useState<{ name: string; phone: string | null } | null>(null);
-  const [alerts, setAlerts] = useState<SosAlert[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [medicalNotes, setMedicalNotes] = useState("");
-  const [consent, setConsent] = useState(false);
+interface SafetyData {
+  contacts: Contact[];
+  myMemberId: string;
+  tripLeader: { name: string; phone: string | null } | null;
+}
+
+export default function SafetyCenterPanel({
+  groupId,
+  isOrganiser,
+  initialSafety,
+  initialSos,
+}: {
+  groupId: string;
+  isOrganiser: boolean;
+  initialSafety?: SafetyData;
+  initialSos?: { alerts: SosAlert[] };
+}) {
+  const mineFromInitial = initialSafety?.contacts.find((c) => c.memberId === initialSafety.myMemberId);
+  const [contacts, setContacts] = useState<Contact[]>(initialSafety?.contacts ?? []);
+  const [myMemberId, setMyMemberId] = useState<string | null>(initialSafety?.myMemberId ?? null);
+  const [tripLeader, setTripLeader] = useState<{ name: string; phone: string | null } | null>(initialSafety?.tripLeader ?? null);
+  const [alerts, setAlerts] = useState<SosAlert[]>(initialSos?.alerts ?? []);
+  const [loading, setLoading] = useState(!initialSafety);
+  const [name, setName] = useState(mineFromInitial?.emergencyContactName ?? "");
+  const [phone, setPhone] = useState(mineFromInitial?.emergencyContactPhone ?? "");
+  const [medicalNotes, setMedicalNotes] = useState(mineFromInitial?.medicalNotes ?? "");
+  const [consent, setConsent] = useState(mineFromInitial?.medicalNotesConsent ?? false);
   const [saving, setSaving] = useState(false);
   const [sosBusy, setSosBusy] = useState(false);
 
@@ -58,8 +75,9 @@ export default function SafetyCenterPanel({ groupId, isOrganiser }: { groupId: s
   }, [groupId]);
 
   useEffect(() => {
-    refresh();
-  }, [refresh]);
+    if (!initialSafety) refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function save(e: React.FormEvent) {
     e.preventDefault();

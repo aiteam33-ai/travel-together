@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
 import { requireMembership } from "@/lib/groups/access";
+import { getSharesData } from "@/lib/groups/panel-data";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
@@ -13,10 +14,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const ctx = await requireMembership(booking.groupId, user.id);
   if (!ctx) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const shares = await prisma.bookingShare.findMany({
-    where: { bookingId: id },
-    include: { member: true },
-  });
-
-  return NextResponse.json({ booking, shares, myMemberId: ctx.membership.id, isOrganiser: ctx.membership.role === "ORGANISER" });
+  const data = await getSharesData(id, ctx);
+  if (!data) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  return NextResponse.json(data);
 }

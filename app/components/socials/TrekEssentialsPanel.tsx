@@ -16,16 +16,20 @@ export default function TrekEssentialsPanel({
   groupId,
   bestSeason,
   difficulty,
+  initialChecklist,
+  initialFitness,
 }: {
   groupId: string;
   bestSeason: string;
   difficulty: string | null;
+  initialChecklist?: { items: ChecklistItem[]; myMemberId: string };
+  initialFitness?: number | null;
 }) {
-  const [items, setItems] = useState<ChecklistItem[]>([]);
-  const [myMemberId, setMyMemberId] = useState<string | null>(null);
-  const [fitness, setFitness] = useState<number | null>(null);
+  const [items, setItems] = useState<ChecklistItem[]>(initialChecklist?.items ?? []);
+  const [myMemberId, setMyMemberId] = useState<string | null>(initialChecklist?.myMemberId ?? null);
+  const [fitness, setFitness] = useState<number | null>(initialFitness ?? null);
   const [needsPrep, setNeedsPrep] = useState<Record<string, boolean>>({});
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!initialChecklist);
 
   const refresh = useCallback(() => {
     fetch(`/api/groups/${groupId}/checklist`)
@@ -38,14 +42,17 @@ export default function TrekEssentialsPanel({
   }, [groupId]);
 
   useEffect(() => {
-    refresh();
-  }, [refresh]);
+    if (!initialChecklist) refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
+    if (initialFitness !== undefined) return;
     fetch(`/api/groups/${groupId}/preferences`)
       .then((r) => r.json())
       .then((data) => setFitness(data.mine?.fitnessSelfRating ?? null));
-  }, [groupId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function toggle(itemId: string, body: Record<string, unknown>) {
     await fetch(`/api/groups/${groupId}/checklist/${itemId}`, {

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
 import { requireMembership } from "@/lib/groups/access";
+import { getFeedData } from "@/lib/groups/panel-data";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
@@ -11,18 +12,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const ctx = await requireMembership(id, user.id);
   if (!ctx) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const items = await prisma.groupFeedItem.findMany({
-    where: { groupId: id, deletedAt: null },
-    include: {
-      author: true,
-      attachmentTour: true,
-      votes: true,
-      poll: { include: { options: { include: { votes: true } } } },
-    },
-    orderBy: { createdAt: "desc" },
-    take: 100,
-  });
-  return NextResponse.json({ items });
+  return NextResponse.json(await getFeedData(id));
 }
 
 const schema = z.object({

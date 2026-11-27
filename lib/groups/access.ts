@@ -23,6 +23,8 @@ export const requireMembership = cache(async (groupId: string, userId: string) =
   return { group, membership };
 });
 
+export type GroupAccessContext = NonNullable<Awaited<ReturnType<typeof requireMembership>>>;
+
 export async function logEvent(type: string, userId?: string, metadata?: Record<string, unknown>) {
   await prisma.productEvent.create({
     data: { type, userId, metadataJson: metadata ? JSON.stringify(metadata) : null },

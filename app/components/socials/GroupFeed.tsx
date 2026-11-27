@@ -37,8 +37,16 @@ interface FeedItem {
 
 const POLL_MS = 8000;
 
-export default function GroupFeed({ groupId, currentMemberId }: { groupId: string; currentMemberId: string }) {
-  const [items, setItems] = useState<FeedItem[]>([]);
+export default function GroupFeed({
+  groupId,
+  currentMemberId,
+  initialData,
+}: {
+  groupId: string;
+  currentMemberId: string;
+  initialData?: { items: FeedItem[] };
+}) {
+  const [items, setItems] = useState<FeedItem[]>(initialData ? [...initialData.items].reverse() : []);
   const [text, setText] = useState("");
   const [kind, setKind] = useState<"TEXT" | "IMAGE" | "LINK">("TEXT");
   const [posting, setPosting] = useState(false);
@@ -64,13 +72,14 @@ export default function GroupFeed({ groupId, currentMemberId }: { groupId: strin
   }, [groupId]);
 
   useEffect(() => {
-    refresh();
+    if (!initialData) refresh();
     const interval = setInterval(refresh, POLL_MS);
     window.addEventListener("focus", refresh);
     return () => {
       clearInterval(interval);
       window.removeEventListener("focus", refresh);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- initialData is only read on mount
   }, [refresh]);
 
   useEffect(() => {

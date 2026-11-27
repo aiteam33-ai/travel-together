@@ -11,6 +11,13 @@ interface MemberReadiness {
   packingDone: boolean;
 }
 
+interface ReadinessData {
+  perMember: MemberReadiness[];
+  readinessPercent: number;
+  departureDate: string | null;
+  myMemberId: string;
+}
+
 function useCountdown(target: string | null) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -26,12 +33,12 @@ function useCountdown(target: string | null) {
   return `${days}d ${hours}h`;
 }
 
-export default function ReadinessPanel({ groupId }: { groupId: string }) {
-  const [perMember, setPerMember] = useState<MemberReadiness[]>([]);
-  const [readinessPercent, setReadinessPercent] = useState(0);
-  const [departureDate, setDepartureDate] = useState<string | null>(null);
-  const [myMemberId, setMyMemberId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+export default function ReadinessPanel({ groupId, initialData }: { groupId: string; initialData?: ReadinessData }) {
+  const [perMember, setPerMember] = useState<MemberReadiness[]>(initialData?.perMember ?? []);
+  const [readinessPercent, setReadinessPercent] = useState(initialData?.readinessPercent ?? 0);
+  const [departureDate, setDepartureDate] = useState<string | null>(initialData?.departureDate ?? null);
+  const [myMemberId, setMyMemberId] = useState<string | null>(initialData?.myMemberId ?? null);
+  const [loading, setLoading] = useState(!initialData);
 
   const refresh = useCallback(() => {
     fetch(`/api/groups/${groupId}/readiness`)
@@ -45,9 +52,11 @@ export default function ReadinessPanel({ groupId }: { groupId: string }) {
       });
   }, [groupId]);
 
+  // initialData came from the server render — skip the redundant fetch on mount.
   useEffect(() => {
-    refresh();
-  }, [refresh]);
+    if (!initialData) refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const countdown = useCountdown(departureDate);
 

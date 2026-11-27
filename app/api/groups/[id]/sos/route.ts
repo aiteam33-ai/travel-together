@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
 import { requireMembership } from "@/lib/groups/access";
 import { addSystemFeedEntry } from "@/lib/groups/feed";
+import { getSosData } from "@/lib/groups/panel-data";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
@@ -12,13 +13,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const ctx = await requireMembership(id, user.id);
   if (!ctx) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const alerts = await prisma.sosAlert.findMany({
-    where: { groupId: id },
-    include: { member: true },
-    orderBy: { createdAt: "desc" },
-    take: 20,
-  });
-  return NextResponse.json({ alerts });
+  return NextResponse.json(await getSosData(id));
 }
 
 const schema = z.object({
