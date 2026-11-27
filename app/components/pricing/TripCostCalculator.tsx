@@ -62,31 +62,37 @@ export default function TripCostCalculator({
     setLoading(true);
     setError(null);
     const controller = new AbortController();
-    fetch("/api/pricing/calculate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      signal: controller.signal,
-      body: JSON.stringify({
-        departureId,
-        departureCity: city,
-        travellers: { adults, childrenWithBed, childrenWithoutBed, infants, rooms, singleOccupancyRooms: singleRooms },
-        joiningMode: joiningAtDestination ? joiningMode : undefined,
-        addOns: { travelInsurance, visaFees },
-        spendPreset,
-        couponCode: couponCode || undefined,
-        amountDuePercentNow,
-      }),
-    })
-      .then(async (res) => {
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error?.formErrors?.[0] ?? "Could not calculate pricing.");
-        setOutput(data.output);
-        onStateChange?.({ output: data.output, adults, departureId });
+
+    // Debounced: without this, every keystroke/click (e.g. typing a coupon
+    // code) fired its own DB-backed request. 350ms lets a burst of changes
+    // (adults++, rooms++, typing) settle into a single request.
+    const debounce = setTimeout(() => {
+      fetch("/api/pricing/calculate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({
+          departureId,
+          departureCity: city,
+          travellers: { adults, childrenWithBed, childrenWithoutBed, infants, rooms, singleOccupancyRooms: singleRooms },
+          joiningMode: joiningAtDestination ? joiningMode : undefined,
+          addOns: { travelInsurance, visaFees },
+          spendPreset,
+          couponCode: couponCode || undefined,
+          amountDuePercentNow,
+        }),
       })
-      .catch((e) => {
-        if (e.name !== "AbortError") setError(e.message);
-      })
-      .finally(() => setLoading(false));
+        .then(async (res) => {
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error?.formErrors?.[0] ?? "Could not calculate pricing.");
+          setOutput(data.output);
+          onStateChange?.({ output: data.output, adults, departureId });
+        })
+        .catch((e) => {
+          if (e.name !== "AbortError") setError(e.message);
+        })
+        .finally(() => setLoading(false));
+    }, 350);
 
     const params = new URLSearchParams();
     params.set("departureId", departureId);
@@ -105,7 +111,10 @@ export default function TripCostCalculator({
     params.set("dueNow", String(amountDuePercentNow));
     router.replace(`?${params.toString()}`, { scroll: false });
 
-    return () => controller.abort();
+    return () => {
+      clearTimeout(debounce);
+      controller.abort();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [departureId, city, adults, childrenWithBed, childrenWithoutBed, infants, rooms, singleRooms, joiningMode, travelInsurance, visaFees, spendPreset, couponCode, amountDuePercentNow]);
 

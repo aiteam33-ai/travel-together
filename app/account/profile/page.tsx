@@ -1,9 +1,11 @@
 import { getCurrentUser } from "@/lib/auth/session";
+import { getUserBadges } from "@/lib/gamification/get-user-badges";
 import LogoutButtons from "@/app/components/account/LogoutButtons";
 import BadgesPanel from "@/app/components/account/BadgesPanel";
 
 export default async function ProfilePage() {
   const user = await getCurrentUser();
+  const { badges, tripsCompleted } = await getUserBadges(user!.id);
 
   return (
     <div>
@@ -13,7 +15,7 @@ export default async function ProfilePage() {
         {user!.phone && <p><strong>Mobile:</strong> {user!.phone}</p>}
         {user!.email && <p><strong>Email:</strong> {user!.email}</p>}
       </div>
-      <BadgesPanel />
+      <BadgesPanel badges={badges} tripsCompleted={tripsCompleted} />
       <LogoutButtons />
     </div>
   );

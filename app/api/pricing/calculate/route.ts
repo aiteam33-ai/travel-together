@@ -14,8 +14,12 @@ export async function POST(req: NextRequest) {
   try {
     const input = await buildPricingInput(parsed.data);
     const output = computePricing(input);
-    const user = await getCurrentUser();
-    await logEvent("CALCULATOR_USED", user?.id, { tourId: input.tourId });
+    // Fire-and-forget: the client already debounces calls to this route, so this
+    // no longer runs per keystroke, but the analytics write still shouldn't make
+    // the user wait on their price update.
+    getCurrentUser()
+      .then((user) => logEvent("CALCULATOR_USED", user?.id, { tourId: input.tourId }))
+      .catch(() => {});
     return NextResponse.json({ input, output });
   } catch (e) {
     console.error(e);

@@ -1,7 +1,3 @@
-"use client";
-
-import { useEffect, useState } from "react";
-
 interface Badge {
   id: string;
   label: string;
@@ -9,23 +5,7 @@ interface Badge {
   earned: boolean;
 }
 
-export default function BadgesPanel() {
-  const [badges, setBadges] = useState<Badge[]>([]);
-  const [tripsCompleted, setTripsCompleted] = useState(0);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("/api/account/badges")
-      .then((r) => r.json())
-      .then((data) => {
-        setBadges(data.badges ?? []);
-        setTripsCompleted(data.tripsCompleted ?? 0);
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) return <div className="skeleton mt-4 h-40 rounded-xl" />;
-
+export default function BadgesPanel({ badges, tripsCompleted }: { badges: Badge[]; tripsCompleted: number }) {
   const earnedCount = badges.filter((b) => b.earned).length;
 
   return (
