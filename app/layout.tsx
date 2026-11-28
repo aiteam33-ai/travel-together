@@ -18,6 +18,7 @@ import BackToTop from "./components/floating/BackToTop";
 import TopLoadingBar from "./components/nav/TopLoadingBar";
 import PageTransition from "./components/PageTransition";
 import { FloatingStackProvider } from "./components/floating/FloatingStackContext";
+import LenisProvider from "./components/motion/LenisProvider";
 
 const hind = Hind({ variable: "--font-hind", subsets: ["latin", "devanagari"], weight: ["400", "500", "600", "700"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -38,6 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <WishlistProvider>
                   <SocialsProvider>
                     <FloatingStackProvider>
+                      <LenisProvider />
                       <TopLoadingBar />
                       <Suspense fallback={null}>
                         <Header />

@@ -14,6 +14,9 @@ import MySocialsTeaser from "./components/landing/MySocialsTeaser";
 import RevealOnScroll from "./components/motion/RevealOnScroll";
 import StaggerReveal from "./components/motion/StaggerReveal";
 import CountUp from "./components/motion/CountUp";
+import Marquee from "./components/animations/Marquee";
+import ScrollWordHighlight from "./components/animations/ScrollWordHighlight";
+import PinnedSwap from "./components/animations/PinnedSwap";
 import { formatDateIST } from "@/lib/pricing/format";
 import { TRAVELLER_TAGS, DEPARTURE_CITIES, DEPARTURE_CITY_LABELS, INDIA_REGIONS, INDIA_REGION_LABELS, TravellerTag, IndiaRegion } from "@/lib/pricing/constants";
 
@@ -53,7 +56,7 @@ export default async function HomePage() {
       {fastFilling.length > 0 && (
         <RevealOnScroll as="section">
           <h2 className="font-heading mb-4 text-2xl font-bold">Departures filling fast</h2>
-          <ScrollRow>
+          <ScrollRow stagger>
             {fastFilling.map((d) => (
               <div key={d.id} className="w-72 shrink-0 snap-start">
                 <TourCard
@@ -79,9 +82,9 @@ export default async function HomePage() {
             <h2 className="font-heading text-2xl font-bold">Explore the world</h2>
             <Link href="/destinations" className="text-sm font-semibold text-accent hover:underline">See all destinations</Link>
           </div>
-          <ScrollRow>
+          <Marquee durationSeconds={38}>
             {worldTours.map(({ tour, futureDepartures, cheapestPricePerPerson }) => (
-              <div key={tour.id} className="w-72 shrink-0 snap-start">
+              <div key={tour.id} className="w-72 shrink-0">
                 <TourCard
                   tourId={tour.id}
                   slug={tour.slug}
@@ -94,7 +97,7 @@ export default async function HomePage() {
                 />
               </div>
             ))}
-          </ScrollRow>
+          </Marquee>
         </RevealOnScroll>
       )}
 
@@ -166,11 +169,12 @@ export default async function HomePage() {
               <Calculator size={22} aria-hidden="true" />
             </span>
             <h2 className="font-heading mt-3 text-2xl font-bold">Trip Expense Calculator</h2>
-            <p className="mt-2 text-white/90">
-              Most &ldquo;starts from&rdquo; prices grow once you call. Ours doesn&apos;t have to — add your travellers, your
-              departure city and your add-ons, and see the real total, taxes and your own estimated spending, split out
-              clearly, before you book.
-            </p>
+            <ScrollWordHighlight
+              className="mt-2 text-white/90"
+              text={
+                "Most “starts from” prices grow once you call. Ours doesn't have to — add your travellers, your departure city and your add-ons, and see the real total, taxes and your own estimated spending, split out clearly, before you book."
+              }
+            />
           </div>
           <Link
             href="/trip-cost-calculator"
@@ -183,13 +187,14 @@ export default async function HomePage() {
 
       <section>
         <h2 className="font-heading mb-4 text-2xl font-bold">Why travel with us</h2>
-        <StaggerReveal as="div" className="grid grid-cols-1 gap-5 md:grid-cols-3">
-          {[
+        <PinnedSwap
+          className="w-full rounded-xl border border-border bg-surface p-6 card-hover md:max-w-xl"
+          items={[
             { icon: ShieldCheck, q: "Is it safe for solo women travellers?", a: "Our women-only departures carry a woman tour manager and all-women local support staff, start to finish." },
             { icon: Accessibility, q: "What if my parents can't walk long distances?", a: "Senior-citizen departures use fewer hotel changes, shorter drive segments, and a slower daily pace." },
             { icon: Calculator, q: "Why does the price look higher than an ad I saw?", a: "Our price panel and calculator show the full door-to-door cost up front, including taxes — not just a joining fare." },
           ].map((item) => (
-            <div key={item.q} className="rounded-xl border border-border bg-surface p-5 card-hover">
+            <div key={item.q}>
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-soft text-accent">
                 <item.icon size={20} aria-hidden="true" />
               </span>
@@ -197,33 +202,39 @@ export default async function HomePage() {
               <p className="mt-2 text-sm text-foreground-muted">{item.a}</p>
             </div>
           ))}
-        </StaggerReveal>
+        />
       </section>
 
       {reviews.length > 0 && (
         <section>
           <h2 className="font-heading mb-4 text-2xl font-bold">What travellers say</h2>
-          <StaggerReveal as="div" className="grid grid-cols-1 gap-5 md:grid-cols-3">
-            {reviews.map((r) => (
-              <div key={r.id} className="rounded-xl border border-border bg-surface p-5 card-hover">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-bold text-white">
-                    {r.name.charAt(0).toUpperCase()}
-                  </span>
-                  <div>
-                    <p className="text-sm font-semibold">
-                      {r.name} {r.verifiedBooking && <span className="ml-1 rounded bg-success/10 px-1.5 py-0.5 text-xs font-medium text-success">Verified booking</span>}
-                    </p>
-                    <div className="flex items-center gap-0.5 text-accent" aria-hidden="true">
-                      {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={12} fill="currentColor" strokeWidth={0} />)}
+          <div className="space-y-4">
+            {[reviews.slice(0, Math.ceil(reviews.length / 2)), reviews.slice(Math.ceil(reviews.length / 2))]
+              .filter((row) => row.length > 0)
+              .map((row, rowIndex) => (
+                <Marquee key={rowIndex} durationSeconds={32} reverse={rowIndex === 1}>
+                  {row.map((r) => (
+                    <div key={r.id} className="w-80 shrink-0 rounded-xl border border-border bg-surface p-5 card-hover">
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-bold text-white">
+                          {r.name.charAt(0).toUpperCase()}
+                        </span>
+                        <div>
+                          <p className="text-sm font-semibold">
+                            {r.name} {r.verifiedBooking && <span className="ml-1 rounded bg-success/10 px-1.5 py-0.5 text-xs font-medium text-success">Verified booking</span>}
+                          </p>
+                          <div className="flex items-center gap-0.5 text-accent" aria-hidden="true">
+                            {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={12} fill="currentColor" strokeWidth={0} />)}
+                          </div>
+                        </div>
+                      </div>
+                      <p className="mt-3 text-sm">{r.text}</p>
+                      <p className="mt-2 text-xs text-foreground-muted">{r.tour.title} · {formatDateIST(r.travelDate)}{r.isSampleData ? " · Sample review" : ""}</p>
                     </div>
-                  </div>
-                </div>
-                <p className="mt-3 text-sm">{r.text}</p>
-                <p className="mt-2 text-xs text-foreground-muted">{r.tour.title} · {formatDateIST(r.travelDate)}{r.isSampleData ? " · Sample review" : ""}</p>
-              </div>
-            ))}
-          </StaggerReveal>
+                  ))}
+                </Marquee>
+              ))}
+          </div>
         </section>
       )}
 

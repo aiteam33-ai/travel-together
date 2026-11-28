@@ -1,14 +1,47 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { usePrefersReducedMotion } from "@/lib/motion/reduced-motion";
 
-export default function ScrollRow({ children }: { children: React.ReactNode }) {
+export default function ScrollRow({ children, stagger = false }: { children: React.ReactNode; stagger?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
+  const reduced = usePrefersReducedMotion();
 
   function scrollBy(dir: 1 | -1) {
     ref.current?.scrollBy({ left: dir * 320, behavior: "smooth" });
   }
+
+  // Same scroll-triggered stagger as StaggerReveal, applied directly to this
+  // row's own children — StaggerReveal can't reach them since they're nested
+  // one level inside ScrollRow's own scroll container.
+  useEffect(() => {
+    if (!stagger || reduced || !ref.current) return;
+    const el = ref.current;
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight) return;
+
+    const items = Array.from(el.children);
+    if (items.length === 0) return;
+
+    let trigger: { kill: () => void } | undefined;
+    (async () => {
+      const gsap = (await import("gsap")).default;
+      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+      gsap.registerPlugin(ScrollTrigger);
+      gsap.set(items, { opacity: 0, y: 20 });
+      trigger = gsap.to(items, {
+        opacity: 1,
+        y: 0,
+        duration: 0.45,
+        stagger: 0.08,
+        ease: "power2.out",
+        scrollTrigger: { trigger: el, start: "top 88%", once: true },
+      }).scrollTrigger;
+    })();
+
+    return () => trigger?.kill();
+  }, [stagger, reduced]);
 
   return (
     <div className="relative">

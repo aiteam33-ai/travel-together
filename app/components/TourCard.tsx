@@ -35,7 +35,7 @@ export default function TourCard({ tourId, slug, title, heroImage, durationDays,
         </Link>
         <p className="text-sm text-foreground-muted">{durationDays} days / {durationNights} nights</p>
         {seatsLeft !== undefined && seatsLeft <= 8 && (
-          <p className="text-sm font-semibold text-danger">Only {seatsLeft} seats left</p>
+          <p className="soft-pulse text-sm font-semibold text-danger">Only {seatsLeft} seats left</p>
         )}
         {nextDates.length > 0 && (
           <p className="text-xs text-foreground-muted">

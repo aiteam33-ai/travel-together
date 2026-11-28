@@ -2,9 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import SearchBar from "../SearchBar";
-import Link from "next/link";
 import { usePrefersReducedMotion } from "@/lib/motion/reduced-motion";
 import { tourPhotoUrl } from "@/lib/tour-photos";
+import RevealLines from "../animations/RevealLines";
+import RollButton from "../animations/RollButton";
+
+const VIDEO_INTERVAL_MS = 6000;
 
 // Real, free-to-use (Mixkit Free License, no attribution required) travel
 // scenery clips — muted/looped/playsInline below, with a photo poster as the
@@ -39,6 +42,12 @@ export default function WelcomeHero() {
     const video = videoRefs.current[active];
     video?.play().catch(() => {}); // autoplay can be blocked until the first user gesture on some mobile browsers — fails silently, poster stays visible
   }, [active, reduced]);
+
+  useEffect(() => {
+    if (reduced) return;
+    const interval = setInterval(() => setActive((i) => (i + 1) % SLIDES.length), VIDEO_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, [reduced]);
 
   return (
     <section className="relative -mx-6 -mt-8 overflow-hidden rounded-b-3xl md:rounded-b-[2.5rem]">
@@ -87,9 +96,11 @@ export default function WelcomeHero() {
         <div className="relative flex min-h-full flex-col justify-end gap-6 p-6 pb-10 text-white md:h-full md:justify-center md:p-14">
           <div data-intro="headline">
             <p className="font-heading text-sm font-bold uppercase tracking-[0.2em] text-white/90">Travel, together</p>
-            <h1 className="font-heading mt-3 max-w-2xl text-4xl font-extrabold leading-tight drop-shadow-sm md:text-6xl">
-              Plan, book and share the trip with your people.
-            </h1>
+            <RevealLines
+              as="h1"
+              className="font-heading mt-3 max-w-2xl text-4xl font-extrabold leading-tight drop-shadow-sm md:text-6xl"
+              lines={["Plan, book and share", "the trip with your people."]}
+            />
             <p className="mt-4 max-w-xl text-base text-white/90 md:text-lg">
               Fixed-departure tours, treks and pilgrimages across every region of India — with My Socials, plan it
               together with the friends or family you&apos;re travelling with.
@@ -97,18 +108,18 @@ export default function WelcomeHero() {
           </div>
 
           <div className="flex flex-wrap gap-3" data-intro="cta">
-            <Link
+            <RollButton
               href="/tours"
               className="min-h-11 rounded-md bg-white px-5 py-2.5 text-sm font-semibold text-foreground press-feedback hover:bg-white/90"
             >
               Explore tours
-            </Link>
-            <Link
+            </RollButton>
+            <RollButton
               href="/my-socials"
               className="min-h-11 rounded-md border border-white/60 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur press-feedback hover:bg-white/20"
             >
               Discover My Socials
-            </Link>
+            </RollButton>
           </div>
 
           <div className="max-w-3xl" data-intro="search">

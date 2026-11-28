@@ -1,11 +1,12 @@
 import Link from "next/link";
 import RevealOnScroll from "../motion/RevealOnScroll";
+import SpringPopIn from "../animations/SpringPopIn";
 
-const HIGHLIGHTS = [
-  { icon: "💬", label: "Group chat" },
-  { icon: "🗳️", label: "Quick polls" },
-  { icon: "💰", label: "Split expenses" },
-  { icon: "🆘", label: "Safety & SOS" },
+const PHONE_CARDS = [
+  { icon: "💬", title: "Rohit", text: "Everyone up for the 6am trek start?", tone: "bg-surface" },
+  { icon: "🗳️", title: "Poll: departure city", text: "Mumbai — 4 votes · Pune — 2 votes", tone: "bg-accent-soft" },
+  { icon: "💰", title: "Split: Hotel Riverside", text: "₹2,400 each · 3 of 5 paid", tone: "bg-surface" },
+  { icon: "🆘", title: "Safety check-in", text: "Priya shared her live location", tone: "bg-danger/10" },
 ];
 
 export default function MySocialsTeaser() {
@@ -33,18 +34,18 @@ export default function MySocialsTeaser() {
           </Link>
         </div>
 
-        <div className="grid shrink-0 grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-2">
-          {HIGHLIGHTS.map((item) => (
-            <div
-              key={item.label}
-              className="flex flex-col items-center gap-2 rounded-xl border border-border bg-surface-raised p-4 text-center card-hover"
-            >
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-soft text-lg" aria-hidden="true">
-                {item.icon}
-              </span>
-              <span className="text-xs font-semibold text-foreground-muted">{item.label}</span>
-            </div>
-          ))}
+        <div className="mx-auto shrink-0 rounded-[2rem] border-[6px] border-foreground/80 bg-background p-3 shadow-xl" style={{ width: 220 }}>
+          <SpringPopIn className="flex flex-col gap-2">
+            {PHONE_CARDS.map((card) => (
+              <div key={card.title} className={`flex items-start gap-2 rounded-lg ${card.tone} p-2.5 text-left`}>
+                <span className="text-base" aria-hidden="true">{card.icon}</span>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold">{card.title}</p>
+                  <p className="truncate text-[11px] text-foreground-muted">{card.text}</p>
+                </div>
+              </div>
+            ))}
+          </SpringPopIn>
         </div>
       </div>
     </RevealOnScroll>
