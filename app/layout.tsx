@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { headers } from "next/headers";
-import { Hind, Geist_Mono } from "next/font/google";
+import { Hind, Geist_Mono, Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
 import { BRAND } from "@/lib/brand";
 import { LocaleProvider } from "@/lib/i18n/LocaleContext";
@@ -23,6 +23,23 @@ import LenisProvider from "./components/motion/LenisProvider";
 
 const hind = Hind({ variable: "--font-hind", subsets: ["latin", "devanagari"], weight: ["400", "500", "600", "700"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+// Bold display font for headings (Phase 2 visual identity) — falls back to
+// Hind glyph-by-glyph for any Devanagari text, since Bricolage Grotesque has
+// no Hindi character set.
+const bricolage = Bricolage_Grotesque({ variable: "--font-bricolage", subsets: ["latin"], weight: ["600", "700", "800"] });
+
+// Applies the user's saved theme before paint (no flash of the wrong theme).
+// Defaults to light — dark mode is opt-in via the toggle, not automatic from
+// the OS preference, per the site's "parents/senior travellers too" audience.
+const NO_FLASH_THEME_SCRIPT = `
+(function() {
+  try {
+    if (localStorage.getItem('theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+    }
+  } catch (e) {}
+})();
+`;
 
 export const metadata: Metadata = {
   title: `${BRAND.name} — Tours, Treks & Pilgrimages`,
@@ -40,7 +57,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const chromeless = CHROMELESS_PREFIXES.some((p) => pathname.startsWith(p));
 
   return (
-    <html lang="en" className={`${hind.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="en" className={`${hind.variable} ${geistMono.variable} ${bricolage.variable} h-full antialiased`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: NO_FLASH_THEME_SCRIPT }} />
+      </head>
       <body className="flex min-h-full flex-col bg-background text-foreground">
         <LocaleProvider>
           <AuthProvider>

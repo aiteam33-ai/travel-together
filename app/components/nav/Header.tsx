@@ -13,6 +13,7 @@ import { useCompare } from "../CompareContext";
 import { useSocials } from "../SocialsContext";
 import MegaMenu from "./MegaMenu";
 import Breadcrumbs from "./Breadcrumbs";
+import ThemeToggle from "../ThemeToggle";
 
 export default function Header() {
   const { t, locale, setLocale } = useLocale();
@@ -60,7 +61,7 @@ export default function Header() {
 
   return (
     <header
-      className={`sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur print:hidden transition-transform duration-300 ${
+      className={`sticky top-0 z-40 border-b border-border/70 bg-surface/80 backdrop-blur-lg print:hidden transition-transform duration-300 ${
         hidden ? "-translate-y-full" : "translate-y-0"
       }`}
     >
@@ -102,6 +103,8 @@ export default function Header() {
           <a href={`tel:${BRAND.supportPhone.replace(/\s/g, "")}`} className="hidden text-sm font-medium lg:inline">
             {BRAND.supportPhone}
           </a>
+
+          <ThemeToggle />
 
           <Link href="/account/wishlist" className="relative hidden min-h-11 min-w-11 items-center justify-center rounded-md lg:flex" aria-label="Wishlist">
             <span aria-hidden="true">♡</span>

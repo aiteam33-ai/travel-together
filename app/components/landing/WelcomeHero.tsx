@@ -105,11 +105,11 @@ export default function WelcomeHero() {
             <RevealLines
               as="h1"
               className="font-heading mt-3 max-w-2xl text-4xl font-extrabold leading-tight drop-shadow-sm md:text-6xl"
-              lines={["Plan, book and share", "the trip with your people."]}
+              lines={["Your next trip,", "planned with your people."]}
             />
             <p className="mt-4 max-w-xl text-base text-white/90 md:text-lg">
-              Fixed-departure tours, treks and pilgrimages across every region of India — with My Socials, plan it
-              together with the friends or family you&apos;re travelling with.
+              Treks, tours and pilgrimages across India — no spreadsheets, no 47-message group chats.
+              Pick a trip, loop in your people with My Socials, and let the group plan itself.
             </p>
           </div>
 

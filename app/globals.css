@@ -10,19 +10,18 @@
    px margin or ad-hoc transition in a component.
    ====================================================== */
 :root {
-  /* "Coastal expedition" palette — deep emerald-teal (ocean + jungle,
-     treks/backwaters/pilgrimage all read in this hue) on a warm sand base,
-     replacing the earlier plain terracotta-on-cream for a more distinctive,
-     premium feel. --accent kept at the same ~4.6:1 contrast margin on
-     --background as the previous palette (verified by hand). */
+  /* Gen Z visual identity refresh (Phase 2) — a single punchy violet accent
+     on the same warm-sand base, chosen over the earlier teal for a bolder,
+     more premium-but-playful feel. --accent kept at ~4.6:1+ contrast on
+     --background (violet-800-ish on cream easily clears WCAG AA). */
   --background: #f6f1e6;
   --surface: #fffdf8;
   --surface-raised: #ffffff;
   --foreground: #1c2824;
   --foreground-muted: #53625a;
-  --accent: #0e6e5c;
-  --accent-strong: #0a5447;
-  --accent-soft: #dcefe8;
+  --accent: #5b21b6;
+  --accent-strong: #4c1d95;
+  --accent-soft: #ede9fe;
   --border: #e3dccb;
   --success: #2f7a4f;
   --success-soft: #e1f3e7;
@@ -67,8 +66,28 @@
   --radius-token-sm: var(--radius-sm);
   --radius-token-lg: var(--radius-lg);
   --font-sans: var(--font-hind);
-  --font-heading: var(--font-hind);
+  /* Bricolage falls back to Hind for Devanagari glyphs it doesn't cover. */
+  --font-heading: var(--font-bricolage), var(--font-hind);
   --font-mono: var(--font-geist-mono);
+}
+
+/* Dark mode override (Phase 2) — opt-in via the toggle, applied by adding
+   .dark to <html> (see the no-flash script in app/layout.tsx). Light stays
+   the default per the "parents/senior travellers too" audience. */
+:root.dark {
+  --background: #15131c;
+  --surface: #1d1a26;
+  --surface-raised: #252131;
+  --foreground: #f2eef9;
+  --foreground-muted: #b4aec4;
+  --accent: #a78bfa;
+  --accent-strong: #c4b5fd;
+  --accent-soft: #352c4a;
+  --border: #352f44;
+  --success: #4ade80;
+  --success-soft: #1c3a2a;
+  --danger: #f87171;
+  --danger-soft: #3a1f1f;
 }
 
 html {

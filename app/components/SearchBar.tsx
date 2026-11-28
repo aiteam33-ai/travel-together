@@ -36,7 +36,7 @@ export default function SearchBar() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-wrap items-end gap-3 rounded-xl bg-surface p-4 text-foreground shadow-md" aria-label="Search tours">
+    <form onSubmit={onSubmit} className="flex flex-wrap items-end gap-3 rounded-2xl border border-white/30 bg-surface/70 p-4 text-foreground shadow-raised backdrop-blur-xl" aria-label="Search tours">
       <label className="flex flex-col text-sm font-medium text-foreground">
         {t("search.destination")}
         <input

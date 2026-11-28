@@ -7,6 +7,7 @@ import CompareCheckbox from "./CompareCheckbox";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import TiltImage from "./motion/TiltImage";
 import TourImage from "./TourImage";
+import StickerBadge from "./StickerBadge";
 
 export interface DepartureOption {
   id: string;
@@ -48,19 +49,21 @@ export default function TourCard({
 
   return (
     <article className="card-hover flex flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-[var(--shadow-soft)]">
-      <Link href={`/tours/${slug}`} className="block overflow-hidden">
+      <Link href={`/tours/${slug}`} className="relative block overflow-hidden">
         <TiltImage className="relative overflow-hidden">
           <TourImage src={heroImage} alt={`${title}, ${durationDays}-day tour`} />
         </TiltImage>
+        {activeSeatsLeft !== undefined && activeSeatsLeft <= 8 && (
+          <div className="soft-pulse absolute left-3 top-3 z-10">
+            <StickerBadge tone="danger">Only {activeSeatsLeft} left</StickerBadge>
+          </div>
+        )}
       </Link>
       <div className="flex flex-1 flex-col gap-2 p-4">
         <Link href={`/tours/${slug}`} className="font-heading text-base font-bold leading-snug hover:text-accent">
           {title}
         </Link>
         <p className="text-sm text-foreground-muted">{durationDays} days / {durationNights} nights</p>
-        {activeSeatsLeft !== undefined && activeSeatsLeft <= 8 && (
-          <p className="soft-pulse text-sm font-semibold text-danger">Only {activeSeatsLeft} seats left</p>
-        )}
 
         {departureOptions && departureOptions.length > 1 ? (
           <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Departure date">
