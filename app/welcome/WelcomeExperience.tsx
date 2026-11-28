@@ -3,26 +3,19 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Fraunces, Inter } from "next/font/google";
+import { Playfair_Display } from "next/font/google";
 import { motion } from "framer-motion";
-import HeroVideo from "../components/welcome/HeroVideo";
-import ChipGroup, { type ChipOption } from "../components/welcome/ChipGroup";
-import TrustStrip from "../components/welcome/TrustStrip";
-import SocialsTeaser from "../components/welcome/SocialsTeaser";
+import { Compass } from "lucide-react";
 import { usePrefersReducedMotion } from "@/lib/motion/reduced-motion";
-import { TRAVELLER_TAGS, DEPARTURE_CITIES, DEPARTURE_CITY_LABELS, type TravellerTag } from "@/lib/pricing/constants";
-import { EASE_OUT } from "../components/animations/easing";
 
-const fraunces = Fraunces({ subsets: ["latin"], weight: ["600", "700"], variable: "--font-fraunces" });
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const playfair = Playfair_Display({ subsets: ["latin"], weight: ["600", "700"], variable: "--font-playfair" });
 
-const PREFS_KEY = "parikrama_prefs";
 const SEEN_KEY = "welcome_seen";
 
-// Sets both the localStorage flag (read by this component) and a plain
-// cookie (read by middleware.ts) — middleware is what actually prevents the
-// flash of this page for returning visitors, redirecting before /welcome
-// ever renders; localStorage here is just a same-tab fallback/mirror.
+// Sets both the localStorage flag (same-tab fallback) and the cookie
+// middleware.ts actually checks server-side to skip this page on return
+// visits — same pair the previous welcome page used, kept so the
+// middleware redirect logic needs no changes.
 function markWelcomeSeen() {
   try {
     localStorage.setItem(SEEN_KEY, "1");
@@ -32,194 +25,120 @@ function markWelcomeSeen() {
   } catch {}
 }
 
-// Built directly from the same arrays /tours' filters use, so these chips
-// can never drift out of sync with the real tag/city values.
-const TRAVELLER_ICONS: Record<TravellerTag, string> = {
-  FAMILY: "👨‍👩‍👧‍👦",
-  HONEYMOON: "💞",
-  SENIOR_CITIZENS: "🧓",
-  WOMEN_ONLY: "💜",
-  PILGRIMAGE: "🛕",
-  TREK: "⛰️",
-};
-const TRAVELLER_LABELS: Record<TravellerTag, string> = {
-  FAMILY: "Family",
-  HONEYMOON: "Honeymoon",
-  SENIOR_CITIZENS: "Senior Citizens",
-  WOMEN_ONLY: "Women Only",
-  PILGRIMAGE: "Pilgrimage",
-  TREK: "Trek",
-};
-const TRAVELLER_OPTIONS: ChipOption[] = TRAVELLER_TAGS.map((tag) => ({ value: tag, label: TRAVELLER_LABELS[tag], icon: TRAVELLER_ICONS[tag] }));
-
-const CITY_OPTIONS: ChipOption[] = DEPARTURE_CITIES.map((c) => ({
-  value: c,
-  label: DEPARTURE_CITY_LABELS[c],
-  icon: c === "JOIN_AT_DESTINATION" ? "✈️" : "📍",
-}));
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE_OUT } },
-};
-
-export default function WelcomeExperience({
-  tourCount,
-  departureCount,
-  travellersServed,
-}: {
-  tourCount: number;
-  departureCount: number;
-  travellersServed: number;
-}) {
+export default function WelcomeExperience() {
   const router = useRouter();
   const reduced = usePrefersReducedMotion();
-  const [tag, setTag] = useState<string | null>(null);
-  const [city, setCity] = useState<string | null>(null);
-  const [ready, setReady] = useState(false);
+  const [leaving, setLeaving] = useState(false);
   const checkedRef = useRef(false);
 
   useEffect(() => {
-    // React's dev StrictMode double-invokes this effect; without this guard
-    // the second invocation would read back the "seen" flag the first
-    // invocation just wrote and immediately redirect itself away.
+    // React's dev StrictMode double-invokes effects; this guard keeps the
+    // one-time "already seen" check from running (and self-redirecting) twice.
     if (checkedRef.current) return;
     checkedRef.current = true;
 
-    // middleware.ts is the real no-flash guard (it redirects server-side
-    // before this page ever renders, based on the welcome_seen cookie) —
-    // this is just a same-tab fallback in case middleware is ever bypassed.
+    // middleware.ts is the real no-flash guard (redirects server-side before
+    // this page ever renders) — this is just a same-tab fallback.
     let seen = false;
     try {
       seen = localStorage.getItem(SEEN_KEY) === "1";
     } catch {}
-    if (seen) {
-      router.replace("/");
-      return;
-    }
-    setReady(true);
+    if (seen) router.replace("/");
   }, [router]);
 
-  useEffect(() => {
-    if (!ready) return;
-    try {
-      localStorage.setItem(PREFS_KEY, JSON.stringify({ tag, city }));
-    } catch {}
-  }, [tag, city, ready]);
-
-  if (!ready) return null;
-
-  function goToTours() {
+  function enter(e: React.MouseEvent) {
+    e.preventDefault();
     markWelcomeSeen();
-    const params = new URLSearchParams();
-    if (tag) params.set("tag", tag);
-    if (city) params.set("city", city);
-    router.push(`/tours${params.toString() ? `?${params.toString()}` : ""}`);
+    if (reduced) {
+      router.push("/");
+      return;
+    }
+    setLeaving(true);
+    setTimeout(() => router.push("/"), 350);
   }
 
   return (
-    <div className={`${fraunces.variable} ${inter.variable} relative flex min-h-[100svh] flex-col`} style={{ fontFamily: "var(--font-inter)" }}>
-      <HeroVideo />
+    <div className="relative h-[100dvh] w-full overflow-hidden bg-black">
+      {/* Cinematic background video — swap the src below for the real clip
+          (/public/videos/welcome.mp4) and the poster for a real still
+          (/public/images/welcome-poster.jpg) when supplied. */}
+      <motion.video
+        className="absolute inset-0 h-full w-full object-cover"
+        src="/videos/welcome.mp4"
+        poster="/images/welcome-poster.jpg"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        initial={{ scale: 1 }}
+        animate={reduced ? undefined : { scale: 1.08 }}
+        transition={reduced ? undefined : { duration: 20, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
+      />
 
-      {/* Top bar */}
-      <div className="flex items-center justify-between px-6 py-5 md:px-10">
-        <span className={fraunces.className + " text-lg font-bold text-welcome-text"}>Parikrama</span>
-        <Link
-          href="/"
-          onClick={markWelcomeSeen}
-          className="text-sm font-semibold text-welcome-text/80 underline-offset-2 hover:text-welcome-text hover:underline"
+      {/* Readability overlay — ~35% black */}
+      <div className="absolute inset-0 bg-black/35" aria-hidden="true" />
+
+      {/* Content */}
+      <div className="relative z-10 flex h-full w-full flex-col items-center justify-center gap-10 px-6 text-center">
+        <motion.h1
+          className={`${playfair.className} text-[clamp(2.75rem,9vw,6.5rem)] font-bold tracking-[0.04em] text-white`}
+          initial={{ opacity: 0, y: 24 }}
+          animate={{
+            opacity: 1,
+            y: 0,
+            textShadow: reduced
+              ? "0 0 24px rgba(255,255,255,0.25)"
+              : ["0 0 18px rgba(255,255,255,0.15)", "0 0 34px rgba(255,255,255,0.5)", "0 0 18px rgba(255,255,255,0.15)"],
+          }}
+          transition={
+            reduced
+              ? { duration: 0.8, ease: "easeOut" }
+              : {
+                  opacity: { duration: 0.8, ease: "easeOut" },
+                  y: { duration: 0.8, ease: "easeOut" },
+                  textShadow: { duration: 4, ease: "easeInOut", repeat: Infinity, delay: 0.8 },
+                }
+          }
         >
-          Skip →
-        </Link>
-      </div>
+          Parikrama
+        </motion.h1>
 
-      {/* Hero content */}
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center gap-10 px-6 pb-32 pt-6 text-center md:pb-16">
         <motion.div
-          initial={reduced ? undefined : "hidden"}
-          animate={reduced ? undefined : "visible"}
-          variants={reduced ? undefined : { visible: { transition: { staggerChildren: 0.12 } } }}
-          className="flex flex-col items-center gap-4"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut", delay: 0.5 }}
         >
-          <motion.p variants={fadeUp} className="text-sm font-bold uppercase tracking-[0.25em] text-welcome-accent">
-            Travel, together
-          </motion.p>
-          <motion.h1 variants={fadeUp} className={fraunces.className + " max-w-2xl text-3xl font-bold leading-tight text-welcome-text md:text-5xl"}>
-            Know your whole trip cost, before you call anyone.
-          </motion.h1>
-          <motion.p variants={fadeUp} className="max-w-xl text-base text-welcome-text/85 md:text-lg">
-            Fixed-departure tours, treks and pilgrimages across every region of India, planned with the
-            friends and family you&apos;re travelling with.
-          </motion.p>
-        </motion.div>
-
-        <motion.section
-          initial={reduced ? undefined : { opacity: 0, y: 20 }}
-          animate={reduced ? undefined : { opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.25, ease: EASE_OUT }}
-          className="w-full"
-        >
-          <h2 className="mb-4 text-sm font-bold uppercase tracking-wide text-welcome-text/70">Who&apos;s travelling?</h2>
-          <ChipGroup legend="Who's travelling?" options={TRAVELLER_OPTIONS} value={tag} onChange={setTag} columns={3} />
-        </motion.section>
-
-        <motion.section
-          initial={reduced ? undefined : { opacity: 0, y: 20 }}
-          animate={reduced ? undefined : { opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4, ease: EASE_OUT }}
-          className="w-full"
-        >
-          <h2 className="mb-4 text-sm font-bold uppercase tracking-wide text-welcome-text/70">Where are you leaving from?</h2>
-          <ChipGroup legend="Where are you leaving from?" options={CITY_OPTIONS} value={city} onChange={setCity} variant="pill" />
-        </motion.section>
-
-        {/* Desktop CTAs — hidden on mobile, where the sticky bar below takes over */}
-        <motion.div
-          initial={reduced ? undefined : { opacity: 0, y: 20 }}
-          animate={reduced ? undefined : { opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.55, ease: EASE_OUT }}
-          className="hidden w-full flex-col items-center gap-3 md:flex"
-        >
-          <button
-            type="button"
-            onClick={goToTours}
-            className="min-h-12 rounded-full bg-welcome-accent px-8 text-base font-bold text-welcome-primary shadow-lg shadow-black/20 transition-transform hover:scale-[1.02] active:scale-[0.98]"
-          >
-            Show my tours →
-          </button>
           <Link
-            href="/trip-cost-calculator"
-            className="text-sm font-semibold text-welcome-text/80 underline-offset-4 hover:text-welcome-text hover:underline"
+            href="/"
+            onClick={enter}
+            aria-label="Enter Parikrama"
+            className="group relative flex h-16 w-16 items-center justify-center rounded-full border border-white/40 bg-white/10 text-white backdrop-blur-md transition-transform duration-200 hover:scale-110 hover:bg-white/20 active:scale-95"
           >
-            Try the trip cost calculator
+            {!reduced && (
+              <motion.span
+                className="absolute inset-0 rounded-full border border-white/50"
+                initial={{ opacity: 0.6, scale: 1 }}
+                animate={{ opacity: 0, scale: 1.6 }}
+                transition={{ duration: 2.2, ease: "easeOut", repeat: Infinity }}
+                aria-hidden="true"
+              />
+            )}
+            <Compass className="h-7 w-7 transition-transform duration-300 group-hover:rotate-45" />
           </Link>
         </motion.div>
-
-        <motion.div
-          initial={reduced ? undefined : { opacity: 0 }}
-          animate={reduced ? undefined : { opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.7 }}
-          className="mt-4"
-        >
-          <TrustStrip tourCount={tourCount} departureCount={departureCount} travellersServed={travellersServed} />
-        </motion.div>
-      </main>
-
-      {/* Mobile sticky CTA bar */}
-      <div className="fixed inset-x-0 bottom-0 z-20 flex flex-col gap-2 border-t border-white/10 bg-welcome-primary/95 p-4 backdrop-blur-md md:hidden">
-        <button
-          type="button"
-          onClick={goToTours}
-          className="min-h-12 w-full rounded-full bg-welcome-accent text-base font-bold text-welcome-primary"
-        >
-          Show my tours →
-        </button>
-        <Link href="/trip-cost-calculator" className="text-center text-sm font-semibold text-welcome-text/80 underline-offset-2 hover:underline">
-          Try the trip cost calculator
-        </Link>
       </div>
 
-      <SocialsTeaser />
+      {/* Fade-out transition before navigating away */}
+      {!reduced && (
+        <motion.div
+          className="pointer-events-none absolute inset-0 z-20 bg-black"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: leaving ? 1 : 0 }}
+          transition={{ duration: 0.35, ease: "easeInOut" }}
+          aria-hidden="true"
+        />
+      )}
     </div>
   );
 }
