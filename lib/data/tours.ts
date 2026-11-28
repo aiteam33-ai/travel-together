@@ -39,6 +39,36 @@ export async function getFastFillingDepartures(limit = 8, international?: boolea
     .slice(0, limit);
 }
 
+// Like getFastFillingDepartures, but deduped by tour — a tour with several
+// qualifying low-seat departures previously showed as several near-identical
+// cards; here it's one card with its qualifying dates as selectable chips.
+export async function getFastFillingDeparturesByTour(limit = 6, international?: boolean) {
+  const departures = await prisma.departure.findMany({
+    where: {
+      startDate: { gte: new Date() },
+      ...(international !== undefined ? { tour: { isInternational: international } } : {}),
+    },
+    include: { tour: true },
+    orderBy: { startDate: "asc" },
+    take: 120,
+  });
+
+  const qualifying = departures
+    .map((d) => ({ ...d, seatsLeft: d.totalSeats - d.seatsBooked }))
+    .filter((d) => d.seatsLeft > 0 && d.seatsLeft <= 8);
+
+  const byTour = new Map<string, typeof qualifying>();
+  for (const d of qualifying) {
+    const list = byTour.get(d.tourId) ?? [];
+    list.push(d);
+    byTour.set(d.tourId, list);
+  }
+
+  return Array.from(byTour.values())
+    .slice(0, limit)
+    .map((list) => ({ tour: list[0].tour, departures: list }));
+}
+
 export async function listToursForListing(filters: {
   destination?: string;
   category?: string;

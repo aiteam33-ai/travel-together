@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { formatDateIST } from "@/lib/pricing/format";
+import { BRAND } from "@/lib/brand";
 
 interface Contact {
   memberId: string;
@@ -187,7 +188,7 @@ export default function SafetyCenterPanel({
         <div className="mt-4 rounded-md border border-border bg-background p-3 text-sm">
           <p className="font-medium">Trip leader</p>
           <p>{tripLeader.name}{tripLeader.phone && ` · ${tripLeader.phone}`}</p>
-          <p className="mt-1 text-xs text-foreground-muted">24×7 support: +91 98765 43210</p>
+          <p className="mt-1 text-xs text-foreground-muted">24×7 support: {BRAND.supportPhone}</p>
         </div>
       )}
 

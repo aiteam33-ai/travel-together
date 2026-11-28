@@ -9,24 +9,28 @@ import RollButton from "../animations/RollButton";
 
 const VIDEO_INTERVAL_MS = 6000;
 
-// Real, free-to-use (Mixkit Free License, no attribution required) travel
-// scenery clips — muted/looped/playsInline below, with a photo poster as the
-// fallback frame while the video loads or if it fails, and reduced-motion
-// visitors get the poster only (no autoplay). Kept short (360p, each well
-// under 4MB) so this never becomes a performance problem on mobile data.
+// TODO(real footage): these are free-license Mixkit stock clips at 360p —
+// noticeably soft on a large hero. Swap `video` (and add `webm` once you
+// have a transcode, same base name) for real branded footage, ideally
+// 1080p/720p MP4 (H.264) + WebM pairs, each under ~4MB. The <video> element
+// below already supports multiple <source> tags (mp4 required, webm
+// optional) so dropping in new URLs here is the only change needed.
 const SLIDES = [
   {
     video: "https://assets.mixkit.co/videos/2168/2168-360.mp4",
+    webm: undefined as string | undefined,
     poster: tourPhotoUrl("https://images.unsplash.com/photo-1512343879784-a960bf40e7f2", 1600, 900),
     label: "Beach",
   },
   {
     video: "https://assets.mixkit.co/videos/4132/4132-360.mp4",
+    webm: undefined as string | undefined,
     poster: tourPhotoUrl("https://images.unsplash.com/photo-1581793745862-99fde7fa73d2", 1600, 900),
     label: "Mountains",
   },
   {
     video: "https://assets.mixkit.co/videos/41576/41576-360.mp4",
+    webm: undefined as string | undefined,
     poster: tourPhotoUrl("https://images.unsplash.com/photo-1661924326425-c14a6426d989", 1600, 900),
     label: "Road trip",
   },
@@ -69,14 +73,16 @@ export default function WelcomeHero() {
                 }}
                 className="h-full w-full object-cover"
                 poster={slide.poster}
-                src={slide.video}
                 muted
                 loop
                 playsInline
                 autoPlay={i === 0}
-                preload={i === 0 ? "auto" : "none"}
+                preload="metadata"
                 aria-hidden="true"
-              />
+              >
+                {slide.webm && <source src={slide.webm} type="video/webm" />}
+                <source src={slide.video} type="video/mp4" />
+              </video>
             )}
           </div>
         ))}

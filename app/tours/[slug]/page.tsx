@@ -1,4 +1,4 @@
-import Image from "next/image";
+import TourImage from "@/app/components/TourImage";
 import { notFound } from "next/navigation";
 import { getTourBySlug, parseJsonField } from "@/lib/data/tours";
 import TripCostCalculator from "@/app/components/pricing/TripCostCalculator";
@@ -40,14 +40,24 @@ export default async function TourDetailPage({ params, searchParams }: { params:
       <div className="space-y-10">
         <div id="overview">
           <div className="grid grid-cols-3 gap-2">
-            <div className="relative col-span-2 h-80 overflow-hidden rounded-xl">
-              <Image src={tour.heroImage} alt={`${tour.title} — illustrative placeholder photo`} fill className="object-cover" priority />
-            </div>
+            <TourImage
+              src={tour.heroImage}
+              alt={`${tour.title}, ${tour.durationDays}-day tour`}
+              aspect="fill"
+              containerClassName="col-span-2 h-80 overflow-hidden rounded-xl"
+              imageClassName="object-cover"
+              priority
+            />
             <div className="flex flex-col gap-2">
               {gallery.slice(0, 2).map((g, i) => (
-                <div key={i} className="relative h-[9.5rem] overflow-hidden rounded-xl">
-                  <Image src={g} alt={`${tour.title} gallery placeholder ${i + 1}`} fill className="object-cover" />
-                </div>
+                <TourImage
+                  key={i}
+                  src={g}
+                  alt={`${tour.title}, view ${i + 1}`}
+                  aspect="fill"
+                  containerClassName="h-[9.5rem] overflow-hidden rounded-xl"
+                  imageClassName="object-cover"
+                />
               ))}
             </div>
           </div>

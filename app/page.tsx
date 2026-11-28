@@ -5,7 +5,7 @@ import {
   ShieldCheck, Accessibility, Calculator, Star, MapPin, CalendarCheck,
 } from "lucide-react";
 import { prisma } from "@/lib/db/client";
-import { getTourCounts, getFastFillingDepartures, getFeaturedInternationalTours } from "@/lib/data/tours";
+import { getTourCounts, getFastFillingDeparturesByTour, getFeaturedInternationalTours } from "@/lib/data/tours";
 import TourCard from "./components/TourCard";
 import ScrollRow from "./components/landing/ScrollRow";
 import LandingIntro from "./components/landing/LandingIntro";
@@ -41,9 +41,11 @@ const REGION_ICONS: Record<IndiaRegion, React.ElementType> = {
 export default async function HomePage() {
   const [{ tourCount, departureCount, travellersServed }, fastFilling, worldTours, reviews] = await Promise.all([
     getTourCounts(),
-    getFastFillingDepartures(6, false),
+    getFastFillingDeparturesByTour(6, false),
     getFeaturedInternationalTours(6),
-    prisma.review.findMany({ orderBy: { createdAt: "desc" }, take: 6, include: { tour: true } }),
+    // Sample/seeded reviews are never shown publicly — only real, submitted
+    // reviews. See the "What travellers say" section below for the empty state.
+    prisma.review.findMany({ where: { isSampleData: false }, orderBy: { createdAt: "desc" }, take: 6, include: { tour: true } }),
   ]);
 
   return (
@@ -56,18 +58,18 @@ export default async function HomePage() {
         <RevealOnScroll as="section">
           <h2 className="font-heading mb-4 text-2xl font-bold">Departures filling fast</h2>
           <ScrollRow stagger>
-            {fastFilling.map((d) => (
-              <div key={d.id} className="w-72 shrink-0 snap-start">
+            {fastFilling.map(({ tour, departures }) => (
+              <div key={tour.id} className="w-72 shrink-0 snap-start">
                 <TourCard
-                  tourId={d.tour.id}
-                  slug={d.tour.slug}
-                  title={d.tour.title}
-                  heroImage={d.tour.heroImage}
-                  durationDays={d.tour.durationDays}
-                  durationNights={d.tour.durationNights}
-                  cheapestPricePerPerson={d.basePricePerPerson}
-                  nextDates={[d.startDate]}
-                  seatsLeft={d.seatsLeft}
+                  tourId={tour.id}
+                  slug={tour.slug}
+                  title={tour.title}
+                  heroImage={tour.heroImage}
+                  durationDays={tour.durationDays}
+                  durationNights={tour.durationNights}
+                  cheapestPricePerPerson={departures[0].basePricePerPerson}
+                  nextDates={departures.map((d) => d.startDate)}
+                  departureOptions={departures.map((d) => ({ id: d.id, startDate: d.startDate, seatsLeft: d.seatsLeft }))}
                 />
               </div>
             ))}
@@ -203,38 +205,37 @@ export default async function HomePage() {
         </StaggerReveal>
       </section>
 
-      {reviews.length > 0 && (
-        <section>
-          <h2 className="font-heading mb-4 text-2xl font-bold">What travellers say</h2>
-          <div className="space-y-4">
-            {[reviews.slice(0, Math.ceil(reviews.length / 2)), reviews.slice(Math.ceil(reviews.length / 2))]
-              .filter((row) => row.length > 0)
-              .map((row, rowIndex) => (
-                <Marquee key={rowIndex} durationSeconds={32} reverse={rowIndex === 1}>
-                  {row.map((r) => (
-                    <div key={r.id} className="w-80 shrink-0 rounded-xl border border-border bg-surface p-5 card-hover">
-                      <div className="flex items-center gap-3">
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-bold text-white">
-                          {r.name.charAt(0).toUpperCase()}
-                        </span>
-                        <div>
-                          <p className="text-sm font-semibold">
-                            {r.name} {r.verifiedBooking && <span className="ml-1 rounded bg-success/10 px-1.5 py-0.5 text-xs font-medium text-success">Verified booking</span>}
-                          </p>
-                          <div className="flex items-center gap-0.5 text-accent" aria-hidden="true">
-                            {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={12} fill="currentColor" strokeWidth={0} />)}
-                          </div>
-                        </div>
-                      </div>
-                      <p className="mt-3 text-sm">{r.text}</p>
-                      <p className="mt-2 text-xs text-foreground-muted">{r.tour.title} · {formatDateIST(r.travelDate)}{r.isSampleData ? " · Sample review" : ""}</p>
+      <section>
+        <h2 className="font-heading mb-4 text-2xl font-bold">What travellers say</h2>
+        {reviews.length > 0 ? (
+          <ScrollRow>
+            {reviews.map((r) => (
+              <div key={r.id} className="w-80 shrink-0 snap-start rounded-xl border border-border bg-surface p-5 card-hover">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-bold text-white">
+                    {r.name.charAt(0).toUpperCase()}
+                  </span>
+                  <div>
+                    <p className="text-sm font-semibold">
+                      {r.name} {r.verifiedBooking && <span className="ml-1 rounded bg-success/10 px-1.5 py-0.5 text-xs font-medium text-success">Verified booking</span>}
+                    </p>
+                    <div className="flex items-center gap-0.5 text-accent" aria-hidden="true">
+                      {Array.from({ length: r.rating }).map((_, i) => <Star key={i} size={12} fill="currentColor" strokeWidth={0} />)}
                     </div>
-                  ))}
-                </Marquee>
-              ))}
+                  </div>
+                </div>
+                <p className="mt-3 text-sm">{r.text}</p>
+                <p className="mt-2 text-xs text-foreground-muted">{r.tour.title} · {formatDateIST(r.travelDate)}</p>
+              </div>
+            ))}
+          </ScrollRow>
+        ) : (
+          <div className="rounded-xl border border-dashed border-border bg-surface p-8 text-center">
+            <p className="font-semibold">No traveller reviews yet</p>
+            <p className="mt-1 text-sm text-foreground-muted">Be the first to book and share how your trip went.</p>
           </div>
-        </section>
-      )}
+        )}
+      </section>
 
       <RevealOnScroll as="section" className="rounded-2xl border border-border bg-surface p-8">
         <div className="grid grid-cols-1 gap-6 text-center sm:grid-cols-3">
