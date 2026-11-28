@@ -32,13 +32,17 @@ export default function WelcomeExperience() {
 
   // Subtle cursor-driven parallax on the background video (desktop only,
   // disabled under reduced motion) — a small, capped shift for depth, not a
-  // full tilt effect.
+  // full tilt effect. Heavily damped, low-stiffness spring so it reads as a
+  // smoothed/stabilized drift rather than tracking the cursor directly —
+  // there's no real per-frame stabilization to apply (no footage-processing
+  // tool available here), so this plus the oversized crop below is the
+  // honest, purely-visual version: nothing ever snaps or reveals an edge.
   const pointerX = useMotionValue(0);
   const pointerY = useMotionValue(0);
-  const springX = useSpring(pointerX, { stiffness: 40, damping: 20 });
-  const springY = useSpring(pointerY, { stiffness: 40, damping: 20 });
-  const videoX = useTransform(springX, [-1, 1], [-14, 14]);
-  const videoY = useTransform(springY, [-1, 1], [-10, 10]);
+  const springX = useSpring(pointerX, { stiffness: 18, damping: 30, mass: 0.6 });
+  const springY = useSpring(pointerY, { stiffness: 18, damping: 30, mass: 0.6 });
+  const videoX = useTransform(springX, [-1, 1], [-10, 10]);
+  const videoY = useTransform(springY, [-1, 1], [-7, 7]);
 
   function onPointerMove(e: React.PointerEvent) {
     if (reduced || e.pointerType !== "mouse") return;
@@ -75,8 +79,19 @@ export default function WelcomeExperience() {
     >
       {/* Cinematic background video — aerial sunrise over mountain clouds.
           Wrapped in an oversized, parallax-shifted container so the small
-          cursor-driven shift never reveals an edge. */}
-      <motion.div className="absolute -inset-6" style={reduced ? undefined : { x: videoX, y: videoY }}>
+          cursor-driven shift never reveals an edge. A permanent ~4% crop
+          (scale 1.04 base) plus GPU-locked compositing is the "stabilization":
+          it swallows the drone footage's own micro-jitter at the frame edges
+          and stops sub-pixel transform rounding from reading as a flicker. */}
+      <motion.div
+        className="absolute -inset-6"
+        style={{
+          x: reduced ? undefined : videoX,
+          y: reduced ? undefined : videoY,
+          z: 0,
+          willChange: "transform",
+        }}
+      >
         <motion.video
           className="h-full w-full object-cover"
           src="/videos/welcome.mp4"
@@ -86,9 +101,10 @@ export default function WelcomeExperience() {
           loop
           playsInline
           preload="auto"
-          initial={{ scale: 1 }}
-          animate={reduced ? undefined : { scale: 1.08 }}
-          transition={reduced ? undefined : { duration: 20, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
+          style={{ z: 0, willChange: "transform" }}
+          initial={{ scale: 1.04 }}
+          animate={reduced ? undefined : { scale: 1.1 }}
+          transition={reduced ? undefined : { duration: 26, ease: [0.45, 0, 0.55, 1], repeat: Infinity, repeatType: "mirror" }}
         />
       </motion.div>
 
