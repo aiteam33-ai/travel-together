@@ -142,6 +142,13 @@ main, h1, h2, h3, p, button, a, input, select, textarea {
   left: 0;
 }
 
+/* The site header hides itself on scroll-down (translates off-screen), so a
+   sticky bar that normally sits just below it slides up to the top instead
+   of leaving a header-sized gap. Header.tsx toggles .header-hidden on <html>. */
+.header-hidden [data-sticky-nav] {
+  top: 0;
+}
+
 /* ---------- Shared small-feedback utilities (Stage 5) ---------- */
 .press-feedback {
   transition: transform var(--duration-micro) var(--ease-standard), box-shadow var(--duration-small) var(--ease-standard);

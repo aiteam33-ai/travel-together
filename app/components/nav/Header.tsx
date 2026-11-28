@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BRAND } from "@/lib/brand";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import { DEPARTURE_CITIES, DEPARTURE_CITY_LABELS, DepartureCityCode } from "@/lib/pricing/constants";
@@ -59,8 +59,29 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Other sticky bars positioned just below the header (e.g. the tour detail
+  // page's section tabs) read these off <html>: --header-h to sit exactly
+  // under the header (its height varies with breadcrumbs, the condensed
+  // state and screen width, so no fixed px offset fits), and .header-hidden
+  // to slide up into its spot while it's hidden instead of leaving a gap.
+  const headerRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const update = () => document.documentElement.style.setProperty("--header-h", `${el.offsetHeight}px`);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("header-hidden", hidden);
+  }, [hidden]);
+
   return (
     <header
+      ref={headerRef}
       className={`sticky top-0 z-40 border-b border-border/70 bg-surface/80 backdrop-blur-lg print:hidden transition-transform duration-300 ${
         hidden ? "-translate-y-full" : "translate-y-0"
       }`}

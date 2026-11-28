@@ -42,7 +42,8 @@ export default function SectionChips() {
   return (
     <nav
       aria-label="Tour sections"
-      className="sticky top-[73px] z-20 -mx-6 overflow-x-auto border-b border-border bg-surface/95 px-6 py-3 shadow-[var(--shadow-soft)] backdrop-blur lg:top-[88px]"
+      data-sticky-nav
+      className="sticky top-[var(--header-h,73px)] z-20 -mx-6 overflow-x-auto border-b border-border bg-surface/95 px-6 py-3 shadow-[var(--shadow-soft)] backdrop-blur transition-[top] duration-300"
     >
       <ul className="mx-auto flex max-w-[1280px] gap-2">
         {SECTIONS.map((s) => (

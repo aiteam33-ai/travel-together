@@ -28,7 +28,8 @@ export default function RevealOnScroll({
     const rect = el.getBoundingClientRect();
     if (rect.top < window.innerHeight) return; // already visible — show as-is
 
-    let trigger: { kill: () => void } | undefined;
+    let trigger: { kill: () => void; refresh: () => void } | undefined;
+    let onLoad: (() => void) | undefined;
     (async () => {
       const gsap = (await import("gsap")).default;
       const { ScrollTrigger } = await import("gsap/ScrollTrigger");
@@ -41,9 +42,24 @@ export default function RevealOnScroll({
         ease: "power2.out",
         scrollTrigger: { trigger: el, start: "top 85%", once: true },
       }).scrollTrigger;
+
+      // Images/video further up the page (gallery, hero) often finish
+      // loading after this trigger's position was computed, shifting layout
+      // and leaving the trigger point stale — which can leave this section
+      // stuck invisible past where it should already have revealed, reading
+      // as a blank gap. Recompute once everything's done loading.
+      onLoad = () => trigger?.refresh();
+      if (document.readyState === "complete") {
+        trigger?.refresh();
+      } else {
+        window.addEventListener("load", onLoad);
+      }
     })();
 
-    return () => trigger?.kill();
+    return () => {
+      trigger?.kill();
+      if (onLoad) window.removeEventListener("load", onLoad);
+    };
   }, [reduced]);
 
   const Component = Tag as React.ElementType;

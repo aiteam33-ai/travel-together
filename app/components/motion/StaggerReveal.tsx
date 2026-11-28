@@ -28,7 +28,8 @@ export default function StaggerReveal({
     const items = Array.from(el.children);
     if (items.length === 0) return;
 
-    let trigger: { kill: () => void } | undefined;
+    let trigger: { kill: () => void; refresh: () => void } | undefined;
+    let onLoad: (() => void) | undefined;
     (async () => {
       const gsap = (await import("gsap")).default;
       const { ScrollTrigger } = await import("gsap/ScrollTrigger");
@@ -42,9 +43,21 @@ export default function StaggerReveal({
         ease: "power2.out",
         scrollTrigger: { trigger: el, start: "top 88%", once: true },
       }).scrollTrigger;
+
+      // See RevealOnScroll — images/video loading after this trigger's
+      // position was computed can shift layout and leave it stale.
+      onLoad = () => trigger?.refresh();
+      if (document.readyState === "complete") {
+        trigger?.refresh();
+      } else {
+        window.addEventListener("load", onLoad);
+      }
     })();
 
-    return () => trigger?.kill();
+    return () => {
+      trigger?.kill();
+      if (onLoad) window.removeEventListener("load", onLoad);
+    };
   }, [reduced]);
 
   const Component = Tag as React.ElementType;
