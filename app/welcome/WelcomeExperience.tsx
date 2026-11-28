@@ -19,6 +19,19 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const PREFS_KEY = "parikrama_prefs";
 const SEEN_KEY = "welcome_seen";
 
+// Sets both the localStorage flag (read by this component) and a plain
+// cookie (read by middleware.ts) — middleware is what actually prevents the
+// flash of this page for returning visitors, redirecting before /welcome
+// ever renders; localStorage here is just a same-tab fallback/mirror.
+function markWelcomeSeen() {
+  try {
+    localStorage.setItem(SEEN_KEY, "1");
+  } catch {}
+  try {
+    document.cookie = `${SEEN_KEY}=1; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+  } catch {}
+}
+
 // Built directly from the same arrays /tours' filters use, so these chips
 // can never drift out of sync with the real tag/city values.
 const TRAVELLER_ICONS: Record<TravellerTag, string> = {
@@ -73,6 +86,9 @@ export default function WelcomeExperience({
     if (checkedRef.current) return;
     checkedRef.current = true;
 
+    // middleware.ts is the real no-flash guard (it redirects server-side
+    // before this page ever renders, based on the welcome_seen cookie) —
+    // this is just a same-tab fallback in case middleware is ever bypassed.
     let seen = false;
     try {
       seen = localStorage.getItem(SEEN_KEY) === "1";
@@ -81,9 +97,6 @@ export default function WelcomeExperience({
       router.replace("/");
       return;
     }
-    try {
-      localStorage.setItem(SEEN_KEY, "1");
-    } catch {}
     setReady(true);
   }, [router]);
 
@@ -97,6 +110,7 @@ export default function WelcomeExperience({
   if (!ready) return null;
 
   function goToTours() {
+    markWelcomeSeen();
     const params = new URLSearchParams();
     if (tag) params.set("tag", tag);
     if (city) params.set("city", city);
@@ -104,20 +118,16 @@ export default function WelcomeExperience({
   }
 
   return (
-    <div className={`${fraunces.variable} ${inter.variable} relative flex min-h-screen flex-col`} style={{ fontFamily: "var(--font-inter)" }}>
+    <div className={`${fraunces.variable} ${inter.variable} relative flex min-h-[100svh] flex-col`} style={{ fontFamily: "var(--font-inter)" }}>
       <HeroVideo />
 
       {/* Top bar */}
       <div className="flex items-center justify-between px-6 py-5 md:px-10">
-        <span className={fraunces.className + " text-lg font-bold text-[#FAF6EF]"}>Parikrama</span>
+        <span className={fraunces.className + " text-lg font-bold text-welcome-text"}>Parikrama</span>
         <Link
           href="/"
-          onClick={() => {
-            try {
-              localStorage.setItem(SEEN_KEY, "1");
-            } catch {}
-          }}
-          className="text-sm font-semibold text-[#FAF6EF]/80 underline-offset-2 hover:text-[#FAF6EF] hover:underline"
+          onClick={markWelcomeSeen}
+          className="text-sm font-semibold text-welcome-text/80 underline-offset-2 hover:text-welcome-text hover:underline"
         >
           Skip →
         </Link>
@@ -131,13 +141,13 @@ export default function WelcomeExperience({
           variants={reduced ? undefined : { visible: { transition: { staggerChildren: 0.12 } } }}
           className="flex flex-col items-center gap-4"
         >
-          <motion.p variants={fadeUp} className="text-sm font-bold uppercase tracking-[0.25em] text-[#F5A623]">
+          <motion.p variants={fadeUp} className="text-sm font-bold uppercase tracking-[0.25em] text-welcome-accent">
             Travel, together
           </motion.p>
-          <motion.h1 variants={fadeUp} className={fraunces.className + " max-w-2xl text-3xl font-bold leading-tight text-[#FAF6EF] md:text-5xl"}>
+          <motion.h1 variants={fadeUp} className={fraunces.className + " max-w-2xl text-3xl font-bold leading-tight text-welcome-text md:text-5xl"}>
             Know your whole trip cost, before you call anyone.
           </motion.h1>
-          <motion.p variants={fadeUp} className="max-w-xl text-base text-[#FAF6EF]/85 md:text-lg">
+          <motion.p variants={fadeUp} className="max-w-xl text-base text-welcome-text/85 md:text-lg">
             Fixed-departure tours, treks and pilgrimages across every region of India, planned with the
             friends and family you&apos;re travelling with.
           </motion.p>
@@ -149,7 +159,7 @@ export default function WelcomeExperience({
           transition={{ duration: 0.6, delay: 0.25, ease: EASE_OUT }}
           className="w-full"
         >
-          <h2 className="mb-4 text-sm font-bold uppercase tracking-wide text-[#FAF6EF]/70">Who&apos;s travelling?</h2>
+          <h2 className="mb-4 text-sm font-bold uppercase tracking-wide text-welcome-text/70">Who&apos;s travelling?</h2>
           <ChipGroup legend="Who's travelling?" options={TRAVELLER_OPTIONS} value={tag} onChange={setTag} columns={3} />
         </motion.section>
 
@@ -159,7 +169,7 @@ export default function WelcomeExperience({
           transition={{ duration: 0.6, delay: 0.4, ease: EASE_OUT }}
           className="w-full"
         >
-          <h2 className="mb-4 text-sm font-bold uppercase tracking-wide text-[#FAF6EF]/70">Where are you leaving from?</h2>
+          <h2 className="mb-4 text-sm font-bold uppercase tracking-wide text-welcome-text/70">Where are you leaving from?</h2>
           <ChipGroup legend="Where are you leaving from?" options={CITY_OPTIONS} value={city} onChange={setCity} variant="pill" />
         </motion.section>
 
@@ -173,13 +183,13 @@ export default function WelcomeExperience({
           <button
             type="button"
             onClick={goToTours}
-            className="min-h-12 rounded-full bg-[#F5A623] px-8 text-base font-bold text-[#12132B] shadow-lg shadow-black/20 transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            className="min-h-12 rounded-full bg-welcome-accent px-8 text-base font-bold text-welcome-primary shadow-lg shadow-black/20 transition-transform hover:scale-[1.02] active:scale-[0.98]"
           >
             Show my tours →
           </button>
           <Link
             href="/trip-cost-calculator"
-            className="text-sm font-semibold text-[#FAF6EF]/80 underline-offset-4 hover:text-[#FAF6EF] hover:underline"
+            className="text-sm font-semibold text-welcome-text/80 underline-offset-4 hover:text-welcome-text hover:underline"
           >
             Try the trip cost calculator
           </Link>
@@ -196,15 +206,15 @@ export default function WelcomeExperience({
       </main>
 
       {/* Mobile sticky CTA bar */}
-      <div className="fixed inset-x-0 bottom-0 z-20 flex flex-col gap-2 border-t border-white/10 bg-[#12132B]/95 p-4 backdrop-blur-md md:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-20 flex flex-col gap-2 border-t border-white/10 bg-welcome-primary/95 p-4 backdrop-blur-md md:hidden">
         <button
           type="button"
           onClick={goToTours}
-          className="min-h-12 w-full rounded-full bg-[#F5A623] text-base font-bold text-[#12132B]"
+          className="min-h-12 w-full rounded-full bg-welcome-accent text-base font-bold text-welcome-primary"
         >
           Show my tours →
         </button>
-        <Link href="/trip-cost-calculator" className="text-center text-sm font-semibold text-[#FAF6EF]/80 underline-offset-2 hover:underline">
+        <Link href="/trip-cost-calculator" className="text-center text-sm font-semibold text-welcome-text/80 underline-offset-2 hover:underline">
           Try the trip cost calculator
         </Link>
       </div>

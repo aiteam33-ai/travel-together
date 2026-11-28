@@ -81,10 +81,10 @@ export default function ChipGroup({
               onClick={() => onChange(opt.value)}
               whileHover={reduced ? undefined : { y: -2 }}
               whileTap={reduced ? undefined : { scale: 0.96 }}
-              className={`rounded-full border px-4 py-2 text-sm font-semibold backdrop-blur-md transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#F5A623] ${
+              className={`rounded-full border px-4 py-2 text-sm font-semibold backdrop-blur-md transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-welcome-accent ${
                 selected
-                  ? "border-[#F5A623] bg-[#F5A623] text-[#12132B]"
-                  : "border-white/20 bg-white/10 text-[#FAF6EF] hover:border-white/40 hover:bg-white/15"
+                  ? "border-welcome-accent bg-welcome-accent text-welcome-primary"
+                  : "border-white/20 bg-white/10 text-welcome-text hover:border-white/40 hover:bg-white/15"
               }`}
             >
               {opt.icon} {opt.label}
@@ -117,14 +117,14 @@ export default function ChipGroup({
               onClick={() => onChange(opt.value)}
               whileHover={reduced ? undefined : { y: -3 }}
               whileTap={reduced ? undefined : { scale: 0.97 }}
-              className={`relative flex flex-col items-center gap-2 rounded-2xl border px-3 py-4 text-center backdrop-blur-md transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#F5A623] ${
+              className={`relative flex flex-col items-center gap-2 rounded-2xl border px-3 py-4 text-center backdrop-blur-md transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-welcome-accent ${
                 selected
-                  ? "border-[#F5A623] bg-[#F5A623] text-[#12132B]"
-                  : "border-white/20 bg-white/10 text-[#FAF6EF] hover:border-white/40 hover:bg-white/15"
+                  ? "border-welcome-accent bg-welcome-accent text-welcome-primary"
+                  : "border-white/20 bg-white/10 text-welcome-text hover:border-white/40 hover:bg-white/15"
               }`}
             >
               {selected && (
-                <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#12132B] text-[#F5A623]">
+                <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-welcome-primary text-welcome-accent">
                   <Check size={12} strokeWidth={3} aria-hidden="true" />
                 </span>
               )}

@@ -18,9 +18,9 @@ export default function SocialsTeaser() {
       transition={{ duration: 0.5, delay: 0.9 }}
       className="fixed bottom-6 right-6 z-20 hidden max-w-xs rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur-md md:block"
     >
-      <p className="text-xs font-bold uppercase tracking-wide text-[#F5A623]">My Socials</p>
-      <p className="mt-1 text-sm text-[#FAF6EF]">Group chat &middot; Quick polls &middot; Split expenses &middot; Safety &amp; SOS</p>
-      <Link href="/my-socials" className="mt-2 inline-block text-sm font-semibold text-[#F5A623] underline underline-offset-2 hover:text-[#F5A623]/80">
+      <p className="text-xs font-bold uppercase tracking-wide text-welcome-accent">My Socials</p>
+      <p className="mt-1 text-sm text-welcome-text">Group chat &middot; Quick polls &middot; Split expenses &middot; Safety &amp; SOS</p>
+      <Link href="/my-socials" className="mt-2 inline-block text-sm font-semibold text-welcome-accent underline underline-offset-2 hover:text-welcome-accent/80">
         Discover My Socials
       </Link>
     </motion.div>

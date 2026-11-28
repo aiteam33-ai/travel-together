@@ -17,10 +17,10 @@ export default function TrustStrip({ tourCount, departureCount, travellersServed
   ];
 
   return (
-    <ul className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm font-medium text-[#FAF6EF]/80">
+    <ul className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm font-medium text-welcome-text/80">
       {items.map((item) => (
         <li key={item} className="flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#F5A623]" aria-hidden="true" />
+          <span className="h-1.5 w-1.5 rounded-full bg-welcome-accent" aria-hidden="true" />
           {item}
         </li>
       ))}

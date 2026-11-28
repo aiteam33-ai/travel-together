@@ -249,38 +249,62 @@ drawn text, so the PDF-font ₹ limitation noted above doesn't apply here).
 
 ## Welcome / onboarding screen (`/welcome`)
 
-A full-screen, chromeless landing page (no site header/footer — see "Chromeless routes" below) that asks
-two quick questions and redirects into a pre-filtered `/tours` list.
+A full-screen, chromeless landing page (no site header/footer — see "Chromeless routes" below): a looping
+scenery-montage background video, two quick questions, and a redirect into a pre-filtered `/tours` list.
 
-**Redirect + preference logic** (`app/welcome/WelcomeExperience.tsx`, all client-side, no server state):
-- On mount, it checks `localStorage.welcome_seen`. If already `"1"` (a returning visitor), it immediately
-  `router.replace("/")`s them back to the homepage — they never see the screen twice.
-- If not seen yet, it sets `welcome_seen = "1"` right away (so the flag is set the moment the page is
-  *seen*, not only if the visitor clicks through) and renders the page.
-- Both chip groups (`ChipGroup`, single-select, full `radiogroup`/`radio` ARIA + arrow-key navigation)
-  write their selection into `localStorage.parikrama_prefs` as `{ tag, city }` on every change — not just
-  on submit — so a selection survives even if the visitor leaves via "Skip".
-- "Show my tours →" builds `/tours?tag=...&city=...`, omitting whichever param wasn't selected (the
-  button is never disabled).
-- The homepage's `SearchBar` reads `parikrama_prefs.city` once on mount and pre-selects that departure
-  city in its own dropdown, so the preference carries forward even outside `/tours`.
-- A `useRef` guard in the mount effect exists specifically to survive React's dev-only Strict Mode
-  double-invoking effects — without it, the second (intentional, dev-only) invocation would read back the
-  `welcome_seen` flag the first invocation had just written and immediately redirect the page away from
-  itself on every fresh visit in `next dev`.
+**Redirect + preference logic**:
+- `middleware.ts` is the real no-flash guard: it checks the `welcome_seen` cookie on every request to
+  `/welcome` and redirects to `/` *before the page ever renders* if it's already set — a returning visitor
+  never sees so much as a flicker of this page. `app/welcome/WelcomeExperience.tsx` (client-side) also
+  checks `localStorage.welcome_seen` on mount as a same-tab fallback, in case middleware is ever bypassed
+  (e.g. a cached response).
+- The flag is set — both the cookie (via `markWelcomeSeen()`, read by middleware) and localStorage (read by
+  this page) — only when the visitor actually continues ("Show my tours →") or explicitly skips, not just
+  from viewing the page.
+- Both chip groups (`ChipGroup`, single-select, full `radiogroup`/`radio` ARIA + roving-tabindex arrow-key
+  navigation) write their selection into `localStorage.parikrama_prefs` as `{ tag, city }` on every change,
+  so a selection survives even across a "Skip".
+- "Show my tours →" builds `/tours?tag=...&city=...`, omitting whichever param wasn't selected (the button
+  is never disabled). The homepage's `SearchBar` reads `parikrama_prefs.city` once on mount and pre-selects
+  that departure city in its own dropdown.
+- A `useRef` guard in the mount effect survives React's dev-only Strict Mode double-invoking effects —
+  without it, the second (intentional, dev-only) invocation would read back the flag the first invocation
+  had just written and immediately redirect the page away from itself on every fresh visit in `next dev`.
 
 **Chromeless routes**: the root layout (`app/layout.tsx`) decides whether to render the normal site shell
 (Header/Footer/nav/floating widgets) or just bare `children`, based on the current path. Since a Server
-Component layout has no equivalent of `usePathname()`, `middleware.ts` forwards the request path as an
+Component layout has no equivalent of `usePathname()`, `middleware.ts` also forwards the request path as an
 `x-pathname` header, which the layout reads via `headers()`. Add a route's prefix to
 `CHROMELESS_PREFIXES` in `app/layout.tsx` to give any other page the same full-screen treatment.
 
-**Design system**: `/welcome` uses its own local palette (`#12132B` indigo, `#F5A623` saffron, `#FAF6EF`
-off-white) via Tailwind arbitrary values, scoped to its own components — it does not touch
-`app/globals.css`'s site-wide tokens. Headings use Fraunces, UI text uses Inter, both loaded via
-`next/font/google` directly in `WelcomeExperience.tsx` (this is a Tailwind v4 project with no
-`tailwind.config.js` to extend — fonts/colors for one route are simplest as local, scoped values rather
-than new global theme tokens).
+**Scenery video** (`app/components/welcome/HeroVideo.tsx` + `app/welcome/clips.ts`):
+- `clips.ts` exports a `CLIPS` array (`mp4`, optional `webm`, `poster`, `caption`, `durationMs`) —
+  `HeroVideo` just loops through whatever's in it, crossfading (1s opacity transition) from one clip to the
+  next on a timer, with the *next* clip's `<video>` already mounted underneath (`preload="auto"`) so there's
+  no blank frame at the crossfade.
+- The caption in the bottom-left fades with the active clip; a pause/play button (bottom-left, labelled via
+  `aria-label`) lets a visitor stop the motion; the video also auto-pauses whenever the tab isn't visible
+  (`document.visibilitychange`).
+- `prefers-reduced-motion`: no `<video>` element is mounted at all — only the active clip's static poster
+  image, full-bleed, no motion.
+- **Swapping scenery clips**: drop new files in `public/videos/`, add an entry to `CLIPS` in
+  `app/welcome/clips.ts` pointing at them (plus a poster image — any photo works, including a remote URL
+  via `tourPhotoUrl`), and remove/reorder entries as you like. Recommended specs per clip: **720p, under
+  4 MB, 6–8 seconds, mp4 (H.264) required** — a `.webm` source is optional (browsers fall back to mp4 fine
+  without it) and can be added later with any video tool if you want marginally smaller file sizes.
+- **Current clips are placeholders**: `hero-1/2/3.mp4` are free-license generic nature stock footage
+  (mountains / water / dusk architecture — not actually Indian locations), downloaded because there was no
+  `ffmpeg` available in this environment to re-encode or generate `.webm`/poster-frame versions from real
+  footage. Replace them with real India-location clips (Himalayan trek, Kerala backwaters, a Rajasthan fort,
+  Varanasi ghats, a Goa/Andaman coastline — the brief's suggested 5-clip order) for the real version of this
+  page; the `CLIPS` config and `HeroVideo` component need no changes to support that, just new files.
+
+**Design system**: `/welcome`'s palette (deep indigo `welcome-primary`, saffron `welcome-accent`, warm
+off-white `welcome-text`, and a 55%-opacity overlay base `welcome-overlay`) lives in `tailwind.config.ts`,
+merged into the site's existing Tailwind v4 `@theme` (defined in `app/globals.css`) via the `@config`
+directive at the top of that file. The `welcome-*` prefix keeps it from ever colliding with or overriding
+the site-wide tokens the rest of the app uses. Headings use Fraunces, UI text uses Inter, both loaded via
+`next/font/google` directly in `WelcomeExperience.tsx`.
 
 ## Tests
 
