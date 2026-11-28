@@ -59,9 +59,7 @@ export default function WelcomeExperience() {
 
   return (
     <div className="relative h-[100dvh] w-full overflow-hidden bg-black">
-      {/* Cinematic background video — swap the src below for the real clip
-          (/public/videos/welcome.mp4) and the poster for a real still
-          (/public/images/welcome-poster.jpg) when supplied. */}
+      {/* Cinematic background video — aerial sunrise over mountain clouds. */}
       <motion.video
         className="absolute inset-0 h-full w-full object-cover"
         src="/videos/welcome.mp4"
