@@ -40,10 +40,13 @@ export default function SectionChips() {
   }
 
   return (
-    <nav aria-label="Tour sections" className="sticky top-[73px] z-20 -mx-6 overflow-x-auto border-b border-border bg-surface/95 px-6 py-2 backdrop-blur lg:top-[88px]">
-      <ul className="flex gap-2">
+    <nav
+      aria-label="Tour sections"
+      className="sticky top-[73px] z-20 -mx-6 overflow-x-auto border-b border-border bg-surface/95 px-6 py-3 shadow-[var(--shadow-soft)] backdrop-blur lg:top-[88px]"
+    >
+      <ul className="mx-auto flex max-w-[1280px] gap-2">
         {SECTIONS.map((s) => (
-          <li key={s.id}>
+          <li key={s.id} className="shrink-0">
             <button
               type="button"
               onClick={() => scrollToSection(s.id)}

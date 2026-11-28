@@ -57,27 +57,36 @@ export default function TourPricePanel({
 
   return (
     <>
-      <div className="rounded-xl border border-border bg-surface p-4">
-        {departures.length > 0 ? (
-          <TripCostCalculator
-            tourId={tourId}
-            isInternational={isInternational}
-            departures={departures}
-            compact
-            onStateChange={(state) => {
-              setOutput(state.output);
-              setAdults(state.adults);
-              setDepartureId(state.departureId);
-            }}
-          />
-        ) : (
-          <p className="text-sm text-foreground-muted">No upcoming departures right now.</p>
-        )}
-        <div className="mt-4 flex flex-col gap-2">
+      <div className="space-y-5 rounded-xl border border-border bg-surface p-6 shadow-[var(--shadow-soft)]">
+        <section>
+          <h2 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground-muted">Price estimate</h2>
+          <div className="mt-3">
+            {departures.length > 0 ? (
+              <TripCostCalculator
+                tourId={tourId}
+                isInternational={isInternational}
+                departures={departures}
+                compact
+                onStateChange={(state) => {
+                  setOutput(state.output);
+                  setAdults(state.adults);
+                  setDepartureId(state.departureId);
+                }}
+              />
+            ) : (
+              <p className="text-sm text-foreground-muted">No upcoming departures right now.</p>
+            )}
+          </div>
+        </section>
+
+        <div className="border-t border-border" />
+
+        <section className="flex flex-col gap-2">
+          <h2 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground-muted">Book this trip</h2>
           <a
             ref={bookButtonRef}
             href={bookHref}
-            className="flex min-h-11 items-center justify-center rounded-md bg-accent px-4 text-center font-semibold text-white press-feedback hover:bg-accent-strong"
+            className="mt-1 flex min-h-11 items-center justify-center rounded-md bg-accent px-4 text-center font-semibold text-white press-feedback hover:bg-accent-strong"
           >
             Book now
           </a>
@@ -90,7 +99,7 @@ export default function TourPricePanel({
           >
             See full cost breakdown
           </button>
-        </div>
+        </section>
       </div>
 
       <SlideOverPanel open={panelOpen} onClose={() => setPanelOpen(false)} title="Full trip cost breakdown">
@@ -106,15 +115,15 @@ export default function TourPricePanel({
             animate={{ y: -extraOffset, opacity: 1 }}
             exit={reduced ? undefined : { y: 80, opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-x-0 bottom-14 z-30 border-t border-border bg-surface-raised px-4 py-3 shadow-[var(--shadow-raised)] md:bottom-0"
+            className="fixed inset-x-0 bottom-14 z-30 border-t border-border bg-surface-raised px-6 py-4 shadow-[var(--shadow-raised)] md:bottom-0"
           >
-            <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-3">
+            <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-3">
               <p className="text-sm font-medium">
                 {formatDateIST(departure.startDate)} · {adults} adult{adults > 1 ? "s" : ""} · <strong>{formatRupees(output.grandTotal)}</strong>
               </p>
               <a
                 href={bookHref}
-                className="flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white press-feedback"
+                className="flex min-h-11 items-center rounded-md bg-accent px-5 text-sm font-semibold text-white press-feedback"
               >
                 Book now
               </a>
