@@ -8,15 +8,12 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const seenWelcome = request.cookies.get("welcome_seen")?.value === "1";
 
-  // A returning visitor (welcome_seen cookie already set) never sees
-  // /welcome at all — redirected server-side, before the page renders, so
-  // there's no flash of the welcome screen before it bounces to "/".
-  if (request.nextUrl.pathname.startsWith("/welcome") && seenWelcome) {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
+  // /welcome is always directly reachable (bookmarked, shared, or just typed
+  // in) regardless of the cookie — only the homepage redirect below is
+  // gated on "first visit", so visiting /welcome itself never bounces away.
 
   // A first-time visitor landing on the homepage is sent to /welcome first
-  // instead — same cookie, opposite direction, so the two checks never loop.
+  // instead — the cookie is what makes this a one-time thing.
   if (request.nextUrl.pathname === "/" && !seenWelcome) {
     return NextResponse.redirect(new URL("/welcome", request.url));
   }
