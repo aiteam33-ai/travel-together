@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { listToursForListing } from "@/lib/data/tours";
+import { listToursForListing, getTrekCategoryFacets } from "@/lib/data/tours";
+import type { Season } from "@/lib/trek/seasons";
 import TourCard from "../components/TourCard";
 import SortSelect from "../components/SortSelect";
 import FilterRail from "../components/listing/FilterRail";
 import ResultsGrid from "../components/listing/ResultsGrid";
+import TreksByCategories from "../components/listing/TreksByCategories";
 
 interface SearchParams {
   destination?: string;
@@ -17,6 +19,8 @@ interface SearchParams {
   durationMax?: string;
   mealPlan?: string;
   difficulty?: string;
+  month?: string;
+  season?: string;
   sort?: string;
   city?: string;
 }
@@ -36,14 +40,20 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
     durationMax: sp.durationMax ? Number(sp.durationMax) : undefined,
     mealPlan: sp.mealPlan,
     difficulty: sp.difficulty,
+    month: sp.month ? Number(sp.month) : undefined,
+    season: sp.season as Season | undefined,
     sort: sp.sort,
   });
+
+  const trekFacets = sp.category === "TREK" ? await getTrekCategoryFacets() : null;
 
   return (
     <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[260px_1fr] lg:gap-8">
       <FilterRail sp={sp} />
 
       <section>
+        {trekFacets && <TreksByCategories facets={trekFacets} />}
+
         <div className="mb-4 flex items-center justify-between">
           <h1 className="font-heading text-2xl font-bold">{results.length} {results.length === 1 ? "tour" : "tours"} found</h1>
           <SortSelect />

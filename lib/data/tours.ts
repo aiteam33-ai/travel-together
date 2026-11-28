@@ -1,5 +1,6 @@
 import { prisma } from "../db/client";
 import { continentFor, splitCountries } from "../destinations";
+import { SEASON_MONTHS, seasonForMonth, type Season } from "../trek/seasons";
 
 export function parseJsonField<T>(value: string, fallback: T): T {
   try {
@@ -50,6 +51,8 @@ export async function listToursForListing(filters: {
   durationMax?: number;
   mealPlan?: string;
   difficulty?: string;
+  month?: number; // 1-12 — has at least one departure starting in this month
+  season?: Season;
   sort?: string;
 }) {
   const tours = await prisma.tour.findMany({
@@ -79,6 +82,11 @@ export async function listToursForListing(filters: {
   if (filters.maxBudget) result = result.filter((r) => (r.cheapestPricePerPerson ?? Infinity) <= filters.maxBudget! * 100);
   if (filters.durationMin) result = result.filter((r) => r.tour.durationDays >= filters.durationMin!);
   if (filters.durationMax) result = result.filter((r) => r.tour.durationDays <= filters.durationMax!);
+  if (filters.month) result = result.filter((r) => r.futureDepartures.some((d) => d.startDate.getMonth() + 1 === filters.month));
+  if (filters.season) {
+    const months = SEASON_MONTHS[filters.season];
+    result = result.filter((r) => r.futureDepartures.some((d) => months.includes(d.startDate.getMonth() + 1)));
+  }
 
   if (filters.sort === "price_asc") result.sort((a, b) => (a.cheapestPricePerPerson ?? 0) - (b.cheapestPricePerPerson ?? 0));
   else if (filters.sort === "price_desc") result.sort((a, b) => (b.cheapestPricePerPerson ?? 0) - (a.cheapestPricePerPerson ?? 0));
@@ -148,6 +156,67 @@ export async function getDestinationsByContinent(): Promise<Record<string, Desti
     list.sort((a, b) => a.country.localeCompare(b.country));
   }
   return byContinent;
+}
+
+export interface TrekCategoryFacets {
+  months: { month: number; count: number }[]; // months with at least one upcoming trek departure
+  seasons: { season: Season; count: number }[];
+  difficulties: { difficulty: string; count: number }[];
+  experienceTags: { tag: string; count: number }[]; // tags other than "TREK" itself
+  durationBuckets: { label: string; min: number; max?: number; count: number }[];
+  regions: { region: string; count: number }[];
+}
+
+// Everything shown in the "Treks by Categories" browse section — all derived
+// from real tour/departure data (never a hardcoded taxonomy), so a bucket
+// only appears once there's an actual trek behind it.
+export async function getTrekCategoryFacets(): Promise<TrekCategoryFacets> {
+  const treks = await prisma.tour.findMany({
+    where: { category: "TREK" },
+    include: { departures: { where: { startDate: { gte: new Date() } } } },
+  });
+
+  const monthCounts = new Map<number, number>();
+  const seasonCounts = new Map<Season, number>();
+  for (const tour of treks) {
+    const months = new Set(tour.departures.map((d) => d.startDate.getMonth() + 1));
+    for (const month of months) {
+      monthCounts.set(month, (monthCounts.get(month) ?? 0) + 1);
+      const season = seasonForMonth(month);
+      seasonCounts.set(season, (seasonCounts.get(season) ?? 0) + 1);
+    }
+  }
+
+  const difficultyCounts = new Map<string, number>();
+  const tagCounts = new Map<string, number>();
+  const regionCounts = new Map<string, number>();
+  const durationBuckets = [
+    { label: "4 days", min: 4, max: 4 },
+    { label: "5 days", min: 5, max: 5 },
+    { label: "6 days", min: 6, max: 6 },
+    { label: "7+ days", min: 7 },
+  ].map((b) => ({ ...b, count: 0 }));
+
+  for (const tour of treks) {
+    if (tour.difficulty) difficultyCounts.set(tour.difficulty, (difficultyCounts.get(tour.difficulty) ?? 0) + 1);
+    if (tour.region) regionCounts.set(tour.region, (regionCounts.get(tour.region) ?? 0) + 1);
+    for (const tag of tour.tags.split(",").map((t) => t.trim()).filter(Boolean)) {
+      if (tag === "TREK") continue;
+      tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+    }
+    for (const bucket of durationBuckets) {
+      if (tour.durationDays >= bucket.min && (bucket.max === undefined || tour.durationDays <= bucket.max)) bucket.count++;
+    }
+  }
+
+  return {
+    months: Array.from(monthCounts.entries()).sort((a, b) => a[0] - b[0]).map(([month, count]) => ({ month, count })),
+    seasons: Array.from(seasonCounts.entries()).map(([season, count]) => ({ season, count })),
+    difficulties: Array.from(difficultyCounts.entries()).map(([difficulty, count]) => ({ difficulty, count })),
+    experienceTags: Array.from(tagCounts.entries()).map(([tag, count]) => ({ tag, count })),
+    durationBuckets: durationBuckets.filter((b) => b.count > 0),
+    regions: Array.from(regionCounts.entries()).map(([region, count]) => ({ region, count })),
+  };
 }
 
 export async function getTourBySlug(slug: string) {
