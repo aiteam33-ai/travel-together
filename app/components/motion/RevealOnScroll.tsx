@@ -12,10 +12,12 @@ export default function RevealOnScroll({
   children,
   as: Tag = "div",
   className,
+  ...rest
 }: {
   children: React.ReactNode;
   as?: keyof React.JSX.IntrinsicElements;
   className?: string;
+  [key: string]: unknown;
 }) {
   const ref = useRef<HTMLElement | null>(null);
   const reduced = usePrefersReducedMotion();
@@ -46,7 +48,7 @@ export default function RevealOnScroll({
 
   const Component = Tag as React.ElementType;
   return (
-    <Component ref={ref} className={className}>
+    <Component ref={ref} className={className} {...rest}>
       {children}
     </Component>
   );

@@ -7,6 +7,7 @@ import SectionChips from "@/app/components/tour/SectionChips";
 import WishlistButton from "@/app/components/WishlistButton";
 import SeatsBar from "@/app/components/tour/SeatsBar";
 import { formatDateIST } from "@/lib/pricing/format";
+import RevealOnScroll from "@/app/components/motion/RevealOnScroll";
 
 interface ItineraryDay { day: number; title: string; description: string }
 interface Hotel { city: string; name: string; rating: number }
@@ -91,7 +92,7 @@ export default async function TourDetailPage({ params, searchParams }: { params:
           </section>
         )}
 
-        <section id="itinerary" aria-labelledby="itinerary-heading">
+        <RevealOnScroll as="section" id="itinerary" aria-labelledby="itinerary-heading">
           <h2 id="itinerary-heading" className="font-heading text-xl font-bold">Day-wise itinerary</h2>
           <ol className="mt-3 space-y-3">
             {itinerary.map((d) => (
@@ -101,9 +102,9 @@ export default async function TourDetailPage({ params, searchParams }: { params:
               </li>
             ))}
           </ol>
-        </section>
+        </RevealOnScroll>
 
-        <div id="inclusions" className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <RevealOnScroll as="div" id="inclusions" className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <section>
             <h2 className="font-heading text-xl font-bold">Inclusions</h2>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">{inclusions.map((i) => <li key={i}>{i}</li>)}</ul>
@@ -112,19 +113,19 @@ export default async function TourDetailPage({ params, searchParams }: { params:
             <h2 className="font-heading text-xl font-bold">Exclusions</h2>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">{exclusions.map((i) => <li key={i}>{i}</li>)}</ul>
           </section>
-        </div>
+        </RevealOnScroll>
 
-        <section id="hotels">
+        <RevealOnScroll as="section" id="hotels">
           <h2 className="font-heading text-xl font-bold">Hotels</h2>
           <ul className="mt-2 space-y-1 text-sm">{hotels.map((h) => <li key={h.name}>{h.city}: {h.name} ({h.rating}★, indicative)</li>)}</ul>
-        </section>
+        </RevealOnScroll>
 
-        <section>
+        <RevealOnScroll as="section">
           <h2 className="font-heading text-xl font-bold">Documents needed</h2>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">{documentsNeeded.map((d) => <li key={d}>{d}</li>)}</ul>
-        </section>
+        </RevealOnScroll>
 
-        <section id="policies" aria-labelledby="cancellation-heading">
+        <RevealOnScroll as="section" id="policies" aria-labelledby="cancellation-heading">
           <h2 id="cancellation-heading" className="font-heading text-xl font-bold">Cancellation policy</h2>
           <table className="mt-2 w-full text-sm">
             <thead><tr className="text-left"><th className="py-1">Cancelled before departure</th><th>Fee</th></tr></thead>
@@ -137,9 +138,9 @@ export default async function TourDetailPage({ params, searchParams }: { params:
               ))}
             </tbody>
           </table>
-        </section>
+        </RevealOnScroll>
 
-        <section aria-labelledby="faq-heading">
+        <RevealOnScroll as="section" aria-labelledby="faq-heading">
           <h2 id="faq-heading" className="font-heading text-xl font-bold">FAQs</h2>
           <div className="mt-2 space-y-2">
             {faqs.map((f) => (
@@ -149,10 +150,10 @@ export default async function TourDetailPage({ params, searchParams }: { params:
               </details>
             ))}
           </div>
-        </section>
+        </RevealOnScroll>
 
         {tour.reviews.length > 0 && (
-          <section id="reviews" aria-labelledby="reviews-heading">
+          <RevealOnScroll as="section" id="reviews" aria-labelledby="reviews-heading">
             <h2 id="reviews-heading" className="font-heading text-xl font-bold">Reviews</h2>
             <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
               {tour.reviews.map((r) => {
@@ -177,7 +178,7 @@ export default async function TourDetailPage({ params, searchParams }: { params:
                 );
               })}
             </div>
-          </section>
+          </RevealOnScroll>
         )}
 
         <section id="full-calculator" aria-labelledby="full-calc-heading">

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
 import { formatDateIST, formatRupees } from "@/lib/pricing/format";
+import StaggerReveal from "@/app/components/motion/StaggerReveal";
 
 export default async function BookingsPage() {
   const user = await requireUser();
@@ -17,7 +18,7 @@ export default async function BookingsPage() {
       {bookings.length === 0 ? (
         <p className="mt-4 text-foreground-muted">No bookings yet. <Link href="/tours" className="underline">Browse tours</Link></p>
       ) : (
-        <div className="mt-4 space-y-3">
+        <StaggerReveal as="div" className="mt-4 space-y-3">
           {bookings.map((b) => (
             <Link key={b.id} href={`/account/bookings/${b.id}`} className="block rounded-xl border border-border bg-surface p-4 hover:border-accent">
               <p className="font-semibold">{b.tour.title}</p>
@@ -27,7 +28,7 @@ export default async function BookingsPage() {
               <p className="text-sm">Paid {formatRupees(b.amountPaid)} of {formatRupees(b.amountDue)}</p>
             </Link>
           ))}
-        </div>
+        </StaggerReveal>
       )}
     </div>
   );

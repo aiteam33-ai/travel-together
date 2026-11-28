@@ -21,8 +21,14 @@ export default function ResultsGrid({ results }: { results: ResultItem[] }) {
   return (
     <LayoutGroup>
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-        {results.map((r) => (
-          <motion.div key={r.tourId} layout={!reduced} transition={{ duration: 0.25 }}>
+        {results.map((r, i) => (
+          <motion.div
+            key={r.tourId}
+            layout={!reduced}
+            initial={reduced ? false : { opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, delay: reduced ? 0 : Math.min(i, 8) * 0.04 }}
+          >
             <TourCard
               tourId={r.tourId}
               slug={r.slug}

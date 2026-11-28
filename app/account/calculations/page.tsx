@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
 import { formatDateIST, formatRupees } from "@/lib/pricing/format";
+import StaggerReveal from "@/app/components/motion/StaggerReveal";
 
 export default async function SavedCalculationsPage() {
   const user = await requireUser();
@@ -13,7 +14,7 @@ export default async function SavedCalculationsPage() {
       {calcs.length === 0 ? (
         <p className="mt-4 text-foreground-muted">No saved calculations yet.</p>
       ) : (
-        <ul className="mt-4 space-y-2">
+        <StaggerReveal as="ul" className="mt-4 space-y-2">
           {calcs.map((c) => {
             const output = JSON.parse(c.outputJson);
             return (
@@ -25,7 +26,7 @@ export default async function SavedCalculationsPage() {
               </li>
             );
           })}
-        </ul>
+        </StaggerReveal>
       )}
     </div>
   );

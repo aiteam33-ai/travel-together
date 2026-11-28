@@ -4,6 +4,8 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
 import { getSocialsDashboardData } from "@/lib/socials/dashboard-data";
 import MarkSocialsSeen from "@/app/components/socials/MarkSocialsSeen";
+import RevealOnScroll from "@/app/components/motion/RevealOnScroll";
+import StaggerReveal from "@/app/components/motion/StaggerReveal";
 
 export default async function SocialsPage() {
   const user = await getCurrentUser();
@@ -28,7 +30,7 @@ export default async function SocialsPage() {
         Connect with friends, plan together, and keep expenses straight — all in one place.
       </p>
 
-      <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+      <StaggerReveal as="div" className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
         {[
           { step: "1", title: "Invite your group", body: "Create a group and invite friends by link or mobile number.", href: "/socials/invite" },
           { step: "2", title: "Plan and calculate together", body: "Shortlist tours, chat, vote, and see each group's live cost estimate.", href: "/socials/plan" },
@@ -43,7 +45,7 @@ export default async function SocialsPage() {
             </span>
           </Link>
         ))}
-      </div>
+      </StaggerReveal>
 
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Link href="/socials/friends" className="rounded-xl border border-border bg-surface p-4 card-hover">
@@ -54,7 +56,7 @@ export default async function SocialsPage() {
         </Link>
       </div>
 
-      <div className="mt-6 rounded-xl border border-border bg-surface p-4">
+      <RevealOnScroll as="div" className="mt-6 rounded-xl border border-border bg-surface p-4">
         <h2 className="font-heading text-lg font-semibold">Group Discussions</h2>
         {recentFeed.length === 0 ? (
           <p className="mt-1 text-sm text-foreground-muted">No recent activity yet.</p>
@@ -67,7 +69,7 @@ export default async function SocialsPage() {
             ))}
           </ul>
         )}
-      </div>
+      </RevealOnScroll>
 
       <div className="mt-8">
         <h2 className="font-heading text-lg font-semibold">Your groups</h2>
@@ -79,7 +81,7 @@ export default async function SocialsPage() {
             </p>
           </div>
         ) : (
-          <div className="mt-3 space-y-3">
+          <StaggerReveal as="div" className="mt-3 space-y-3">
             {groups.map((group) => (
               <Link key={group.id} href={`/socials/${group.id}`} className="block rounded-xl border border-border bg-surface p-4 hover:border-accent">
                 <p className="font-semibold">{group.name}</p>
@@ -89,7 +91,7 @@ export default async function SocialsPage() {
                 </p>
               </Link>
             ))}
-          </div>
+          </StaggerReveal>
         )}
       </div>
     </div>
