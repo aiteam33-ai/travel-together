@@ -25,7 +25,7 @@ export default function SplitTitle({
 
   return (
     <motion.h1
-      className={className}
+      className={`${className ?? ""} whitespace-nowrap`}
       initial="hidden"
       animate="visible"
       variants={{ visible: { transition: { staggerChildren: 0.055, delayChildren: 0.1 } } }}
