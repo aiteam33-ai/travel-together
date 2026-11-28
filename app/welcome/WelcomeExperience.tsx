@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Playfair_Display } from "next/font/google";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
@@ -28,7 +27,6 @@ function markWelcomeSeen() {
 }
 
 export default function WelcomeExperience() {
-  const router = useRouter();
   const reduced = usePrefersReducedMotion();
   const [leaving, setLeaving] = useState(false);
 
@@ -49,15 +47,25 @@ export default function WelcomeExperience() {
     pointerY.set((e.clientY / innerHeight) * 2 - 1);
   }
 
+  // A full navigation (not next/navigation's router.push) — this is a
+  // one-time, once-per-visitor click leaving a chromeless page for a
+  // completely different layout, so there's nothing soft-navigation buys
+  // here, and a plain location change can't silently fail to complete the
+  // way a client-side transition occasionally did (reported: the fade-out
+  // would finish and leave a stuck black screen instead of reaching "/").
   function enter(e: React.MouseEvent) {
     e.preventDefault();
     markWelcomeSeen();
     if (reduced) {
-      router.push("/");
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.assign("/");
       return;
     }
     setLeaving(true);
-    setTimeout(() => router.push("/"), 350);
+    setTimeout(() => {
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.assign("/");
+    }, 350);
   }
 
   return (
