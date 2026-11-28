@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { prisma } from "../db/client";
 import { randomBytes } from "crypto";
 
@@ -32,6 +33,18 @@ export const getCurrentUser = cache(async () => {
   if (!session || session.expiresAt < new Date()) return null;
   return session.user;
 });
+
+// A parent layout's own redirect-if-no-user check does NOT re-run on a
+// client-side navigation between sibling pages under it (Next.js keeps the
+// layout mounted) — so a session that expires or is logged out elsewhere
+// while someone is already browsing, e.g., /account/*, can reach a subpage
+// with no guard having run at all. Every page that needs a logged-in user
+// should call this instead of asserting getCurrentUser()! non-null.
+export async function requireUser() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/");
+  return user;
+}
 
 export async function destroySession() {
   const jar = await cookies();

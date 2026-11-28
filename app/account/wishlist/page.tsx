@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
 
 export default async function WishlistPage() {
-  const user = await getCurrentUser();
-  const items = await prisma.wishlistItem.findMany({ where: { userId: user!.id }, include: { tour: true } });
+  const user = await requireUser();
+  const items = await prisma.wishlistItem.findMany({ where: { userId: user.id }, include: { tour: true } });
 
   return (
     <div>

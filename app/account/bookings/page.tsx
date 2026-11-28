@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
 import { formatDateIST, formatRupees } from "@/lib/pricing/format";
 
 export default async function BookingsPage() {
-  const user = await getCurrentUser();
+  const user = await requireUser();
   const bookings = await prisma.booking.findMany({
-    where: { userId: user!.id },
+    where: { userId: user.id },
     include: { tour: true, departure: true },
     orderBy: { createdAt: "desc" },
   });

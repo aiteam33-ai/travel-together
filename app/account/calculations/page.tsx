@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
 import { formatDateIST, formatRupees } from "@/lib/pricing/format";
 
 export default async function SavedCalculationsPage() {
-  const user = await getCurrentUser();
-  const calcs = await prisma.savedCalculation.findMany({ where: { userId: user!.id }, include: { tour: true }, orderBy: { createdAt: "desc" } });
+  const user = await requireUser();
+  const calcs = await prisma.savedCalculation.findMany({ where: { userId: user.id }, include: { tour: true }, orderBy: { createdAt: "desc" } });
 
   return (
     <div>

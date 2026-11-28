@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
 import { parseJsonField } from "@/lib/data/tours";
 import PriceBreakdown from "@/app/components/pricing/PriceBreakdown";
@@ -13,8 +13,8 @@ interface CancellationRule { daysBefore: number; feePercent: number }
 
 export default async function BookingDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const user = await getCurrentUser();
-  const booking = await prisma.booking.findFirst({ where: { id, userId: user!.id }, include: { tour: true, departure: true, payments: true } });
+  const user = await requireUser();
+  const booking = await prisma.booking.findFirst({ where: { id, userId: user.id }, include: { tour: true, departure: true, payments: true } });
   if (!booking) notFound();
 
   const { output } = JSON.parse(booking.pricingSnapshotJson);

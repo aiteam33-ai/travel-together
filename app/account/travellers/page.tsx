@@ -1,9 +1,9 @@
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
 
 export default async function SavedTravellersPage() {
-  const user = await getCurrentUser();
-  const travellers = await prisma.savedTraveller.findMany({ where: { userId: user!.id } });
+  const user = await requireUser();
+  const travellers = await prisma.savedTraveller.findMany({ where: { userId: user.id } });
 
   return (
     <div>

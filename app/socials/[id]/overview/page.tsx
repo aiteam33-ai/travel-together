@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireUser } from "@/lib/auth/session";
 import { requireMembership } from "@/lib/groups/access";
 import { prisma } from "@/lib/db/client";
 import { formatRupees } from "@/lib/pricing/format";
@@ -31,8 +31,8 @@ function asJson<T>(data: unknown): T {
 
 export default async function GroupOverviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const user = await getCurrentUser();
-  const ctx = await requireMembership(id, user!.id);
+  const user = await requireUser();
+  const ctx = await requireMembership(id, user.id);
   if (!ctx) return null;
 
   const group = await prisma.group.findUnique({

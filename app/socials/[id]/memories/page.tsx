@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireUser } from "@/lib/auth/session";
 import { requireMembership } from "@/lib/groups/access";
 import { prisma } from "@/lib/db/client";
 import MemoriesClient from "@/app/components/socials/MemoriesClient";
@@ -10,8 +10,8 @@ interface ItineraryDay {
 
 export default async function GroupMemoriesPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const user = await getCurrentUser();
-  const ctx = await requireMembership(id, user!.id);
+  const user = await requireUser();
+  const ctx = await requireMembership(id, user.id);
   if (!ctx) return null;
 
   const [group, photos, expenseTotal] = await Promise.all([

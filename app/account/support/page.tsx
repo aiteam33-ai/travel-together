@@ -1,10 +1,10 @@
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireUser } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
 import SupportForm from "@/app/components/account/SupportForm";
 
 export default async function SupportPage() {
-  const user = await getCurrentUser();
-  const requests = await prisma.supportRequest.findMany({ where: { userId: user!.id }, orderBy: { createdAt: "desc" } });
+  const user = await requireUser();
+  const requests = await prisma.supportRequest.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" } });
 
   return (
     <div>

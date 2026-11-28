@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireUser } from "@/lib/auth/session";
 import { requireMembership } from "@/lib/groups/access";
 import { prisma } from "@/lib/db/client";
 import BudgetCalculator from "@/app/components/socials/BudgetCalculator";
@@ -6,8 +6,8 @@ import SmartBudgetPlanner from "@/app/components/socials/SmartBudgetPlanner";
 
 export default async function GroupBudgetPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const user = await getCurrentUser();
-  const ctx = await requireMembership(id, user!.id);
+  const user = await requireUser();
+  const ctx = await requireMembership(id, user.id);
   if (!ctx) return null;
 
   const joinedCount = await prisma.groupMember.count({ where: { groupId: id, status: "JOINED" } });
