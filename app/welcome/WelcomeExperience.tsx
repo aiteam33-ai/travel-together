@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Playfair_Display } from "next/font/google";
@@ -31,7 +31,6 @@ export default function WelcomeExperience() {
   const router = useRouter();
   const reduced = usePrefersReducedMotion();
   const [leaving, setLeaving] = useState(false);
-  const checkedRef = useRef(false);
 
   // Subtle cursor-driven parallax on the background video (desktop only,
   // disabled under reduced motion) — a small, capped shift for depth, not a
@@ -49,21 +48,6 @@ export default function WelcomeExperience() {
     pointerX.set((e.clientX / innerWidth) * 2 - 1);
     pointerY.set((e.clientY / innerHeight) * 2 - 1);
   }
-
-  useEffect(() => {
-    // React's dev StrictMode double-invokes effects; this guard keeps the
-    // one-time "already seen" check from running (and self-redirecting) twice.
-    if (checkedRef.current) return;
-    checkedRef.current = true;
-
-    // middleware.ts is the real no-flash guard (redirects server-side before
-    // this page ever renders) — this is just a same-tab fallback.
-    let seen = false;
-    try {
-      seen = localStorage.getItem(SEEN_KEY) === "1";
-    } catch {}
-    if (seen) router.replace("/");
-  }, [router]);
 
   function enter(e: React.MouseEvent) {
     e.preventDefault();
