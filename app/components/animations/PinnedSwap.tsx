@@ -55,20 +55,30 @@ export default function PinnedSwap({
         ))}
       </div>
 
-      {/* Desktop: pinned, scroll-driven swap */}
-      <div ref={ref} className="relative hidden md:block" style={{ height: `${items.length * 60}vh` }}>
-        <div className="sticky top-24 flex min-h-[40vh] items-center">
-          {items.map((item, i) => (
-            <motion.div
-              key={i}
-              className="absolute inset-0 flex items-center"
-              animate={{ opacity: active === i ? 1 : 0, y: active === i ? 0 : 12 }}
-              transition={{ duration: 0.35, ease: "easeOut" }}
-              style={{ pointerEvents: active === i ? "auto" : "none" }}
-            >
-              <div className={className}>{item}</div>
-            </motion.div>
-          ))}
+      {/* Desktop: pinned, scroll-driven swap. The sticky layer is sized to
+          the content (not the full viewport) so there's no large empty gap
+          of bare background around the small card while scrolling through
+          the track. */}
+      <div ref={ref} className="relative hidden md:block" style={{ height: `${items.length * 45}vh` }}>
+        <div className="sticky top-24 flex items-center justify-center py-10">
+          <div className="relative w-full">
+            {items.map((item, i) => (
+              <motion.div
+                key={i}
+                className="absolute inset-0 flex items-center justify-center"
+                animate={{ opacity: active === i ? 1 : 0, y: active === i ? 0 : 12 }}
+                transition={{ duration: 0.35, ease: "easeOut" }}
+                style={{ pointerEvents: active === i ? "auto" : "none" }}
+              >
+                <div className={className}>{item}</div>
+              </motion.div>
+            ))}
+            {/* Reserves real layout height (the absolute items above don't), so the
+                centering container isn't collapsed to zero height. */}
+            <div className="invisible" aria-hidden="true">
+              <div className={className}>{items[0]}</div>
+            </div>
+          </div>
         </div>
       </div>
     </>

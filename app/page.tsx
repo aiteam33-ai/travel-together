@@ -16,7 +16,6 @@ import StaggerReveal from "./components/motion/StaggerReveal";
 import CountUp from "./components/motion/CountUp";
 import Marquee from "./components/animations/Marquee";
 import ScrollWordHighlight from "./components/animations/ScrollWordHighlight";
-import PinnedSwap from "./components/animations/PinnedSwap";
 import { formatDateIST } from "@/lib/pricing/format";
 import { TRAVELLER_TAGS, DEPARTURE_CITIES, DEPARTURE_CITY_LABELS, INDIA_REGIONS, INDIA_REGION_LABELS, TravellerTag, IndiaRegion } from "@/lib/pricing/constants";
 
@@ -187,14 +186,13 @@ export default async function HomePage() {
 
       <section>
         <h2 className="font-heading mb-4 text-2xl font-bold">Why travel with us</h2>
-        <PinnedSwap
-          className="w-full rounded-xl border border-border bg-surface p-6 card-hover md:max-w-xl"
-          items={[
+        <StaggerReveal as="div" className="grid grid-cols-1 gap-5 md:grid-cols-3">
+          {[
             { icon: ShieldCheck, q: "Is it safe for solo women travellers?", a: "Our women-only departures carry a woman tour manager and all-women local support staff, start to finish." },
             { icon: Accessibility, q: "What if my parents can't walk long distances?", a: "Senior-citizen departures use fewer hotel changes, shorter drive segments, and a slower daily pace." },
             { icon: Calculator, q: "Why does the price look higher than an ad I saw?", a: "Our price panel and calculator show the full door-to-door cost up front, including taxes — not just a joining fare." },
           ].map((item) => (
-            <div key={item.q}>
+            <div key={item.q} className="rounded-xl border border-border bg-surface p-5 card-hover">
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-soft text-accent">
                 <item.icon size={20} aria-hidden="true" />
               </span>
@@ -202,7 +200,7 @@ export default async function HomePage() {
               <p className="mt-2 text-sm text-foreground-muted">{item.a}</p>
             </div>
           ))}
-        />
+        </StaggerReveal>
       </section>
 
       {reviews.length > 0 && (
