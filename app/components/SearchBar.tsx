@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DEPARTURE_CITIES, DEPARTURE_CITY_LABELS } from "@/lib/pricing/constants";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 
@@ -12,6 +12,18 @@ export default function SearchBar() {
   const [duration, setDuration] = useState("");
   const [budget, setBudget] = useState("");
   const [city, setCity] = useState("MUMBAI");
+
+  // Pre-select from the /welcome onboarding choice, if any — read after
+  // mount (not in the initializer) so this never runs during SSR, where
+  // localStorage doesn't exist.
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("parikrama_prefs");
+      const savedCity = raw ? JSON.parse(raw)?.city : null;
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of a stored preference on mount
+      if (typeof savedCity === "string" && savedCity) setCity(savedCity);
+    } catch {}
+  }, []);
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();

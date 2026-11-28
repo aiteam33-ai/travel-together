@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { headers } from "next/headers";
 import { Hind, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { BRAND } from "@/lib/brand";
@@ -28,7 +29,16 @@ export const metadata: Metadata = {
   description: BRAND.tagline,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+// Full-screen, chromeless routes (their own onboarding/landing experience,
+// not the normal site shell) list their path prefixes here. The pathname
+// comes from middleware.ts, which is the only way a Server Component layout
+// can know the current path (there's no server-side usePathname).
+const CHROMELESS_PREFIXES = ["/welcome"];
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const pathname = (await headers()).get("x-pathname") ?? "";
+  const chromeless = CHROMELESS_PREFIXES.some((p) => pathname.startsWith(p));
+
   return (
     <html lang="en" className={`${hind.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-background text-foreground">
@@ -40,18 +50,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <SocialsProvider>
                     <FloatingStackProvider>
                       <LenisProvider />
-                      <TopLoadingBar />
-                      <Suspense fallback={null}>
-                        <Header />
-                      </Suspense>
-                      <main id="main-content" className="mx-auto w-full max-w-[1440px] flex-1 px-6 py-8 pb-24 md:pb-8">
-                        <PageTransition>{children}</PageTransition>
-                      </main>
-                      <Footer />
-                      <HelpButton />
-                      <CompareTray />
-                      <BackToTop />
-                      <BottomTabBar />
+                      {chromeless ? (
+                        children
+                      ) : (
+                        <>
+                          <TopLoadingBar />
+                          <Suspense fallback={null}>
+                            <Header />
+                          </Suspense>
+                          <main id="main-content" className="mx-auto w-full max-w-[1440px] flex-1 px-6 py-8 pb-24 md:pb-8">
+                            <PageTransition>{children}</PageTransition>
+                          </main>
+                          <Footer />
+                          <HelpButton />
+                          <CompareTray />
+                          <BackToTop />
+                          <BottomTabBar />
+                        </>
+                      )}
                     </FloatingStackProvider>
                   </SocialsProvider>
                 </WishlistProvider>
