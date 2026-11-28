@@ -19,6 +19,12 @@ import ScrollWordHighlight from "./components/animations/ScrollWordHighlight";
 import { formatDateIST } from "@/lib/pricing/format";
 import { TRAVELLER_TAGS, DEPARTURE_CITIES, DEPARTURE_CITY_LABELS, INDIA_REGIONS, INDIA_REGION_LABELS, TravellerTag, IndiaRegion } from "@/lib/pricing/constants";
 
+// Statically generated (no per-request DB round-trip) but revalidated every
+// 60s — seat counts and "filling fast" departures shown here are live
+// inventory, so this can't be frozen at build time forever like a pure
+// marketing page; ISR keeps it fast while staying reasonably fresh.
+export const revalidate = 60;
+
 const TRAVELLER_TAG_ICONS: Record<TravellerTag, React.ElementType> = {
   FAMILY: Users,
   HONEYMOON: Heart,

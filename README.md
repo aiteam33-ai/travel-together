@@ -271,11 +271,14 @@ scenery-montage background video, two quick questions, and a redirect into a pre
   without it, the second (intentional, dev-only) invocation would read back the flag the first invocation
   had just written and immediately redirect the page away from itself on every fresh visit in `next dev`.
 
-**Chromeless routes**: the root layout (`app/layout.tsx`) decides whether to render the normal site shell
-(Header/Footer/nav/floating widgets) or just bare `children`, based on the current path. Since a Server
-Component layout has no equivalent of `usePathname()`, `middleware.ts` also forwards the request path as an
-`x-pathname` header, which the layout reads via `headers()`. Add a route's prefix to
-`CHROMELESS_PREFIXES` in `app/layout.tsx` to give any other page the same full-screen treatment.
+**Chromeless routes**: the root layout (`app/layout.tsx`) always renders the normal site shell
+(Header/Footer/nav/floating widgets) — a fully chromeless page like `/welcome` instead covers them with its
+own `fixed inset-0` overlay (see `app/welcome/WelcomeExperience.tsx`) and hides the body scrollbar for as
+long as it's mounted. This used to be decided per-request in the layout via `headers()` (reading a pathname
+header `middleware.ts` forwarded), but calling `headers()`/`cookies()` in the root layout forces the *entire
+app* into fully dynamic, no-static-generation rendering — a sitewide performance cost paid on every route
+just for one chromeless page. Give any other page the same full-screen treatment by having its own content
+cover the shell the same way, rather than adding back a path-based check in the layout.
 
 **Scenery video** (`app/components/welcome/HeroVideo.tsx` + `app/welcome/clips.ts`):
 - `clips.ts` exports a `CLIPS` array (`mp4`, optional `webm`, `poster`, `caption`, `durationMs`) —

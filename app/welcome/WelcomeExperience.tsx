@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Playfair_Display } from "next/font/google";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
@@ -51,6 +51,20 @@ export default function WelcomeExperience() {
     pointerY.set((e.clientY / innerHeight) * 2 - 1);
   }
 
+  // This component is `fixed`, covering the normal site chrome (Header,
+  // Footer, BottomTabBar) that the root layout now always renders — that's
+  // what let the layout drop its headers()-based chromeless check, which
+  // was forcing every single page on the site into fully dynamic (no
+  // static generation) rendering. Hide the body's own scrollbar while this
+  // is mounted so the ordinary page underneath can't be scrolled into view.
+  useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, []);
+
   // A full navigation (not next/navigation's router.push) — this is a
   // one-time, once-per-visitor click leaving a chromeless page for a
   // completely different layout, so there's nothing soft-navigation buys
@@ -74,7 +88,7 @@ export default function WelcomeExperience() {
 
   return (
     <div
-      className="relative h-[100dvh] w-full overflow-hidden bg-black"
+      className="fixed inset-0 z-[100] overflow-hidden bg-black"
       onPointerMove={onPointerMove}
     >
       {/* Cinematic background video — aerial sunrise over mountain clouds.
