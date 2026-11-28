@@ -4,9 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Playfair_Display } from "next/font/google";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Compass } from "lucide-react";
 import { usePrefersReducedMotion } from "@/lib/motion/reduced-motion";
+import ParticleField from "../components/welcome/ParticleField";
+import SplitTitle from "../components/welcome/SplitTitle";
 
 const playfair = Playfair_Display({ subsets: ["latin"], weight: ["600", "700"], variable: "--font-playfair" });
 
@@ -30,6 +32,23 @@ export default function WelcomeExperience() {
   const reduced = usePrefersReducedMotion();
   const [leaving, setLeaving] = useState(false);
   const checkedRef = useRef(false);
+
+  // Subtle cursor-driven parallax on the background video (desktop only,
+  // disabled under reduced motion) — a small, capped shift for depth, not a
+  // full tilt effect.
+  const pointerX = useMotionValue(0);
+  const pointerY = useMotionValue(0);
+  const springX = useSpring(pointerX, { stiffness: 40, damping: 20 });
+  const springY = useSpring(pointerY, { stiffness: 40, damping: 20 });
+  const videoX = useTransform(springX, [-1, 1], [-14, 14]);
+  const videoY = useTransform(springY, [-1, 1], [-10, 10]);
+
+  function onPointerMove(e: React.PointerEvent) {
+    if (reduced || e.pointerType !== "mouse") return;
+    const { innerWidth, innerHeight } = window;
+    pointerX.set((e.clientX / innerWidth) * 2 - 1);
+    pointerY.set((e.clientY / innerHeight) * 2 - 1);
+  }
 
   useEffect(() => {
     // React's dev StrictMode double-invokes effects; this guard keeps the
@@ -58,49 +77,46 @@ export default function WelcomeExperience() {
   }
 
   return (
-    <div className="relative h-[100dvh] w-full overflow-hidden bg-black">
-      {/* Cinematic background video — aerial sunrise over mountain clouds. */}
-      <motion.video
-        className="absolute inset-0 h-full w-full object-cover"
-        src="/videos/welcome.mp4"
-        poster="/images/welcome-poster.jpg"
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        initial={{ scale: 1 }}
-        animate={reduced ? undefined : { scale: 1.08 }}
-        transition={reduced ? undefined : { duration: 20, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
-      />
+    <div
+      className="relative h-[100dvh] w-full overflow-hidden bg-black"
+      onPointerMove={onPointerMove}
+    >
+      {/* Cinematic background video — aerial sunrise over mountain clouds.
+          Wrapped in an oversized, parallax-shifted container so the small
+          cursor-driven shift never reveals an edge. */}
+      <motion.div className="absolute -inset-6" style={reduced ? undefined : { x: videoX, y: videoY }}>
+        <motion.video
+          className="h-full w-full object-cover"
+          src="/videos/welcome.mp4"
+          poster="/images/welcome-poster.jpg"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          initial={{ scale: 1 }}
+          animate={reduced ? undefined : { scale: 1.08 }}
+          transition={reduced ? undefined : { duration: 20, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
+        />
+      </motion.div>
 
-      {/* Readability overlay — ~35% black */}
-      <div className="absolute inset-0 bg-black/35" aria-hidden="true" />
+      {/* Ambient floating dust over the video, under the readability overlay */}
+      {!reduced && <ParticleField />}
+
+      {/* Readability overlay — radial vignette, darker at the edges */}
+      <div
+        className="absolute inset-0 z-[6] bg-black/25"
+        style={{ backgroundImage: "radial-gradient(ellipse at center, rgba(0,0,0,0) 35%, rgba(0,0,0,0.45) 100%)" }}
+        aria-hidden="true"
+      />
 
       {/* Content */}
       <div className="relative z-10 flex h-full w-full flex-col items-center justify-center gap-10 px-6 text-center">
-        <motion.h1
+        <SplitTitle
+          text="Parikrama"
+          reduced={reduced}
           className={`${playfair.className} text-[clamp(2.75rem,9vw,6.5rem)] font-bold tracking-[0.04em] text-white`}
-          initial={{ opacity: 0, y: 24 }}
-          animate={{
-            opacity: 1,
-            y: 0,
-            textShadow: reduced
-              ? "0 0 24px rgba(255,255,255,0.25)"
-              : ["0 0 18px rgba(255,255,255,0.15)", "0 0 34px rgba(255,255,255,0.5)", "0 0 18px rgba(255,255,255,0.15)"],
-          }}
-          transition={
-            reduced
-              ? { duration: 0.8, ease: "easeOut" }
-              : {
-                  opacity: { duration: 0.8, ease: "easeOut" },
-                  y: { duration: 0.8, ease: "easeOut" },
-                  textShadow: { duration: 4, ease: "easeInOut", repeat: Infinity, delay: 0.8 },
-                }
-          }
-        >
-          Parikrama
-        </motion.h1>
+        />
 
         <motion.div
           initial={{ opacity: 0, y: 16 }}
